@@ -63,6 +63,12 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 #screen-multiplayer .screen-heading{margin-bottom:24px}
 @media(max-width:650px){.home-play-area{grid-template-columns:1fr;gap:4px}.home-play-copy{padding:12px 4px}.home-play-button{min-height:145px}.mode-choice-grid{grid-template-columns:1fr;gap:13px}.mode-choice{min-height:220px;padding:18px}}
 
+
+.cloze-promo{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:22px;padding:22px;background:linear-gradient(120deg,#fff5dc,#f1eafe);border:1px solid #f0dfb5;border-radius:20px}.cloze-promo h2{margin:7px 0;font-size:21px}.cloze-promo p{margin:0;color:var(--muted);line-height:1.5}
+.cloze-card{max-width:850px;margin:18px auto;background:white;border:1px solid var(--line);border-radius:22px;padding:clamp(17px,4vw,30px);box-shadow:0 8px 25px #17324d0d}.cloze-story-heading{padding:18px;background:#f1f8f6;border-radius:16px;margin-bottom:20px}.cloze-story-heading span{font-size:12px;letter-spacing:1px;font-weight:800;color:var(--teal)}.cloze-story-heading h2{margin:8px 0}.cloze-story-heading p{margin:0}
+.cloze-story-text{font-size:18px;line-height:2.2}.cloze-blank{display:inline-block;width:min(155px,30vw);padding:5px 8px;border:2px dashed #91b9b4;border-radius:9px;font:inherit;font-size:16px;background:#fbfefd;color:var(--ink);vertical-align:middle}.cloze-blank:focus{outline:3px solid #bde4dc;border-color:var(--teal)}.cloze-blank.correct{border:2px solid #16845b;background:#e9f8ef}.cloze-blank.wrong{border:2px solid #c65b50;background:#fff0ed}.cloze-hint{display:block;font-size:12px;color:var(--muted);line-height:1.3;margin:1px 0 8px}
+.cloze-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.cloze-feedback{margin-top:15px;font-weight:650;line-height:1.6}.cloze-feedback:empty{display:none}@media(max-width:600px){.cloze-promo{align-items:flex-start;flex-direction:column}.cloze-story-text{font-size:16px;line-height:2.3}.cloze-blank{width:min(125px,34vw);font-size:15px}}
+
 </style>
 </head>
 <body>
@@ -130,6 +136,22 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
    <button class="game" onclick="launchGamePage('Battle Literasi')"><span class="emoji">🏆</span><strong>Battle Literasi</strong><small>Kumpulkan poin dari tantangan.</small></button>
    <button class="game" onclick="launchGamePage('Misi Penyelamatan Buku')"><span class="emoji">📖</span><strong>Misi Penyelamatan Buku</strong><small>Selesaikan misi penyelamatan buku.</small></button>
   </div>
+
+  <div class="cloze-promo">
+   <div><span class="emoji">✍️</span><h2>Kuis Lengkapi Cerita Rakyat</h2><p>Isi kata-kata yang hilang agar cerita menjadi utuh. Latih kosakata dan pemahaman bacaanmu!</p></div>
+   <button class="btn gold" onclick="goScreen('screen-cloze')">Mulai Kuis →</button>
+  </div>
+ </section>
+ <section class="app-screen hidden" id="screen-cloze">
+  <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
+  <div class="screen-heading"><span>✍️ TANTANGAN KOSAKATA</span><h1>Kuis Lengkapi Cerita Rakyat</h1><p>Baca ceritanya dengan teliti, lalu isi kata yang paling tepat pada setiap bagian kosong.</p></div>
+  <div class="cloze-card">
+   <div class="cloze-story-heading"><span>📚 CERITA RAKYAT NUSANTARA</span><h2 id="cloze-story-title">Timun Mas</h2><p class="muted">Bacalah setiap kalimat dan lengkapi kata yang hilang.</p></div>
+   <div id="cloze-story-text" class="cloze-story-text"></div>
+   <div class="cloze-actions"><button class="btn" onclick="checkClozeAnswers()">Periksa Jawaban</button><button class="btn secondary" onclick="resetClozeQuiz()">Ulangi</button></div>
+   <div id="cloze-feedback" class="cloze-feedback" aria-live="polite"></div>
+  </div>
+  <p class="muted small-note">Kuis contoh ini tersimpan di dalam halaman website dan dapat dimainkan tanpa koneksi internet setelah halaman berhasil dimuat.</p>
  </section>
  <section class="app-screen hidden" id="screen-battle">
   <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
@@ -577,6 +599,29 @@ async function onlineSubmitAnswer(index){
  }catch(error){onlineSetStatus('Jawaban belum tersimpan: '+error.message)}
 }
 
+
+const clozeStoryItems=[
+ {before:'Pada zaman dahulu, hiduplah seorang perempuan bernama Mbok Srini. Ia tinggal seorang diri dan sangat ingin mempunyai seorang ',answer:'anak',hint:'Seseorang yang masih kecil dan menjadi keturunan orang tua.',after:'.'},
+ {before:'Suatu hari, Mbok Srini bertemu dengan seorang ',answer:'raksasa',hint:'Makhluk besar dalam cerita dongeng.',after:' yang memberinya biji mentimun.'},
+ {before:'Mbok Srini menanam biji itu. Beberapa waktu kemudian, tumbuh tanaman ',answer:'mentimun',hint:'Buah berwarna hijau yang sering dijadikan lalapan.',after:' yang sangat besar.'},
+ {before:'Ketika buah itu dibelah, di dalamnya terdapat seorang bayi perempuan yang kemudian diberi nama ',answer:'timun mas',hint:'Nama tokoh utama dalam cerita ini; terdiri dari dua kata.',after:'.'},
+ {before:'Saat Timun Mas tumbuh besar, ia harus menyelamatkan diri dari kejaran ',answer:'raksasa',hint:'Tokoh besar yang mengejar Timun Mas.',after:'.'}
+];
+function renderClozeStory(){
+ const el=document.getElementById('cloze-story-text');if(!el)return;
+ el.innerHTML=clozeStoryItems.map((item,i)=>'<p>'+escapeHtml(item.before)+'<input class="cloze-blank" type="text" data-cloze-index="'+i+'" aria-label="Kata yang hilang nomor '+(i+1)+'" autocomplete="off" placeholder="Kata '+(i+1)+'"><span class="cloze-hint">Petunjuk: '+escapeHtml(item.hint)+'</span>'+escapeHtml(item.after)+'</p>').join('');
+ document.getElementById('cloze-feedback').textContent='';
+}
+function checkClozeAnswers(){
+ const inputs=[...document.querySelectorAll('[data-cloze-index]')];let score=0;
+ inputs.forEach((input,i)=>{const correct=input.value.trim().toLocaleLowerCase('id-ID')===clozeStoryItems[i].answer;input.classList.toggle('correct',correct);input.classList.toggle('wrong',!correct);if(correct)score+=20;});
+ const feedback=document.getElementById('cloze-feedback');
+ if(score===100)feedback.textContent='🎉 Hebat! Semua kata tepat. Cerita Timun Mas berhasil kamu lengkapi dengan sempurna. Skor: 100/100.';
+ else feedback.textContent='Skor kamu: '+score+'/100. Masih ada '+(5-score/20)+' kata yang perlu diperbaiki. Perhatikan petunjuk di bawah setiap kalimat, lalu coba lagi.';
+}
+function resetClozeQuiz(){renderClozeStory();}
+
+renderClozeStory();
 updateTeacher();
 </script>
 </body></html>
