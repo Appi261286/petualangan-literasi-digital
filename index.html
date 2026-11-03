@@ -43,6 +43,26 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 .local-options summary{font-weight:750;cursor:pointer;color:var(--blue);padding:4px}
 @media(max-width:680px){.online-columns{grid-template-columns:1fr}.online-help{min-height:0}.online-settings{grid-template-columns:1fr}.online-battle-wrap{padding:13px}.online-card{padding:16px}}
 
+
+/* Pilihan mode bermain - desain ramah siswa */
+.home-play-area{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center;margin:24px 0}
+.home-play-copy{padding:22px 8px}.home-play-copy h2{font-size:clamp(24px,4vw,34px);margin:7px 0}.home-play-copy p{color:var(--muted);max-width:460px}
+.home-play-button{border:0;border-radius:24px;padding:22px;text-align:left;cursor:pointer;color:#fff;background:linear-gradient(135deg,#147d78,#2856a5);box-shadow:0 12px 28px #174e6a25;display:flex;flex-direction:column;gap:6px;min-height:170px}
+.home-play-button>span{font-size:34px}.home-play-button b{font-size:22px}.home-play-button small{opacity:.9}.home-play-button strong{margin-top:7px}
+.mode-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:22px 0}
+.mode-choice{position:relative;overflow:hidden;border:0;border-radius:25px;padding:22px;text-align:left;cursor:pointer;min-height:265px;display:flex;flex-direction:column;align-items:flex-start;box-shadow:0 10px 26px #1d3d5512;transition:transform .18s,box-shadow .18s}
+.mode-choice:hover{transform:translateY(-4px);box-shadow:0 16px 32px #1d3d5520}
+.single-mode{background:linear-gradient(145deg,#fff3d7,#ffe3ad)}.multi-mode{background:linear-gradient(145deg,#e5f5ff,#cce9fa)}
+.team-mode{background:linear-gradient(145deg,#e8f8e9,#c9edcf)}.class-mode{background:linear-gradient(145deg,#f0eaff,#ddd0ff)}
+.mode-art{font-size:clamp(38px,6vw,58px);margin-bottom:12px;filter:drop-shadow(0 5px 3px #00000010)}
+.mode-tag{font-size:11px;font-weight:850;letter-spacing:1.2px;opacity:.7}
+.mode-choice h2{font-size:clamp(22px,3vw,28px);margin:6px 0;color:#19394a}
+.mode-choice p{color:#355363;line-height:1.5;max-width:360px;margin:0 0 18px}
+.mode-choice strong{margin-top:auto;color:#154e62;display:flex;justify-content:space-between;width:100%;align-items:center}
+.mode-choice strong span{font-size:22px}
+#screen-multiplayer .screen-heading{margin-bottom:24px}
+@media(max-width:650px){.home-play-area{grid-template-columns:1fr;gap:4px}.home-play-copy{padding:12px 4px}.home-play-button{min-height:145px}.mode-choice-grid{grid-template-columns:1fr;gap:13px}.mode-choice{min-height:220px;padding:18px}}
+
 </style>
 </head>
 <body>
@@ -51,35 +71,35 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 
 <section id="app-pages">
  <section class="app-screen" id="screen-home">
-  <div class="welcome-card"><div class="welcome-icon">📚</div><div><span class="eyebrow">SD Negeri 1 Lamappoloware</span><h1>Selamat datang di Petualangan Literasi!</h1><p>Pilih pintu masuk sesuai peranmu agar langkah-langkahnya lebih mudah diikuti.</p></div></div>
+  <div class="welcome-card"><div class="welcome-icon">📚</div><div><span class="eyebrow">SD Negeri 1 Lamappoloware</span><h1>Selamat datang di Petualangan Literasi!</h1><p>Belajar membaca jadi petualangan seru. Pilih cara bermain dan mulai tantanganmu!</p></div></div>
   <div class="device-support">
-   <div class="device-support-heading"><b>🎮 Satu permainan, tiga pilihan perangkat</b><span>Gunakan perangkat yang tersedia di kelasmu.</span></div>
+   <div class="device-support-heading"><b>🎮 Main dari perangkat apa saja</b><span>Di kelas atau di rumah.</span></div>
    <div class="device-support-grid">
-    <div class="device-support-card"><span>🖥️</span><b>IFD</b><small>Guru menampilkan soal dan papan skor untuk seluruh kelas.</small></div>
-    <div class="device-support-card"><span>📱</span><b>HP Android</b><small>Siswa bergabung dan menjawab melalui HP masing-masing.</small></div>
-    <div class="device-support-card"><span>💻</span><b>Laptop / Komputer</b><small>Siswa dapat bermain melalui browser seperti di HP.</small></div>
+    <div class="device-support-card"><span>🖥️</span><b>IFD</b><small>Tampilkan permainan bersama di layar kelas.</small></div>
+    <div class="device-support-card"><span>📱</span><b>HP Android</b><small>Baca cerita dan jawab tantangan dari HP.</small></div>
+    <div class="device-support-card"><span>💻</span><b>Laptop / Komputer</b><small>Main dengan nyaman melalui browser.</small></div>
    </div>
-   <p class="device-support-note">💡 Semua perangkat membuka alamat website yang sama. Tampilan akan menyesuaikan ukuran layar secara otomatis.</p>
+   <p class="device-support-note">💡 Semua perangkat membuka alamat website yang sama. Tampilan menyesuaikan ukuran layar.</p>
   </div>
-  <div class="role-grid">
-   <button class="role-card" onclick="goScreen('screen-student')"><span>🎒</span><h2>Masuk sebagai Siswa</h2><p>Bermain sendiri, membuat tim, atau bergabung ke ruang permainan.</p><b>Masuk ke area siswa →</b></button>
-   <button class="role-card teacher-role" onclick="openTeacherPage()"><span>👩‍🏫</span><h2>Masuk sebagai Guru</h2><p>Membuat ruang, mengatur permainan, dan membagi siswa ke dalam tim.</p><b>Masuk ke panel guru →</b></button>
+  <div class="home-play-area">
+   <div class="home-play-copy"><span class="eyebrow">SIAP BERPETUALANG?</span><h2>Pilih cara bermainmu!</h2><p>Main sendiri atau ajak teman-temanmu. Kamu yang menentukan.</p></div>
+   <button class="home-play-button" onclick="goScreen('screen-student')"><span>🚀</span><b>Mulai Bermain</b><small>Pilih Single Player atau Multiplayer</small><strong>Ayo mulai →</strong></button>
   </div>
  </section>
  <section class="app-screen hidden" id="screen-student">
   <button class="back-link" onclick="goScreen('screen-home')">← Halaman utama</button>
-  <div class="screen-heading"><span>🎒 AREA SISWA</span><h1>Bagaimana kamu ingin bermain?</h1><p>Pilih satu cara bermain. Ikuti langkah berikutnya sesuai pilihanmu.</p></div>
-  <div class="choice-grid">
-   <button class="choice-card" onclick="selectStudentMode('single')"><span>🧍</span><h2>Single Player</h2><p>Saya ingin bermain sendiri.</p></button>
-   <button class="choice-card" onclick="selectStudentMode('multi')"><span>👥</span><h2>Multiplayer / Tim</h2><p>Saya ingin bermain bersama teman.</p></button>
+  <div class="screen-heading"><span>🎮 PILIH PETUALANGAN</span><h1>Mau bermain bagaimana hari ini?</h1><p>Pilih gaya bermain yang paling kamu sukai.</p></div>
+  <div class="mode-choice-grid">
+   <button class="mode-choice single-mode" onclick="selectStudentMode('single')"><span class="mode-art">🧒📖</span><span class="mode-tag">UNTUK DIRI SENDIRI</span><h2>Single Player</h2><p>Jelajahi permainan dengan kecepatanmu sendiri. Kumpulkan poin dan bintang!</p><strong>Main sendiri <span>→</span></strong></button>
+   <button class="mode-choice multi-mode" onclick="selectStudentMode('multi')"><span class="mode-art">🧑‍🤝‍🧑🏆</span><span class="mode-tag">AJAK TEMANMU</span><h2>Multiplayer</h2><p>Bentuk tim atau bertanding bersama teman-teman dalam satu kelas.</p><strong>Main bersama <span>→</span></strong></button>
   </div>
  </section>
  <section class="app-screen hidden" id="screen-multiplayer">
-  <button class="back-link" onclick="goScreen('screen-student')">← Kembali ke pilihan siswa</button>
-  <div class="screen-heading"><span>👥 MULTIPLAYER</span><h1>Pilih cara bergabung dalam tim</h1><p>Apakah tim dibentuk oleh siswa atau diatur oleh guru?</p></div>
-  <div class="choice-grid">
-   <button class="choice-card" onclick="goScreen('screen-student-team')"><span>🤝</span><h2>Tim dibentuk siswa</h2><p>Buat tim sendiri dan undang teman menggunakan kode tim.</p></button>
-   <button class="choice-card" onclick="goScreen('screen-teacher-join')"><span>🏫</span><h2>Tim diatur guru</h2><p>Masukkan kode ruang dari guru. Guru yang menentukan timmu.</p></button>
+  <button class="back-link" onclick="goScreen('screen-student')">← Kembali ke pilihan bermain</button>
+  <div class="screen-heading"><span>👥 MULTIPLAYER</span><h1>Serunya bermain bersama!</h1><p>Pilih apakah ingin bermain sebagai satu tim atau bertanding dengan seluruh kelas.</p></div>
+  <div class="mode-choice-grid">
+   <button class="mode-choice team-mode" onclick="goScreen('screen-student-team')"><span class="mode-art">🤝🌟</span><span class="mode-tag">KERJA SAMA</span><h2>Main Tim</h2><p>Buat tim, bagikan kode undangan, lalu ajak teman bergabung.</p><strong>Buat / gabung tim <span>→</span></strong></button>
+   <button class="mode-choice class-mode" onclick="goScreen('screen-battle')"><span class="mode-art">⚡🏅</span><span class="mode-tag">TANTANGAN KELAS</span><h2>Battle Kelas</h2><p>Satu pemain membuat kode pertandingan. Teman-teman bergabung dengan kode yang sama.</p><strong>Buat / gabung pertandingan <span>→</span></strong></button>
   </div>
  </section>
  <section class="app-screen hidden" id="screen-student-team">
