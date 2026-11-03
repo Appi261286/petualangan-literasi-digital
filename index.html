@@ -135,11 +135,11 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
   <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
   <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Atur pertandingan literasi</h1><p>Buat pertandingan di satu perangkat untuk uji coba. IFD, HP, dan laptop akan dapat tersinkron setelah Firebase dipasang.</p></div>
   <div class="online-battle-wrap" id="online-battle">
-   <div class="online-intro"><span class="online-kicker">🌐 MODE TERHUBUNG INTERNET</span><h2>Battle Literasi Online</h2><p>Guru membuat ruang pertandingan. Siswa masuk menggunakan kode dari HP atau laptop masing-masing.</p></div>
+   <div class="online-intro"><span class="online-kicker">🌐 MODE TERHUBUNG INTERNET</span><h2>Battle Literasi Online</h2><p>Satu pemain membuat ruang pertandingan. Teman-teman bergabung menggunakan kode dari HP atau laptop masing-masing.</p></div>
    <div class="online-columns">
     <div class="online-card teacher-card">
-     <div class="online-card-icon">👩‍🏫</div><h3>1. HALAMAN GURU</h3><p class="online-help">Gunakan laptop atau IFD untuk membuat dan mengendalikan pertandingan.</p>
-     <label for="online-host-name">Nama guru</label><input id="online-host-name" class="field" placeholder="Contoh: Ibu Sari">
+     <div class="online-card-icon">🎯</div><h3>1. BUAT PERTANDINGAN</h3><p class="online-help">Satu pemain membuat ruang dan membagikan kode kepada teman-temannya.</p>
+     <label for="online-host-name">Nama pembuat ruang</label><input id="online-host-name" class="field" placeholder="Masukkan nama pemain">
      <div class="online-settings">
       <div><label for="online-count">Jumlah soal</label><select id="online-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
       <div><label for="online-seconds">Waktu setiap soal</label><select id="online-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
@@ -148,11 +148,11 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
      <p class="online-footnote">Setelah ruang dibuat, bagikan kode yang tampil kepada siswa.</p>
     </div>
     <div class="online-card student-card">
-     <div class="online-card-icon">📱</div><h3>2. HALAMAN SISWA</h3><p class="online-help">Setiap siswa membuka website di HP atau laptop sendiri.</p>
+     <div class="online-card-icon">📱</div><h3>2. GABUNG PERTANDINGAN</h3><p class="online-help">Setiap siswa membuka website di HP atau laptop sendiri.</p>
      <label for="online-player-name">Nama siswa</label><input id="online-player-name" class="field" placeholder="Ketik nama lengkap">
-     <label for="online-room-code">Kode ruang dari guru</label><input id="online-room-code" class="field" placeholder="Contoh: LIT123" maxlength="8" style="text-transform:uppercase">
+     <label for="online-room-code">Kode pertandingan</label><input id="online-room-code" class="field" placeholder="Contoh: LIT123" maxlength="8" style="text-transform:uppercase">
      <button class="btn gold online-action" onclick="onlineJoinRoom()">Gabung ke pertandingan</button>
-     <p class="online-footnote">Pastikan kode ruang sama persis dengan yang diberikan guru.</p>
+     <p class="online-footnote">Masukkan kode yang dibagikan oleh pembuat pertandingan.</p>
     </div>
    </div>
    <p id="online-status" class="notice online-status" aria-live="polite">Menghubungkan ke Firebase…</p>
@@ -481,7 +481,7 @@ function onlineMakeCode(){return 'LIT'+Math.floor(10000+Math.random()*90000).toS
 async function onlineCreateRoom(){
  const ok=await onlineReady;if(!ok)return;
  const host=document.getElementById('online-host-name').value.trim();
- if(!host){onlineSetStatus('Isi nama guru terlebih dahulu.');return}
+ if(!host){onlineSetStatus('Isi nama kamu terlebih dahulu.');return}
  const code=onlineMakeCode(),count=Number(document.getElementById('online-count').value),seconds=Number(document.getElementById('online-seconds').value);
  const chosen=[...questions].sort(()=>Math.random()-.5).slice(0,Math.min(count,questions.length));
  const data={code,hostName:host,hostUid:onlineUid,status:'waiting',settings:{seconds,count:chosen.length},questions:chosen,qIndex:0,startedAt:0,players:{},answers:{}};
@@ -498,9 +498,9 @@ async function onlineJoinRoom(){
  if(!name||!code){onlineSetStatus('Isi nama siswa dan kode ruang.');return}
  try{
   const ref=onlineDb.ref('battleRooms/'+code),snap=await ref.once('value');
-  if(!snap.exists()){onlineSetStatus('Kode ruang tidak ditemukan. Periksa kembali kode dari guru.');return}
+  if(!snap.exists()){onlineSetStatus('Kode pertandingan tidak ditemukan. Periksa kembali kodenya.');return}
   const room=snap.val();
-  if(room.status!=='waiting'){onlineSetStatus('Pertandingan sudah dimulai atau selesai. Minta guru membuat ruang baru.');return}
+  if(room.status!=='waiting'){onlineSetStatus('Pertandingan sudah dimulai atau selesai. Minta pembuat ruang membuat pertandingan baru.');return}
   await ref.child('players/'+onlineUid).set({name,score:0,joinedAt:firebase.database.ServerValue.TIMESTAMP});
   onlineWatchRoom(code,false);
  }catch(error){onlineSetStatus('Gagal bergabung: '+error.message)}
@@ -509,7 +509,7 @@ function onlineWatchRoom(code,isHost){
  if(onlineRoomRef)onlineRoomRef.off();
  if(onlineTick){clearInterval(onlineTick);onlineTick=null}
  onlineRoomCode=code;onlineRoomRef=onlineDb.ref('battleRooms/'+code);
- onlineSetStatus((isHost?'Ruang guru dibuat.':'Berhasil masuk ruang.')+' Kode: '+code);
+ onlineSetStatus((isHost?'Ruang pertandingan berhasil dibuat.':'Berhasil bergabung ke pertandingan.')+' Kode: '+code);
  onlineRoomRef.on('value',snap=>{
   if(!snap.exists()){onlineSetStatus('Ruang tidak ditemukan.');return}
   onlineRoomData=snap.val();onlineRenderRoom(isHost);
@@ -535,7 +535,7 @@ function onlineRenderRoom(isHost){
  const room=onlineRoomData,view=document.getElementById('online-room-view');
  if(!room||!view)return;
  const players=room.players||{},names=Object.values(players).map(p=>escapeHtml(p.name||'Siswa'));
- const code='<div class="notice"><b>Kode ruang: '+escapeHtml(room.code)+'</b><br>Bagikan kode ini kepada siswa. Jumlah siswa: '+names.length+'</div>';
+ const code='<div class="notice"><b>Kode ruang: '+escapeHtml(room.code)+'</b><br>Bagikan kode ini kepada teman-teman. Jumlah peserta: '+names.length+'</div>';
  const list='<h3>Peserta ('+names.length+')</h3><ul>'+names.map(n=>'<li>'+n+'</li>').join('')+'</ul>';
  if(room.status==='waiting'){
   view.innerHTML=code+list+(isHost?'<button class="btn" onclick="onlineStartMatch()">Mulai pertandingan</button>':'<p class="muted">Menunggu guru memulai pertandingan…</p>');
