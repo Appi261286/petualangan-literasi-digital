@@ -511,6 +511,7 @@ async function onlineCreateRoom(){
   const ref=onlineDb.ref('battleRooms/'+code);
   const snap=await ref.once('value');
   if(snap.exists()){onlineSetStatus('Kode ruang bentrok. Tekan buat ruang sekali lagi.');return}
+  data.players[onlineUid]={name:host,score:0,host:true,joinedAt:firebase.database.ServerValue.TIMESTAMP};
   await ref.set(data);onlineWatchRoom(code,true);
  }catch(error){onlineSetStatus('Gagal membuat ruang: '+error.message)}
 }
@@ -556,33 +557,31 @@ function onlineWatchRoom(code,isHost){
 function onlineRenderRoom(isHost){
  const room=onlineRoomData,view=document.getElementById('online-room-view');
  if(!room||!view)return;
- const players=room.players||{},names=Object.values(players).map(p=>escapeHtml(p.name||'Siswa'));
- const code='<div class="notice"><b>Kode ruang: '+escapeHtml(room.code)+'</b><br>Bagikan kode ini kepada teman-teman. Jumlah peserta: '+names.length+'</div>';
- const list='<h3>Peserta ('+names.length+')</h3><ul>'+names.map(n=>'<li>'+n+'</li>').join('')+'</ul>';
+ const players=room.players||{},playerList=Object.values(players);
+ const names=playerList.map(p=>escapeHtml(p.name||'Siswa'));
+ const code='<div class="notice"><b>Kode pertandingan: '+escapeHtml(room.code)+'</b><br>Bagikan kode ini kepada teman-teman. Peserta: '+names.length+'</div>';
+ const list='<h3>Peserta ('+names.length+')</h3><ul>'+playerList.map(p=>'<li>'+escapeHtml(p.name||'Siswa')+(p.host?' — pembuat pertandingan':'')+'</li>').join('')+'</ul>';
  if(room.status==='waiting'){
-  view.innerHTML=code+list+(isHost?'<button class="btn" onclick="onlineStartMatch()">Mulai pertandingan</button>':'<p class="muted">Menunggu guru memulai pertandingan…</p>');
+  view.innerHTML=code+list+(isHost?'<p class="muted">Kamu juga ikut bermain sebagai peserta. Mulai setelah minimal satu teman bergabung.</p><button class="btn" onclick="onlineStartMatch()" '+(playerList.length<2?'disabled':'')+'>Mulai pertandingan</button>':'<p class="muted">Menunggu pembuat pertandingan memulai permainan…</p>');
   return;
  }
  if(room.status==='finished'){
-  const ranked=Object.values(players).sort((a,b)=>(b.score||0)-(a.score||0));
-  view.innerHTML=code+'<h3>🏆 Hasil pertandingan</h3><ol>'+ranked.map(p=>'<li><b>'+escapeHtml(p.name)+'</b> — '+(p.score||0)+' poin</li>').join('')+'</ol><p>Pertandingan selesai. Guru dapat membuat ruang baru untuk pertandingan berikutnya.</p>';
+  const ranked=playerList.sort((a,b)=>(b.score||0)-(a.score||0));
+  view.innerHTML=code+'<h3>🏆 Hasil pertandingan</h3><ol>'+ranked.map(p=>'<li><b>'+escapeHtml(p.name)+'</b> — '+(p.score||0)+' poin</li>').join('')+'</ol><p>Pertandingan selesai. Buat ruang baru untuk pertandingan berikutnya.</p>';
   return;
  }
- const q=room.questions[room.qIndex],answers=(room.answers&&room.answers[room.qIndex])||{},me=players[onlineUid],already=!!answers[onlineUid];
+ const q=room.questions&&room.questions[room.qIndex];
+ if(!q){view.innerHTML=code+'<p>Soal belum tersedia.</p>';return;}
+ const answers=(room.answers&&room.answers[room.qIndex])||{},me=players[onlineUid],already=!!answers[onlineUid];
  const elapsed=Math.max(0,Math.floor((Date.now()-Number(room.startedAt))/1000)),remaining=Math.max(0,Number(room.settings.seconds)-elapsed);
- const scoreboard=Object.values(players).sort((a,b)=>(b.score||0)-(a.score||0)).map(p=>'<li>'+escapeHtml(p.name)+': <b>'+(p.score||0)+'</b> poin</li>').join('');
- if(isHost){
-  view.innerHTML=code+'<h3>Soal '+(room.qIndex+1)+' / '+room.questions.length+'</h3><p class="question">'+escapeHtml(q.q)+'</p><p><b>Waktu tersisa sekitar '+remaining+' detik</b></p><h3>Skor sementara</h3><ol>'+scoreboard+'</ol><p class="muted">Siswa menjawab dari perangkat masing-masing. Soal berganti otomatis setelah waktu habis.</p>';
- }else if(!me){
-  view.innerHTML=code+'<p class="notice">Nama perangkat ini belum terdaftar pada ruang tersebut. Masuk kembali dengan kode ruang.</p>';
- }else{
-  const choices=already?'<div class="notice">Jawaban sudah diterima. Tunggu soal berikutnya.</div>':'<div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="onlineSubmitAnswer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div>';
-  view.innerHTML=code+'<h3>Soal '+(room.qIndex+1)+' / '+room.questions.length+'</h3><p class="muted">Waktu tersisa sekitar '+remaining+' detik</p><p class="question">'+escapeHtml(q.q)+'</p>'+choices+'<h3>Skor sementara</h3><ol>'+scoreboard+'</ol>';
- }
+ const scoreboard=playerList.sort((a,b)=>(b.score||0)-(a.score||0)).map(p=>'<li>'+escapeHtml(p.name)+': <b>'+(p.score||0)+'</b> poin</li>').join('');
+ if(!me){view.innerHTML=code+'<p class="notice">Perangkat ini belum terdaftar sebagai peserta.</p>';return;}
+ const choices=already?'<div class="notice">Jawaban sudah diterima. Tunggu soal berikutnya.</div>':'<div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="onlineSubmitAnswer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div>';
+ view.innerHTML=code+'<h3>Soal '+(room.qIndex+1)+' / '+room.questions.length+'</h3><p class="muted">Waktu tersisa sekitar '+remaining+' detik</p><p class="question">'+escapeHtml(q.q)+'</p>'+choices+'<h3>Skor sementara</h3><ol>'+scoreboard+'</ol>';
 }
 async function onlineStartMatch(){
  if(!onlineRoomRef||!onlineRoomData||onlineRoomData.hostUid!==onlineUid)return;
- if(Object.keys(onlineRoomData.players||{}).length<1){onlineSetStatus('Belum ada siswa yang bergabung.');return}
+ if(Object.keys(onlineRoomData.players||{}).length<2){onlineSetStatus('Minimal dua pemain diperlukan, termasuk pembuat pertandingan.');return}
  await onlineRoomRef.update({status:'playing',qIndex:0,startedAt:Date.now()});
 }
 async function onlineSubmitAnswer(index){
