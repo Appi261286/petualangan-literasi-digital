@@ -623,5 +623,115 @@ function resetClozeQuiz(){renderClozeStory();}
 
 renderClozeStory();
 updateTeacher();
+
+/* Mesin permainan dengan mekanisme berbeda untuk setiap jenis game */
+var gameSession = null;
+var gameClock = null;
+var storyOrderItems = [
+ ['Beni memilih buku cerita di perpustakaan.',1],
+ ['Beni membaca buku dengan tenang.',2],
+ ['Beni mencatat informasi penting dari bacaan.',3],
+ ['Beni mengembalikan buku ke tempat semula.',4]
+];
+function stopGameClock(){if(gameClock){clearInterval(gameClock);gameClock=null;}}
+function shuffleGameItems(items){return [...items].sort(()=>Math.random()-.5);}
+function startGame(name){
+ stopGameClock();
+ player=document.getElementById('nama').value.trim()||'Pemain';
+ const level=document.getElementById('level')?.value||'Mudah';
+ const total=(level==='Mudah'?5:level==='Sedang'?8:10);
+ let selected=shuffleGameItems(questions).slice(0,total);
+ gameSession={name,items:selected,index:0,score:0,streak:0,lives:3,finished:false,started:false,seconds:45,order:shuffleGameItems(storyOrderItems),orderChecked:false};
+ current=0;score=0;
+ document.getElementById('game-title').textContent=name;
+ document.getElementById('play').classList.remove('hidden');
+ renderQuestion();
+}
+function finishGame(reason){
+ if(!gameSession||gameSession.finished)return;
+ stopGameClock();gameSession.finished=true;
+ const max=gameSession.items.length*20;
+ const area=document.getElementById('quiz-area');
+ area.innerHTML='<div class="notice"><h3>🎉 '+(reason||'Permainan selesai!')+'</h3><p>Nama pemain: <b>'+escapeHtml(player)+'</b></p><p>Skor akhir: <b>'+gameSession.score+' / '+max+'</b></p><p>Jawaban benar: '+Math.round(gameSession.score/20)+' dari '+gameSession.items.length+' tantangan.</p></div><button class="btn" onclick="startGame(\''+escapeHtml(gameSession.name).replace(/'/g,"\\'")+'\')">Main lagi</button> <button class="btn secondary" onclick="closeGame()">Kembali</button>';
+ score=gameSession.score;saveScore(player,score,gameSession.name);
+}
+function renderQuestion(){
+ if(!gameSession||gameSession.finished)return;
+ const g=gameSession.name,area=document.getElementById('quiz-area');
+ if(g==='Susun Cerita'){renderStoryOrder();return;}
+ const q=gameSession.items[gameSession.index];
+ if(!q){finishGame();return;}
+ const n=gameSession.index+1,total=gameSession.items.length;
+ const progress='<div class="muted">Tantangan '+n+' dari '+total+' • Skor '+gameSession.score+(g==='Misi Penyelamatan Buku'?' • ❤️ '.repeat(gameSession.lives):'')+'</div>';
+ if(g==='Tebak Kata'){
+  area.innerHTML=progress+'<div class="question">🔤 '+q.q+'</div><p class="muted">Petunjuk: '+escapeHtml(q.why)+'</p><label for="word-answer">Ketik jawaban yang paling tepat</label><input id="word-answer" class="field" placeholder="Tulis jawabanmu..." autocomplete="off"><button class="btn" onclick="submitWordAnswer()">Periksa kata</button><div id="feedback"></div>';
+  return;
+ }
+ if(g==='Puzzle Literasi'){
+  const target=q.a[q.c],scrambled=target.replace(/[^a-zA-Z]/g,'').split('').sort(()=>Math.random()-.5).join(' • ');
+  gameSession.puzzleAnswer=target;
+  area.innerHTML=progress+'<div class="question">🧩 Susun huruf berikut menjadi jawaban yang tepat!</div><div class="notice" style="font-size:22px;text-align:center;letter-spacing:2px">'+escapeHtml(scrambled)+'</div><p>'+q.q+'</p><input id="puzzle-answer" class="field" placeholder="Susun menjadi kata/frasa..." autocomplete="off"><button class="btn" onclick="submitPuzzleAnswer()">Periksa susunan</button><div id="feedback"></div>';
+  return;
+ }
+ let intro='';
+ if(g==='Petualangan Literasi')intro='<div class="notice">🗺️ Misi '+n+': Bantu tokoh menyelesaikan tantangan membaca untuk melanjutkan perjalanan.</div>';
+ if(g==='Detektif Bacaan')intro='<div class="notice"><b>🔎 Berkas detektif</b><p>“Rani menyiram bunga setiap pagi. Ia menggunakan air secukupnya dan membersihkan daun yang kering. Karena dirawat dengan teratur, bunga di halaman Rani tumbuh segar.”</p><small>Amati informasi dalam bacaan sebelum menjawab.</small></div>';
+ if(g==='Duel Kuis Literasi')intro='<div class="notice">⚔️ Duel cepat! Jawab sebanyak mungkin sebelum waktu habis. Waktu: <b id="duel-clock">'+gameSession.seconds+'</b> detik.</div>';
+ if(g==='Battle Literasi')intro='<div class="notice">🏆 Arena poin! Jawaban benar berturut-turut meningkatkan semangat dan skor.</div>';
+ if(g==='Misi Penyelamatan Buku')intro='<div class="notice">📖 Selamatkan buku! Kamu memiliki 3 kesempatan. Jawaban salah mengurangi satu hati.</div>';
+ area.innerHTML=progress+intro+'<div class="question">'+escapeHtml(q.q)+'</div><div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="answer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div><div id="feedback"></div>';
+ if(g==='Duel Kuis Literasi'&&!gameSession.started){
+  gameSession.started=true;gameClock=setInterval(()=>{if(!gameSession||gameSession.finished)return;gameSession.seconds--;const el=document.getElementById('duel-clock');if(el)el.textContent=gameSession.seconds;if(gameSession.seconds<=0)finishGame('Waktu duel habis!');},1000);
+ }
+}
+function showGameFeedback(ok,message){
+ const el=document.getElementById('feedback');if(!el)return;
+ el.innerHTML='<div class="notice">'+(ok?'✅ Tepat! ':'💡 Belum tepat. ')+escapeHtml(message)+'</div><button class="btn" onclick="nextGameQuestion()">Lanjutkan →</button>';
+}
+function answer(i){
+ if(!gameSession||gameSession.finished)return;
+ const q=gameSession.items[gameSession.index];if(!q)return;
+ document.querySelectorAll('#quiz-area .answer').forEach(b=>b.disabled=true);
+ const ok=i===q.c;
+ if(ok){gameSession.score+=20;gameSession.streak++;}else{gameSession.streak=0;if(gameSession.name==='Misi Penyelamatan Buku')gameSession.lives--;}
+ score=gameSession.score;
+ if(gameSession.name==='Misi Penyelamatan Buku'&&gameSession.lives<=0){showGameFeedback(false,'Kesempatan habis. '+q.why);const b=document.querySelector('#feedback button');if(b)b.onclick=()=>finishGame('Buku belum berhasil diselamatkan');return;}
+ showGameFeedback(ok,q.why+(gameSession.name==='Battle Literasi'&&ok&&gameSession.streak>1?' Kombo '+gameSession.streak+'!':''));
+}
+function submitWordAnswer(){
+ const q=gameSession.items[gameSession.index],v=(document.getElementById('word-answer').value||'').trim().toLowerCase();
+ if(!v){document.getElementById('feedback').textContent='Masukkan jawaban terlebih dahulu.';return;}
+ const target=q.a[q.c].toLowerCase();
+ const ok=v===target;
+ if(ok){gameSession.score+=20;score=gameSession.score;}
+ showGameFeedback(ok,ok?'Kata yang kamu pilih sesuai dengan petunjuk.':'Jawaban yang diharapkan: '+q.a[q.c]+'. '+q.why);
+}
+function submitPuzzleAnswer(){
+ const v=(document.getElementById('puzzle-answer').value||'').trim().toLowerCase().replace(/\s+/g,'');
+ const target=gameSession.puzzleAnswer.toLowerCase().replace(/\s+/g,'');
+ const ok=v===target;
+ if(ok){gameSession.score+=20;score=gameSession.score;}
+ showGameFeedback(ok,ok?'Kamu berhasil menyusun huruf!':'Jawaban yang benar: '+gameSession.puzzleAnswer);
+}
+function nextGameQuestion(){
+ if(!gameSession||gameSession.finished)return;
+ if(gameSession.name==='Misi Penyelamatan Buku'&&gameSession.lives<=0){finishGame('Misi selesai');return;}
+ gameSession.index++;current=gameSession.index;
+ if(gameSession.index>=gameSession.items.length){finishGame(gameSession.name==='Misi Penyelamatan Buku'?'Buku berhasil diselamatkan!':'Semua tantangan selesai!');return;}
+ renderQuestion();
+}
+function renderStoryOrder(){
+ const area=document.getElementById('quiz-area');
+ area.innerHTML='<div class="muted">🧩 Susun Cerita • Atur urutan peristiwa dari awal hingga akhir.</div><div class="question">Urutkan langkah Beni saat membaca buku di perpustakaan.</div>'+gameSession.order.map((item,i)=>'<div class="notice" style="display:flex;align-items:center;gap:8px"><b>'+(i+1)+'.</b><span style="flex:1">'+escapeHtml(item[0])+'</span><button class="btn secondary" style="padding:6px 10px" onclick="moveStoryItem('+i+',-1)" '+(i===0?'disabled':'')+'>↑</button><button class="btn secondary" style="padding:6px 10px" onclick="moveStoryItem('+i+',1)" '+(i===gameSession.order.length-1?'disabled':'')+'>↓</button></div>').join('')+'<button class="btn" onclick="checkStoryOrder()">Periksa urutan</button><div id="feedback"></div>';
+}
+function moveStoryItem(i,d){const j=i+d;if(j<0||j>=gameSession.order.length)return;[gameSession.order[i],gameSession.order[j]]=[gameSession.order[j],gameSession.order[i]];renderStoryOrder();}
+function checkStoryOrder(){
+ const ok=gameSession.order.every((item,i)=>item[1]===i+1);
+ if(ok){gameSession.score=100;score=100;document.getElementById('feedback').innerHTML='<div class="notice">🌟 Hebat! Urutan ceritamu sudah benar.</div><button class="btn" onclick="finishGame(\'Cerita berhasil disusun!\')">Lihat hasil</button>';}
+ else document.getElementById('feedback').innerHTML='<div class="notice">Belum tepat. Perhatikan urutan kegiatan: memilih, membaca, mencatat, lalu mengembalikan buku.</div><button class="btn" onclick="renderStoryOrder()">Coba lagi</button>';
+}
+function resetQuiz(){if(gameSession)startGame(gameSession.name);}
+function closeGame(){stopGameClock();document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';}
+
 </script>
 </body></html>
