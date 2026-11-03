@@ -659,7 +659,7 @@ function onlineRenderRoom(isHost){
  const board='<div class="battle-team-board">'+teamPanel('🔴 Tim Merah',red,'red')+teamPanel('🔵 Tim Biru',blue,'blue')+'</div>';
  const members='<h3>Daftar peserta</h3><p>Merah: '+red.length+' siswa · Biru: '+blue.length+' siswa</p>';
  if(room.status==='waiting'){
-  view.innerHTML=code+board+members+(isHost?'<p class="muted">Pastikan kedua tim memiliki anggota. Kamu juga ikut bermain sebagai peserta.</p><button class="btn" onclick="onlineStartMatch()" '+(!red.length||!blue.length?'disabled':'')+'>Mulai Battle Antartim</button>':'<p class="muted">Menunggu pembuat pertandingan memulai Battle…</p>');
+  view.innerHTML=code+board+members+(isHost?'<p class="muted">Pastikan kedua tim memiliki anggota. Kamu juga ikut bermain sebagai peserta.</p><button class="btn" onclick="onlineStartMatch()">Mulai Battle Antartim</button>':'<p class="muted">Menunggu pembuat pertandingan memulai Battle…</p>');
   return;
  }
  if(room.status==='finished'){
@@ -676,9 +676,13 @@ function onlineRenderRoom(isHost){
  view.innerHTML=code+'<div class="notice"><b>Soal '+(Number(room.qIndex)+1)+' / '+room.questions.length+'</b> · Waktu '+remaining+' detik · Kamu: '+escapeHtml(me.team==='red'?'Tim Merah':'Tim Biru')+'</div>'+board+'<div class="battle-live-question"><h2>'+escapeHtml(q.q)+'</h2>'+choices+'</div>';
 }
 async function onlineStartMatch(){
- if(!onlineRoomRef||!onlineRoomData||onlineRoomData.hostUid!==onlineUid)return;
- const ps=Object.values(onlineRoomData.players||{});if(!ps.some(p=>p.team==='red')||!ps.some(p=>p.team==='blue')){onlineSetStatus('Minimal satu pemain Tim Merah dan satu pemain Tim Biru harus bergabung.');return}
- await onlineRoomRef.update({status:'playing',qIndex:0,startedAt:Date.now()});
+ if(!onlineRoomRef||!onlineRoomData){onlineSetStatus('Ruang pertandingan belum siap. Buat ruang terlebih dahulu.');return;}
+ if(onlineRoomData.hostUid!==onlineUid){onlineSetStatus('Hanya pembuat pertandingan yang dapat memulai Battle.');return;}
+ const ps=Object.values(onlineRoomData.players||{});
+ const hasRed=ps.some(p=>p.team==='red'),hasBlue=ps.some(p=>p.team==='blue');
+ if(!hasRed||!hasBlue){onlineSetStatus('Belum bisa mulai. Pastikan ada minimal satu siswa di Tim Merah dan satu siswa di Tim Biru. Bagikan kode pertandingan kepada tim lawan.');return;}
+ try{await onlineRoomRef.update({status:'playing',qIndex:0,startedAt:Date.now()});onlineSetStatus('Battle Antartim dimulai! Semua peserta mendapat soal yang sama.');}
+ catch(error){onlineSetStatus('Gagal memulai pertandingan: '+error.message);}
 }
 async function onlineSubmitAnswer(index){
  if(!onlineRoomRef||!onlineRoomData||onlineRoomData.status!=='playing')return;
