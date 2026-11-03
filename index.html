@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#155e75">
+<title>Petualangan Literasi Digital</title>
+<style>
+:root{--ink:#17324d;--muted:#60758a;--teal:#0f766e;--blue:#155e75;--paper:#f3f8fb;--white:#fff;--gold:#f4b942;--line:#dce7ee}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--paper)}
+header{background:linear-gradient(120deg,#155e75,#0f766e);color:white;padding:24px clamp(16px,4vw,56px)}
+.top{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-size:clamp(22px,4vw,34px);font-weight:850;line-height:1.1}.sub{opacity:.9;margin-top:8px}.tag{background:#ffffff24;border:1px solid #ffffff55;padding:8px 12px;border-radius:30px;font-size:13px}
+main{max-width:1100px;margin:24px auto;padding:0 16px 50px}.hero{background:white;border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 8px 26px #18324d0d;display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:center}
+h1,h2,h3,p{margin-top:0}.hero h1{font-size:clamp(25px,4vw,38px);margin-bottom:10px}.hero p{color:var(--muted);line-height:1.6}.actions{display:flex;flex-wrap:wrap;gap:10px}.btn{border:0;border-radius:12px;padding:12px 17px;font-weight:750;cursor:pointer;background:var(--teal);color:white}.btn.secondary{background:#e7f2f5;color:var(--blue)}.btn.gold{background:var(--gold);color:#493400}.join{background:#edf7f6;border-radius:18px;padding:18px}.join input,.field{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;margin:7px 0 12px}.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:30px 0 14px}.section-head p{color:var(--muted);margin:0}.games{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.game{background:white;border:1px solid var(--line);border-radius:17px;padding:17px;text-align:left;cursor:pointer;min-height:150px;transition:.15s}.game:hover{transform:translateY(-3px);box-shadow:0 8px 20px #17324d12}.emoji{font-size:30px}.game strong{display:block;margin:9px 0 5px}.game small{color:var(--muted);line-height:1.4}.panel{margin-top:24px;background:white;border:1px solid var(--line);border-radius:18px;padding:20px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:#f1f7f9;padding:14px;border-radius:13px}.stat b{display:block;font-size:24px}.muted{color:var(--muted)}.hidden{display:none!important}.question{font-size:19px;font-weight:750;line-height:1.45}.answers{display:grid;gap:9px;margin:15px 0}.answer{background:#f5f9fb;color:var(--ink);border:1px solid var(--line);text-align:left;border-radius:12px;padding:13px;font:inherit;cursor:pointer}.answer:hover{border-color:var(--teal)}.answer:disabled{cursor:default}.notice{padding:12px;border-radius:12px;background:#fff7df;margin:12px 0}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+@media(max-width:800px){.games{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+@media(max-width:420px){.games{grid-template-columns:1fr 1fr;gap:9px}.game{padding:12px;min-height:145px}.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><div class="brand">📚 Petualangan Literasi Digital</div><div class="sub">Belajar membaca, memahami cerita, dan bermain bersama!</div></div><span class="tag">SD Negeri 1 Lamappoloware</span></div></header>
+<main>
+<section class="hero">
+<div><h1>Jelajahi dunia cerita!</h1><p>Ikuti misi membaca, pecahkan teka-teki, dan kumpulkan poin literasi. Pilih permainan yang kamu suka. Aplikasi ini adalah versi uji coba awal.</p><div class="actions"><button class="btn" onclick="document.getElementById('daftar-game').scrollIntoView({behavior:'smooth'})">Mulai bermain</button><button class="btn secondary" onclick="showTeacher()">Panel guru</button></div></div>
+<div class="join"><h3>🚪 Gabung permainan</h3><label for="nama">Nama pemain</label><input id="nama" placeholder="Tulis nama kamu"><label for="kode">Kode ruang</label><input id="kode" placeholder="Contoh: BACA01" maxlength="10"><button class="btn gold" style="width:100%" onclick="joinRoom()">Gabung ruang</button><small id="join-msg" class="muted">Mode ruang bersama akan diaktifkan pada pengembangan Firebase.</small></div>
+</section>
+<div class="section-head" id="daftar-game"><div><h2>🎮 Pilih permainan</h2><p>Delapan tantangan untuk mengasah kemampuan literasi.</p></div></div>
+<section class="games">
+<button class="game" onclick="startGame('Petualangan Literasi')"><span class="emoji">🗺️</span><strong>Petualangan Literasi</strong><small>Jelajahi cerita dan selesaikan misi.</small></button>
+<button class="game" onclick="startGame('Duel Kuis Literasi')"><span class="emoji">⚔️</span><strong>Duel Kuis Literasi</strong><small>Uji pengetahuan melalui kuis.</small></button>
+<button class="game" onclick="startGame('Tebak Kata')"><span class="emoji">🔤</span><strong>Tebak Kata</strong><small>Temukan kata dari petunjuk.</small></button>
+<button class="game" onclick="startGame('Susun Cerita')"><span class="emoji">🧩</span><strong>Susun Cerita</strong><small>Urutkan kejadian dalam cerita.</small></button>
+<button class="game" onclick="startGame('Detektif Bacaan')"><span class="emoji">🔎</span><strong>Detektif Bacaan</strong><small>Cari informasi penting dalam bacaan.</small></button>
+<button class="game" onclick="startGame('Puzzle Literasi')"><span class="emoji">🧠</span><strong>Puzzle Literasi</strong><small>Asah logika dan pemahaman.</small></button>
+<button class="game" onclick="startGame('Battle Literasi')"><span class="emoji">🏆</span><strong>Battle Literasi</strong><small>Kumpulkan poin dari tantangan.</small></button>
+<button class="game" onclick="startGame('Misi Penyelamatan Buku')"><span class="emoji">📖</span><strong>Misi Penyelamatan Buku</strong><small>Selesaikan misi untuk menyelamatkan buku.</small></button>
+</section>
+<section id="play" class="panel hidden" aria-live="polite"><div class="section-head"><div><span class="muted">Permainan pilihan</span><h2 id="game-title">Kuis Literasi</h2></div><button class="btn secondary" onclick="closeGame()">Tutup</button></div><div class="actions" style="margin-bottom:14px"><label>Kesulitan <select id="level" class="field" style="width:auto;margin:0" onchange="resetQuiz()"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit">Sulit</option></select></label></div><div id="quiz-area"></div></section>
+<section id="teacher" class="panel hidden"><div class="section-head"><div><span class="muted">Area pengelolaan</span><h2>👩‍🏫 Panel Guru</h2></div><button class="btn secondary" onclick="document.getElementById('teacher').classList.add('hidden')">Tutup</button></div><div class="notice">Panel ini masih berupa contoh lokal di perangkat ini. Pembuatan ruang, sinkronisasi siswa, dan kontrol pertandingan langsung memerlukan Firebase pada tahap berikutnya.</div><div class="stats"><div class="stat"><span class="muted">Pemain tersimpan</span><b id="player-count">0</b></div><div class="stat"><span class="muted">Poin terkumpul</span><b id="point-count">0</b></div><div class="stat"><span class="muted">Mode</span><b style="font-size:18px">Uji coba</b></div></div><h3 style="margin-top:20px">Buat kode ruang contoh</h3><button class="btn" onclick="makeRoom()">Buat kode ruang</button> <strong id="room-code"></strong><h3 style="margin-top:20px">Riwayat skor di perangkat ini</h3><div id="score-list" class="muted">Belum ada skor.</div><button class="btn secondary" onclick="clearScores()">Reset skor lokal</button></section>
+<div class="footer">Versi prototipe awal • Data skor disimpan di browser perangkat ini.</div>
+</main>
+<script>
+const questions=[
+{q:'Bacalah: “Rani menyiram bunga setiap pagi agar tetap segar.” Mengapa Rani menyiram bunga?',a:['Agar bunga tetap segar','Agar bunga cepat layu','Agar pot menjadi besar'],c:0,why:'Rani menyiram bunga supaya bunga tetap segar.'},
+{q:'Tokoh utama dalam sebuah cerita adalah …',a:['Tempat cerita berlangsung','Tokoh yang paling banyak diceritakan','Pesan di akhir cerita'],c:1,why:'Tokoh utama merupakan tokoh yang menjadi pusat cerita.'},
+{q:'Apa yang sebaiknya dilakukan setelah meminjam buku perpustakaan?',a:['Mencoret halaman','Mengembalikan tepat waktu','Menyimpan selamanya'],c:1,why:'Buku pinjaman harus dijaga dan dikembalikan tepat waktu.'},
+{q:'Kalimat yang berisi ajakan adalah …',a:['Ayo kita membaca bersama!','Buku itu berwarna biru.','Kemarin hujan turun.'],c:0,why:'Kata “ayo” menunjukkan ajakan.'},
+{q:'Saat menemukan informasi di bacaan, langkah terbaik adalah …',a:['Membaca dengan teliti','Menebak tanpa membaca','Langsung menutup buku'],c:0,why:'Membaca teliti membantu menemukan informasi yang benar.'}
+];
+let current=0,score=0,player='';
+function getScores(){try{return JSON.parse(localStorage.getItem('literasiScores')||'[]')}catch(e){return[]}}
+function saveScore(name,points,game){const s=getScores();s.unshift({name,points,game,date:new Date().toLocaleDateString('id-ID')});localStorage.setItem('literasiScores',JSON.stringify(s.slice(0,50)));updateTeacher()}
+function joinRoom(){const n=document.getElementById('nama').value.trim(),k=document.getElementById('kode').value.trim();const el=document.getElementById('join-msg');if(!n||!k){el.textContent='Isi nama pemain dan kode ruang terlebih dahulu.';return}player=n;el.textContent='Halo, '+n+'! Kode '+k+' diterima untuk simulasi. Ruang multiplayer belum aktif.'}
+function showTeacher(){document.getElementById('teacher').classList.remove('hidden');updateTeacher()}
+function makeRoom(){const c='BACA'+Math.floor(100+Math.random()*900);document.getElementById('room-code').textContent=c+' (kode contoh)'}
+function startGame(name){player=document.getElementById('nama').value.trim()||'Pemain';current=0;score=0;document.getElementById('game-title').textContent=name;document.getElementById('play').classList.remove('hidden');document.getElementById('play').scrollIntoView({behavior:'smooth'});renderQuestion()}
+function closeGame(){document.getElementById('play').classList.add('hidden')}
+function resetQuiz(){current=0;score=0;renderQuestion()}
+function renderQuestion(){const area=document.getElementById('quiz-area');if(current>=questions.length){area.innerHTML='<h3>🎉 Permainan selesai!</h3><p>Skor kamu: <b>'+score+' / '+questions.length*20+'</b></p><p>Terus berlatih membaca dan memahami cerita.</p><button class="btn" onclick="startGame(document.getElementById(\'game-title\').textContent)">Main lagi</button>';saveScore(player,score,document.getElementById('game-title').textContent);return}
+const q=questions[current];area.innerHTML='<p class="muted">Pertanyaan '+(current+1)+' dari '+questions.length+' • Skor '+score+'</p><div class="question">'+q.q+'</div><div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="answer('+i+')">'+a+'</button>').join('')+'</div><div id="feedback"></div>'}
+function answer(i){const q=questions[current],buttons=document.querySelectorAll('.answer');buttons.forEach(b=>b.disabled=true);const ok=i===q.c;if(ok)score+=20;document.getElementById('feedback').innerHTML='<div class="notice">'+(ok?'✅ Benar!':'💡 Belum tepat.')+' '+q.why+'</div><button class="btn" onclick="current++;renderQuestion()">'+(current===questions.length-1?'Lihat hasil':'Pertanyaan berikutnya')+'</button>'}
+function updateTeacher(){const s=getScores();document.getElementById('player-count').textContent=new Set(s.map(x=>x.name)).size;document.getElementById('point-count').textContent=s.reduce((a,x)=>a+x.points,0);document.getElementById('score-list').innerHTML=s.length?s.map(x=>'<p><b>'+escapeHtml(x.name)+'</b> — '+escapeHtml(x.game)+': '+x.points+' poin <small>('+x.date+')</small></p>').join(''):'Belum ada skor.'}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function clearScores(){if(confirm('Hapus semua skor yang tersimpan di browser ini?')){localStorage.removeItem('literasiScores');updateTeacher()}}
+updateTeacher();
+</script>
+</body></html>
