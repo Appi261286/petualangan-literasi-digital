@@ -14,6 +14,9 @@ main{max-width:1100px;margin:24px auto;padding:0 16px 50px}.hero{background:whit
 h1,h2,h3,p{margin-top:0}.hero h1{font-size:clamp(25px,4vw,38px);margin-bottom:10px}.hero p{color:var(--muted);line-height:1.6}.actions{display:flex;flex-wrap:wrap;gap:10px}.btn{border:0;border-radius:12px;padding:12px 17px;font-weight:750;cursor:pointer;background:var(--teal);color:white}.btn.secondary{background:#e7f2f5;color:var(--blue)}.btn.gold{background:var(--gold);color:#493400}.join{background:#edf7f6;border-radius:18px;padding:18px}.join input,.field{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;margin:7px 0 12px}.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:30px 0 14px}.section-head p{color:var(--muted);margin:0}.games{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.game{background:white;border:1px solid var(--line);border-radius:17px;padding:17px;text-align:left;cursor:pointer;min-height:150px;transition:.15s}.game:hover{transform:translateY(-3px);box-shadow:0 8px 20px #17324d12}.emoji{font-size:30px}.game strong{display:block;margin:9px 0 5px}.game small{color:var(--muted);line-height:1.4}.panel{margin-top:24px;background:white;border:1px solid var(--line);border-radius:18px;padding:20px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:#f1f7f9;padding:14px;border-radius:13px}.stat b{display:block;font-size:24px}.muted{color:var(--muted)}.hidden{display:none!important}.question{font-size:19px;font-weight:750;line-height:1.45}.answers{display:grid;gap:9px;margin:15px 0}.answer{background:#f5f9fb;color:var(--ink);border:1px solid var(--line);text-align:left;border-radius:12px;padding:13px;font:inherit;cursor:pointer}.answer:hover{border-color:var(--teal)}.answer:disabled{cursor:default}.notice{padding:12px;border-radius:12px;background:#fff7df;margin:12px 0}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
 @media(max-width:800px){.games{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
 @media(max-width:420px){.games{grid-template-columns:1fr 1fr;gap:9px}.game{padding:12px;min-height:145px}.stats{grid-template-columns:1fr}}
+
+.mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.mode-card{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;background:#f7fbfc;border:2px solid var(--line);border-radius:15px;padding:16px;cursor:pointer;color:var(--ink)}.mode-card span{font-size:29px}.mode-card b{font-size:18px}.mode-card small,.team-option small{display:block;color:var(--muted);line-height:1.45}.mode-card.active{border-color:var(--teal);background:#eaf7f5}.team-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.team-option{display:flex;align-items:flex-start;gap:10px;padding:14px;border:1px solid var(--line);border-radius:13px;cursor:pointer}.team-option input{margin-top:4px;accent-color:var(--teal)}.team-option span{display:block}.room-display{margin:12px 0;padding:15px;border:1px dashed #9bb9c4;background:#f3fafb;border-radius:14px}.room-display strong{display:block;font-size:28px;letter-spacing:3px;color:var(--teal);margin:6px 0}.room-display small{color:var(--muted)}.join-fields{display:flex;gap:8px;max-width:600px}.join-fields input{min-width:0;flex:1;padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit}.setup-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:15px 0}.setup-grid>div{min-width:0}.small-note{font-size:13px;margin-top:12px}@media(max-width:650px){.mode-grid,.team-choice,.setup-grid{grid-template-columns:1fr}.join-fields{flex-direction:column}}
+
 </style>
 </head>
 <body>
@@ -23,6 +26,33 @@ h1,h2,h3,p{margin-top:0}.hero h1{font-size:clamp(25px,4vw,38px);margin-bottom:10
 <div><h1>Jelajahi dunia cerita!</h1><p>Ikuti misi membaca, pecahkan teka-teki, dan kumpulkan poin literasi. Pilih permainan yang kamu suka. Aplikasi ini adalah versi uji coba awal.</p><div class="actions"><button class="btn" onclick="document.getElementById('daftar-game').scrollIntoView({behavior:'smooth'})">Mulai bermain</button><button class="btn secondary" onclick="showTeacher()">Panel guru</button></div></div>
 <div class="join"><h3>🚪 Gabung permainan</h3><label for="nama">Nama pemain</label><input id="nama" placeholder="Tulis nama kamu"><label for="kode">Kode ruang</label><input id="kode" placeholder="Contoh: BACA01" maxlength="10"><button class="btn gold" style="width:100%" onclick="joinRoom()">Gabung ruang</button><small id="join-msg" class="muted">Mode ruang bersama akan diaktifkan pada pengembangan Firebase.</small></div>
 </section>
+
+<section class="panel" id="mode-bermain">
+ <div class="section-head"><div><span class="muted">Pilih cara bermain</span><h2>🎯 Mode permainan</h2><p>Pilih bermain sendiri atau bersama teman.</p></div></div>
+ <div class="mode-grid">
+  <button class="mode-card active" id="mode-single" onclick="setPlayMode('single')"><span>🧍</span><b>Single Player</b><small>Bermain sendiri dan kumpulkan skor pribadi.</small></button>
+  <button class="mode-card" id="mode-multi" onclick="setPlayMode('multi')"><span>👥</span><b>Multiplayer / Tim</b><small>Bermain bersama teman dalam satu tim atau beberapa tim.</small></button>
+ </div>
+ <div id="multi-options" class="hidden">
+  <h3>Bagaimana tim akan dibentuk?</h3>
+  <div class="team-choice">
+   <label class="team-option"><input type="radio" name="team-management" value="student" checked onchange="setTeamManagement('student')"><span><b>🤝 Tim dibentuk siswa</b><small>Tanpa Panel Guru. Satu siswa membuat tim dan membagikan kode undangan kepada teman-temannya.</small></span></label>
+   <label class="team-option"><input type="radio" name="team-management" value="teacher" onchange="setTeamManagement('teacher')"><span><b>👩‍🏫 Tim diatur guru</b><small>Dengan Panel Guru. Siswa masuk memakai kode ruang; guru yang membagi siswa ke dalam tim.</small></span></label>
+  </div>
+  <div id="student-team-box" class="notice"><b>Ketua tim:</b> pilih jenis permainan dan level, lalu buat kode undangan. Bagikan kode itu kepada teman yang ingin bergabung.</div>
+  <div id="teacher-team-box" class="notice hidden"><b>Anggota tim:</b> masukkan kode ruang dari guru. Setelah masuk, tunggu guru menempatkanmu ke dalam tim.</div>
+ </div>
+ <div class="setup-grid">
+  <div><label for="mode-game"><b>🎮 Jenis permainan</b></label><select id="mode-game" class="field"><option>Petualangan Literasi</option><option>Duel Kuis Literasi</option><option>Tebak Kata</option><option>Susun Cerita</option><option>Detektif Bacaan</option><option>Puzzle Literasi</option><option>Battle Literasi</option><option>Misi Penyelamatan Buku</option></select></div>
+  <div><label for="mode-level"><b>⭐ Tingkat kesulitan</b></label><select id="mode-level" class="field"><option>Mudah</option><option>Sedang</option><option>Sulit</option></select></div>
+  <div><label for="mode-name"><b>Nama pemain</b></label><input id="mode-name" class="field" placeholder="Tulis nama siswa"></div>
+ </div>
+ <div id="student-create-actions" class="actions hidden"><button class="btn" onclick="createStudentTeam()">Buat tim & kode undangan</button></div>
+ <div id="teacher-join-actions" class="join-fields hidden"><input id="teacher-room-code" placeholder="Masukkan kode dari guru" maxlength="10"><button class="btn gold" onclick="joinTeacherRoom()">Gabung ruang guru</button></div>
+ <div id="team-room-result" class="room-display hidden" aria-live="polite"></div>
+ <p class="muted small-note" id="mode-status">Single Player dipilih. Kamu bermain sendiri di perangkat ini.</p>
+</section>
+
 <div class="section-head" id="daftar-game"><div><h2>🎮 Pilih permainan</h2><p>Delapan tantangan untuk mengasah kemampuan literasi.</p></div></div>
 <section class="games">
 <button class="game" onclick="startGame('Petualangan Literasi')"><span class="emoji">🗺️</span><strong>Petualangan Literasi</strong><small>Jelajahi cerita dan selesaikan misi.</small></button>
@@ -61,6 +91,42 @@ function answer(i){const q=questions[current],buttons=document.querySelectorAll(
 function updateTeacher(){const s=getScores();document.getElementById('player-count').textContent=new Set(s.map(x=>x.name)).size;document.getElementById('point-count').textContent=s.reduce((a,x)=>a+x.points,0);document.getElementById('score-list').innerHTML=s.length?s.map(x=>'<p><b>'+escapeHtml(x.name)+'</b> — '+escapeHtml(x.game)+': '+x.points+' poin <small>('+x.date+')</small></p>').join(''):'Belum ada skor.'}
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function clearScores(){if(confirm('Hapus semua skor yang tersimpan di browser ini?')){localStorage.removeItem('literasiScores');updateTeacher()}}
+
+let selectedPlayMode='single';
+let teamManagement='student';
+function setPlayMode(mode){
+ selectedPlayMode=mode;
+ document.getElementById('mode-single').classList.toggle('active',mode==='single');
+ document.getElementById('mode-multi').classList.toggle('active',mode==='multi');
+ document.getElementById('multi-options').classList.toggle('hidden',mode!=='multi');
+ document.getElementById('mode-status').textContent=mode==='single'?'Single Player dipilih. Kamu bermain sendiri di perangkat ini.':'Multiplayer dipilih. Tentukan apakah tim dibentuk siswa atau diatur guru.';
+ if(mode==='multi')setTeamManagement(teamManagement);
+ else ['student-create-actions','teacher-join-actions','team-room-result'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+}
+function setTeamManagement(kind){
+ teamManagement=kind;
+ document.getElementById('student-team-box').classList.toggle('hidden',kind!=='student');
+ document.getElementById('teacher-team-box').classList.toggle('hidden',kind!=='teacher');
+ document.getElementById('student-create-actions').classList.toggle('hidden',kind!=='student');
+ document.getElementById('teacher-join-actions').classList.toggle('hidden',kind!=='teacher');
+ document.getElementById('team-room-result').classList.add('hidden');
+ document.getElementById('mode-status').textContent=kind==='student'?'Siswa membuat tim sendiri dan membagikan kode undangan.':'Guru membuat ruang dan mengatur pembagian tim.';
+}
+function createStudentTeam(){
+ const name=document.getElementById('mode-name').value.trim();
+ if(!name){document.getElementById('mode-status').textContent='Isi nama ketua tim terlebih dahulu.';return}
+ const code='TIM'+Math.floor(100+Math.random()*900);
+ const box=document.getElementById('team-room-result');
+ box.classList.remove('hidden');
+ box.innerHTML='<b>Tim siswa dibuat (simulasi)</b><strong>'+code+'</strong><small>Ketua tim: '+escapeHtml(name)+' • '+escapeHtml(document.getElementById('mode-game').value)+' • Level '+escapeHtml(document.getElementById('mode-level').value)+'<br>Bagikan kode ini kepada teman. Koneksi anggota tim akan aktif setelah Firebase dihubungkan.</small>';
+}
+function joinTeacherRoom(){
+ const code=document.getElementById('teacher-room-code').value.trim().toUpperCase();
+ const name=document.getElementById('mode-name').value.trim();
+ if(!name||!code){document.getElementById('mode-status').textContent='Isi nama dan kode ruang dari guru.';return}
+ document.getElementById('mode-status').textContent='Kode '+code+' diterima untuk simulasi, '+name+'. Tunggu guru menempatkanmu ke dalam tim. Ruang bersama belum tersambung ke Firebase.';
+}
+
 updateTeacher();
 </script>
 </body></html>
