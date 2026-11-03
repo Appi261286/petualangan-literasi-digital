@@ -282,7 +282,25 @@ const questions=[
 let current=0,score=0,player='';
 function getScores(){try{return JSON.parse(localStorage.getItem('literasiScores')||'[]')}catch(e){return[]}}
 function saveScore(name,points,game){const s=getScores();s.unshift({name,points,game,date:new Date().toLocaleDateString('id-ID')});localStorage.setItem('literasiScores',JSON.stringify(s.slice(0,50)));updateTeacher()}
-function joinRoom(){const n=document.getElementById('nama').value.trim(),k=document.getElementById('kode').value.trim();const el=document.getElementById('join-msg');if(!n||!k){el.textContent='Isi nama pemain dan kode ruang terlebih dahulu.';return}player=n;el.textContent='Halo, '+n+'! Kode '+k+' diterima untuk simulasi. Ruang multiplayer belum aktif.'}
+function joinRoom(){
+ const n=document.getElementById('nama').value.trim(),k=document.getElementById('kode').value.trim().toUpperCase(),el=document.getElementById('join-msg');
+ if(!n||!k){el.textContent='Isi nama pemain dan kode ruang terlebih dahulu.';return}
+ if(k.startsWith('TIM')){
+  document.getElementById('student-member-name').value=n;
+  document.getElementById('student-member-code').value=k;
+  goScreen('screen-student-team');
+  joinStudentTeamPage();
+  return;
+ }
+ if(k.startsWith('LIT')){
+  document.getElementById('online-player-name').value=n;
+  document.getElementById('online-room-code').value=k;
+  goScreen('screen-battle');
+  onlineJoinRoom();
+  return;
+ }
+ el.textContent='Kode tidak dikenali. Gunakan kode TIM untuk Main Tim atau kode LIT untuk Battle Kelas.';
+}
 function showTeacher(){document.getElementById('teacher').classList.remove('hidden');updateTeacher()}
 function makeRoom(){const c='BACA'+Math.floor(100+Math.random()*900);document.getElementById('room-code').textContent=c+' (kode contoh)'}
 function startGame(name){player=document.getElementById('nama').value.trim()||'Pemain';current=0;score=0;document.getElementById('game-title').textContent=name;document.getElementById('play').classList.remove('hidden');document.getElementById('play').scrollIntoView({behavior:'smooth'});renderQuestion()}
