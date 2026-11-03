@@ -600,7 +600,7 @@ async function onlineCreateRoom(){
  if(!host){onlineSetStatus('Isi nama kamu terlebih dahulu.');return}
  const code=onlineMakeCode(),count=Number(document.getElementById('online-count').value),seconds=Number(document.getElementById('online-seconds').value);
  const chosen=[...questions].sort(()=>Math.random()-.5).slice(0,Math.min(count,questions.length));
- const hostTeam=document.getElementById('online-host-team').value;const data={code,hostName:host,hostUid:onlineUid,status:'waiting',teams:{red:{name:'Tim Merah'},blue:{name:'Tim Biru'}},settings:{seconds,count:chosen.length},questions:chosen,qIndex:0,startedAt:0,players:{},answers:{}};
+ const hostTeam=document.getElementById('online-host-team').value;const data={code,hostName:host,hostUid:onlineUid,status:'waiting',teams:{red:{name:'Tim Merah'},blue:{name:'Tim Biru'}},settings:{seconds,count:chosen.length},teamScores:{red:1000,blue:1000},questions:chosen,qIndex:0,startedAt:0,players:{},answers:{}};
  try{
   const ref=onlineDb.ref('battleRooms/'+code);
   const snap=await ref.once('value');
@@ -654,8 +654,8 @@ function onlineRenderRoom(isHost){
  const players=room.players||{},list=Object.entries(players),all=list.map(x=>x[1]);
  const code='<div class="notice"><b>Kode Battle: '+escapeHtml(room.code)+'</b><br>Bagikan kode ini kepada kedua tim. Peserta: '+all.length+'</div>';
  const red=all.filter(p=>p.team==='red'),blue=all.filter(p=>p.team==='blue');
- const teamScore=arr=>arr.reduce((sum,p)=>sum+(Number(p.score)||0),0);
- const teamPanel=(name,arr,color)=>'<div class="battle-team-panel '+color+'"><h2>'+name+'</h2><div class="battle-team-score">'+teamScore(arr)+'</div><p>'+arr.length+' pemain</p><ul>'+arr.map(p=>'<li>'+escapeHtml(p.name||'Siswa')+' · '+(Number(p.score)||0)+' poin'+(p.host?' · host':'')+'</li>').join('')+'</ul></div>';
+ const teamScore=(arr,key)=>Number((room.teamScores||{})[key]??1000)+arr.reduce((sum,p)=>sum+(Number(p.score)||0),0);
+ const teamPanel=(name,arr,color)=>'<div class="battle-team-panel '+color+'"><h2>'+name+'</h2><div class="battle-team-score">'+teamScore(arr,color)+'</div><p>'+arr.length+' pemain</p><ul>'+arr.map(p=>'<li>'+escapeHtml(p.name||'Siswa')+' · '+(Number(p.score)||0)+' poin'+(p.host?' · host':'')+'</li>').join('')+'</ul></div>';
  const board='<div class="battle-team-board">'+teamPanel('🔴 Tim Merah',red,'red')+teamPanel('🔵 Tim Biru',blue,'blue')+'</div>';
  const members='<h3>Daftar peserta</h3><p>Merah: '+red.length+' siswa · Biru: '+blue.length+' siswa</p>';
  if(room.status==='waiting'){
@@ -663,7 +663,7 @@ function onlineRenderRoom(isHost){
   return;
  }
  if(room.status==='finished'){
-  const rs=teamScore(red),bs=teamScore(blue),winner=rs===bs?'Pertandingan seri!':rs>bs?'🏆 Tim Merah menang!':'🏆 Tim Biru menang!';
+  const rs=teamScore(red,'red'),bs=teamScore(blue,'blue'),winner=rs===bs?'Pertandingan seri!':rs>bs?'🏆 Tim Merah menang!':'🏆 Tim Biru menang!';
   view.innerHTML=code+board+'<div class="notice"><h2>'+winner+'</h2><p>Hasil akhir: Merah '+rs+' — '+bs+' Biru</p></div><button class="btn" onclick="onlinePrintResults()">🖨️ Cetak hasil lomba</button>';
   return;
  }
@@ -688,7 +688,7 @@ async function onlinePrintResults(){
  if(!onlineRoomData)return;
  const room=onlineRoomData,players=Object.values(room.players||{});
  const teams=[{key:'red',name:'Tim Merah'},{key:'blue',name:'Tim Biru'}];
- const score=t=>players.filter(p=>p.team===t.key).reduce((s,p)=>s+(Number(p.score)||0),0);
+ const score=t=>Number((room.teamScores||{})[t.key]??1000)+players.filter(p=>p.team===t.key).reduce((s,p)=>s+(Number(p.score)||0),0);
  const rows=teams.map(t=>'<tr><th>'+t.name+'</th><td>'+players.filter(p=>p.team===t.key).map(p=>escapeHtml(p.name||'Siswa')).join(', ')+'</td><td>'+score(t)+'</td></tr>').join('');
  const win=score(teams[0])===score(teams[1])?'Seri':score(teams[0])>score(teams[1])?'Tim Merah':'Tim Biru';
  const w=window.open('','_blank');if(!w){onlineSetStatus('Izinkan pop-up untuk mencetak hasil.');return;}
@@ -700,12 +700,12 @@ async function onlineSubmitAnswer(index){
  const qIndex=Number(onlineRoomData.qIndex),q=onlineRoomData.questions[qIndex];
  const answerRef=onlineRoomRef.child('answers/'+qIndex+'/'+onlineUid);
  const existing=await answerRef.once('value');if(existing.exists())return;
- const correct=index===q.c,points=correct?100:0;
+ const correct=index===q.c,points=correct?100:-50;
  try{
   await answerRef.set({choice:index,correct,answeredAt:firebase.database.ServerValue.TIMESTAMP});
   await onlineRoomRef.child('players/'+onlineUid+'/score').transaction(value=>(Number(value)||0)+points);
   const view=document.getElementById('online-room-view');
-  if(view)view.insertAdjacentHTML('afterbegin','<div class="notice">'+(correct?'✅ Jawaban benar! +100 poin.':'💡 Jawaban belum tepat.')+'</div>');
+  if(view)view.insertAdjacentHTML('afterbegin','<div class="notice">'+(correct?'✅ Jawaban benar! +100 poin untuk tim.':'💡 Jawaban salah. −50 poin untuk tim.')+'</div>');
  }catch(error){onlineSetStatus('Jawaban belum tersimpan: '+error.message)}
 }
 
