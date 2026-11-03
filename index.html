@@ -591,7 +591,8 @@ const onlineReady=(async()=>{
  }
 })();
 var onlineDisplayOnly=false;
-function onlineWatchDisplay(){const code=document.getElementById("online-display-code").value.trim().toUpperCase();if(!code){onlineSetStatus("Masukkan kode Battle terlebih dahulu.");return}onlineReady.then(ok=>{if(!ok)return;onlineDisplayOnly=true;onlineWatchRoom(code,false);onlineSetStatus("Mode layar IFD aktif. Kode: "+code)})}\nfunction onlineSetStatus(message){const el=document.getElementById('online-status');if(el)el.textContent=message}
+function onlineWatchDisplay(){const code=document.getElementById("online-display-code").value.trim().toUpperCase();if(!code){onlineSetStatus("Masukkan kode Battle terlebih dahulu.");return}onlineReady.then(ok=>{if(!ok)return;onlineDisplayOnly=true;onlineWatchRoom(code,false);onlineSetStatus("Mode layar IFD aktif. Kode: "+code)})}
+function onlineSetStatus(message){const el=document.getElementById('online-status');if(el)el.textContent=message}
 function onlineMakeCode(){return 'LIT'+Math.floor(10000+Math.random()*90000).toString().slice(0,3)}
 async function onlineCreateRoom(){
  const ok=await onlineReady;if(!ok)return;
