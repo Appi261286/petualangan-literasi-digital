@@ -26,6 +26,23 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 #app-pages{min-height:60vh}.app-screen{animation:screenIn .18s ease-out}.app-screen.hidden{display:none!important}@keyframes screenIn{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}
 .welcome-card{display:flex;align-items:center;gap:22px;padding:clamp(22px,4vw,38px);background:white;border-radius:22px;box-shadow:0 8px 26px #18324d0d}.welcome-icon{font-size:clamp(48px,8vw,76px)}.welcome-card h1,.screen-heading h1{font-size:clamp(25px,4vw,36px);margin:7px 0}.welcome-card p,.screen-heading p{color:var(--muted);line-height:1.6;margin:0}.eyebrow,.screen-heading>span{font-size:12px;font-weight:800;letter-spacing:1.2px;color:var(--teal)}.role-grid,.choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}.role-card,.choice-card{background:white;border:1px solid var(--line);border-radius:18px;padding:22px;text-align:left;cursor:pointer;color:var(--ink);transition:.15s}.role-card:hover,.choice-card:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 8px 22px #17324d12}.role-card>span,.choice-card>span{font-size:36px}.role-card h2,.choice-card h2{margin:10px 0 7px;font-size:21px}.role-card p,.choice-card p{color:var(--muted);line-height:1.5;min-height:45px}.role-card b{color:var(--teal)}.teacher-role{background:#f7fbfc}.back-link{border:0;background:transparent;color:var(--teal);font:inherit;font-weight:750;cursor:pointer;padding:8px 0;margin-bottom:14px}.screen-heading{margin:8px 0 20px}.form-card{background:white;border:1px solid var(--line);border-radius:17px;padding:20px;margin:14px 0;max-width:720px}.form-card h2{font-size:19px}.form-card label{display:block;font-weight:650;margin-top:10px}.form-card .field{max-width:100%}.form-card .btn{margin-top:6px}.form-card.narrow{max-width:520px}.small-note{font-size:13px}.room-display{margin-top:14px;padding:15px;background:#eff8f7;border:1px dashed #85b9b0;border-radius:13px;line-height:1.5}.room-display strong{display:block;font-size:28px;letter-spacing:3px;color:var(--teal);margin:6px 0}@media(max-width:650px){.role-grid,.choice-grid{grid-template-columns:1fr}.welcome-card{align-items:flex-start}.role-card p,.choice-card p{min-height:0}}
 
+
+/* Tata letak Battle Online */
+.online-battle-wrap{background:#f3f8fa;border:1px solid #d9e7ec;border-radius:20px;padding:clamp(14px,3vw,26px);margin:16px 0 20px}
+.online-intro{margin-bottom:18px}.online-intro h2{font-size:clamp(22px,3vw,29px);margin:7px 0}.online-intro p,.online-help,.online-footnote{color:var(--muted);line-height:1.5}
+.online-kicker{font-size:12px;font-weight:800;letter-spacing:1px;color:var(--teal)}
+.online-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.online-card{background:white;border:1px solid var(--line);border-radius:17px;padding:clamp(15px,2.5vw,22px);min-width:0}
+.online-card h3{font-size:17px;margin:6px 0}.online-card-icon{font-size:30px}.online-help{font-size:14px;min-height:42px;margin:5px 0 14px}
+.online-card label{display:block;font-weight:700;margin:10px 0 4px}.online-card .field{margin:4px 0 10px;min-height:46px}
+.online-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.online-action{width:100%;min-height:48px;margin-top:10px;font-size:15px}
+.online-footnote{font-size:12px;margin:12px 0 0}.online-status{margin:16px 0}.online-room-view:empty{display:none}
+.online-room-view{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;margin-top:14px;overflow-wrap:anywhere}
+.online-room-view button{min-height:44px;margin:5px}.local-options{background:white;border:1px solid var(--line);border-radius:15px;padding:15px 18px;margin:18px 0}
+.local-options summary{font-weight:750;cursor:pointer;color:var(--blue);padding:4px}
+@media(max-width:680px){.online-columns{grid-template-columns:1fr}.online-help{min-height:0}.online-settings{grid-template-columns:1fr}.online-battle-wrap{padding:13px}.online-card{padding:16px}}
+
 </style>
 </head>
 <body>
@@ -97,46 +114,53 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
  <section class="app-screen hidden" id="screen-battle">
   <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
   <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Atur pertandingan literasi</h1><p>Buat pertandingan di satu perangkat untuk uji coba. IFD, HP, dan laptop akan dapat tersinkron setelah Firebase dipasang.</p></div>
-  <div class="form-card" id="online-battle" style="max-width:none;border:2px solid #0f766e">
-   <h2>🌐 Battle Literasi Online (Firebase)</h2>
-   <p class="muted">Guru membuat ruang. Siswa masuk dari HP masing-masing menggunakan kode ruang.</p>
-   <div class="setup-grid">
-    <div><label for="online-host-name"><b>Nama guru / pembuat ruang</b></label><input id="online-host-name" class="field" placeholder="Nama guru"></div>
-    <div><label for="online-count"><b>Jumlah soal</b></label><select id="online-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
-    <div><label for="online-seconds"><b>Waktu per soal</b></label><select id="online-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
+  <div class="online-battle-wrap" id="online-battle">
+   <div class="online-intro"><span class="online-kicker">🌐 MODE TERHUBUNG INTERNET</span><h2>Battle Literasi Online</h2><p>Guru membuat ruang pertandingan. Siswa masuk menggunakan kode dari HP atau laptop masing-masing.</p></div>
+   <div class="online-columns">
+    <div class="online-card teacher-card">
+     <div class="online-card-icon">👩‍🏫</div><h3>1. HALAMAN GURU</h3><p class="online-help">Gunakan laptop atau IFD untuk membuat dan mengendalikan pertandingan.</p>
+     <label for="online-host-name">Nama guru</label><input id="online-host-name" class="field" placeholder="Contoh: Ibu Sari">
+     <div class="online-settings">
+      <div><label for="online-count">Jumlah soal</label><select id="online-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
+      <div><label for="online-seconds">Waktu setiap soal</label><select id="online-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
+     </div>
+     <button class="btn online-action" onclick="onlineCreateRoom()">Buat ruang pertandingan</button>
+     <p class="online-footnote">Setelah ruang dibuat, bagikan kode yang tampil kepada siswa.</p>
+    </div>
+    <div class="online-card student-card">
+     <div class="online-card-icon">📱</div><h3>2. HALAMAN SISWA</h3><p class="online-help">Setiap siswa membuka website di HP atau laptop sendiri.</p>
+     <label for="online-player-name">Nama siswa</label><input id="online-player-name" class="field" placeholder="Ketik nama lengkap">
+     <label for="online-room-code">Kode ruang dari guru</label><input id="online-room-code" class="field" placeholder="Contoh: LIT123" maxlength="8" style="text-transform:uppercase">
+     <button class="btn gold online-action" onclick="onlineJoinRoom()">Gabung ke pertandingan</button>
+     <p class="online-footnote">Pastikan kode ruang sama persis dengan yang diberikan guru.</p>
+    </div>
    </div>
-   <button class="btn" onclick="onlineCreateRoom()">Buat ruang online sebagai guru</button>
-   <hr style="border:0;border-top:1px solid #dce7ee;margin:20px 0">
-   <h3>📱 Siswa masuk ke ruang</h3>
-   <div class="setup-grid">
-    <div><label for="online-player-name"><b>Nama siswa</b></label><input id="online-player-name" class="field" placeholder="Nama siswa"></div>
-    <div><label for="online-room-code"><b>Kode ruang dari guru</b></label><input id="online-room-code" class="field" placeholder="Contoh: LIT123" maxlength="8" style="text-transform:uppercase"></div>
-   </div>
-   <button class="btn gold" onclick="onlineJoinRoom()">Gabung sebagai siswa</button>
-   <p id="online-status" class="notice" aria-live="polite">Menghubungkan ke Firebase…</p>
-   <div id="online-room-view"></div>
+   <p id="online-status" class="notice online-status" aria-live="polite">Menghubungkan ke Firebase…</p>
+   <div id="online-room-view" class="online-room-view"></div>
   </div>
-  <div class="form-card" style="max-width:none">
-   <div class="setup-grid">
-    <div><label for="battle-mode"><b>Jenis pertandingan</b></label><select id="battle-mode" class="field" onchange="updateBattleHint()"><option value="individual">Battle Individu</option><option value="team">Battle Antartim</option></select></div>
-    <div><label for="battle-level"><b>Tingkat kesulitan</b></label><select id="battle-level" class="field" onchange="applyBattleLevel()"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit">Sulit</option><option value="Sangat Sulit">Sangat Sulit</option></select></div>
-    <div><label for="battle-count"><b>Jumlah soal</b></label><select id="battle-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
+  <details class="local-options">
+   <summary>Pengaturan Battle Lokal (uji coba satu perangkat)</summary>
+   <p class="muted small-note">Bagian ini bukan untuk pertandingan online. Gunakan hanya jika ingin mencoba permainan pada satu perangkat.</p>
+   <div class="form-card" style="max-width:none">
+    <div class="setup-grid">
+     <div><label for="battle-mode"><b>Jenis pertandingan</b></label><select id="battle-mode" class="field" onchange="updateBattleHint()"><option value="individual">Battle Individu</option><option value="team">Battle Antartim</option></select></div>
+     <div><label for="battle-level"><b>Tingkat kesulitan</b></label><select id="battle-level" class="field" onchange="applyBattleLevel()"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit">Sulit</option><option value="Sangat Sulit">Sangat Sulit</option></select></div>
+     <div><label for="battle-count"><b>Jumlah soal</b></label><select id="battle-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
+    </div>
+    <div id="team-answer-mode-wrap" class="hidden"><label for="team-answer-mode"><b>Mode jawaban Battle Antartim</b></label><select id="team-answer-mode" class="field"><option value="individual">Setiap anggota menjawab sendiri</option><option value="team">Tim berdiskusi dan menjawab bersama</option></select><p class="muted small-note">Mode individu: semua anggota mendapat giliran; skor tim adalah rata-rata skor anggota. Mode diskusi: satu jawaban mewakili seluruh tim.</p></div>
+    <div class="setup-grid">
+     <div><label for="battle-seconds"><b>Waktu per soal</b></label><select id="battle-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
+     <div><label for="battle-room"><b>Kode ruang lokal</b></label><input id="battle-room" class="field" placeholder="Dibuat otomatis" readonly></div>
+     <div><label for="battle-penalty"><b>Jawaban salah / waktu habis</b></label><select id="battle-penalty" class="field"><option value="0">0 poin</option><option value="-10">-10 poin</option></select></div>
+    </div>
+    <label for="battle-players"><b id="battle-participants-label">Nama peserta (satu nama per baris)</b></label>
+    <textarea id="battle-players" class="field" rows="5" placeholder="Alya&#10;Bima&#10;Citra"></textarea>
+    <p id="battle-hint" class="muted small-note">Mode individu: tulis satu nama siswa pada setiap baris.</p>
+    <button class="btn" onclick="startBattle()">Mulai simulasi lokal</button>
    </div>
-   <div id="team-answer-mode-wrap" class="hidden"><label for="team-answer-mode"><b>Mode jawaban Battle Antartim (dipilih guru)</b></label><select id="team-answer-mode" class="field"><option value="individual">Setiap anggota menjawab sendiri</option><option value="team">Tim berdiskusi dan menjawab bersama</option></select><p class="muted small-note">Mode individu: semua anggota mendapat giliran; skor tim adalah rata-rata skor anggota. Mode diskusi: satu jawaban mewakili seluruh tim.</p></div>
-   <div class="setup-grid">
-    <div><label for="battle-seconds"><b>Waktu per soal</b></label><select id="battle-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
-    <div><label for="battle-room"><b>Kode ruang (contoh lokal)</b></label><input id="battle-room" class="field" placeholder="Dibuat otomatis" readonly></div>
-    <div><label for="battle-penalty"><b>Jawaban salah / waktu habis</b></label><select id="battle-penalty" class="field"><option value="0">0 poin</option><option value="-10">-10 poin</option></select></div>
-   </div>
-   <label for="battle-players"><b id="battle-participants-label">Nama peserta (satu nama per baris)</b></label>
-   <textarea id="battle-players" class="field" rows="5" placeholder="Contoh:&#10;Alya&#10;Bima&#10;Citra"></textarea>
-   <p id="battle-hint" class="muted small-note">Mode individu: tulis satu nama siswa pada setiap baris.</p>
-   <button class="btn" onclick="startBattle()">Buat ruang & mulai pertandingan</button>
-   <p class="muted small-note">Aturan awal: jawaban benar +100 poin, jawaban salah atau waktu habis 0 poin (dapat diubah). Jika seri, waktu total tercepat menjadi penentu.</p>
-  </div>
+  </details>
   <div id="battle-play-area" class="form-card hidden" style="max-width:none" aria-live="polite"></div>
   <div id="battle-scoreboard" class="form-card hidden" style="max-width:none"></div>
-  <div class="notice">⚠️ Tahap ini adalah simulasi lokal pada satu perangkat. Kode ruang belum menghubungkan HP/laptop lain. Jangan gunakan untuk penilaian resmi sebelum Firebase aktif.</div>
  </section>
 </section>
 
