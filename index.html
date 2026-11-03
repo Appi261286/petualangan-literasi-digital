@@ -126,6 +126,10 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
    <h2>🏆 Ruang Battle</h2><p class="muted">Ikuti pertandingan individu atau antartim dengan timer dan papan peringkat.</p>
    <button class="btn gold" onclick="goScreen('screen-battle')">Atur Battle Individu / Antartim →</button>
   </div>
+  <div class="cloze-promo">
+   <div><span class="emoji">📚</span><h2>Perpustakaan Cerita Rakyat</h2><p>Baca cerita rakyat dan uji pemahamanmu melalui kuis melengkapi kata. Koleksi cerita dapat dikembangkan bertahap.</p></div>
+   <button class="btn gold" onclick="goScreen('screen-cloze')">Buka Cerita & Kuis →</button>
+  </div>
   <div class="games">
    <button class="game" onclick="launchGamePage('Petualangan Literasi')"><span class="emoji">🗺️</span><strong>Petualangan Literasi</strong><small>Jelajahi cerita dan selesaikan misi.</small></button>
    <button class="game" onclick="launchGamePage('Duel Kuis Literasi')"><span class="emoji">⚔️</span><strong>Duel Kuis Literasi</strong><small>Uji pengetahuan melalui kuis.</small></button>
@@ -137,10 +141,6 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
    <button class="game" onclick="launchGamePage('Misi Penyelamatan Buku')"><span class="emoji">📖</span><strong>Misi Penyelamatan Buku</strong><small>Selesaikan misi penyelamatan buku.</small></button>
   </div>
 
-  <div class="cloze-promo">
-   <div><span class="emoji">✍️</span><h2>Kuis Lengkapi Cerita Rakyat</h2><p>Isi kata-kata yang hilang agar cerita menjadi utuh. Latih kosakata dan pemahaman bacaanmu!</p></div>
-   <button class="btn gold" onclick="goScreen('screen-cloze')">Mulai Kuis →</button>
-  </div>
  </section>
  <section class="app-screen hidden" id="screen-cloze">
   <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
