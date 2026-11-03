@@ -97,6 +97,25 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
  <section class="app-screen hidden" id="screen-battle">
   <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
   <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Atur pertandingan literasi</h1><p>Buat pertandingan di satu perangkat untuk uji coba. IFD, HP, dan laptop akan dapat tersinkron setelah Firebase dipasang.</p></div>
+  <div class="form-card" id="online-battle" style="max-width:none;border:2px solid #0f766e">
+   <h2>🌐 Battle Literasi Online (Firebase)</h2>
+   <p class="muted">Guru membuat ruang. Siswa masuk dari HP masing-masing menggunakan kode ruang.</p>
+   <div class="setup-grid">
+    <div><label for="online-host-name"><b>Nama guru / pembuat ruang</b></label><input id="online-host-name" class="field" placeholder="Nama guru"></div>
+    <div><label for="online-count"><b>Jumlah soal</b></label><select id="online-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
+    <div><label for="online-seconds"><b>Waktu per soal</b></label><select id="online-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
+   </div>
+   <button class="btn" onclick="onlineCreateRoom()">Buat ruang online sebagai guru</button>
+   <hr style="border:0;border-top:1px solid #dce7ee;margin:20px 0">
+   <h3>📱 Siswa masuk ke ruang</h3>
+   <div class="setup-grid">
+    <div><label for="online-player-name"><b>Nama siswa</b></label><input id="online-player-name" class="field" placeholder="Nama siswa"></div>
+    <div><label for="online-room-code"><b>Kode ruang dari guru</b></label><input id="online-room-code" class="field" placeholder="Contoh: LIT123" maxlength="8" style="text-transform:uppercase"></div>
+   </div>
+   <button class="btn gold" onclick="onlineJoinRoom()">Gabung sebagai siswa</button>
+   <p id="online-status" class="notice" aria-live="polite">Menghubungkan ke Firebase…</p>
+   <div id="online-room-view"></div>
+  </div>
   <div class="form-card" style="max-width:none">
    <div class="setup-grid">
     <div><label for="battle-mode"><b>Jenis pertandingan</b></label><select id="battle-mode" class="field" onchange="updateBattleHint()"><option value="individual">Battle Individu</option><option value="team">Battle Antartim</option></select></div>
@@ -167,6 +186,9 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 <section id="teacher" class="panel hidden"><div class="section-head"><div><span class="muted">Area pengelolaan</span><h2>👩‍🏫 Panel Guru</h2></div><button class="btn secondary" onclick="document.getElementById('teacher').classList.add('hidden')">Tutup</button></div><div class="notice">Panel ini masih berupa contoh lokal di perangkat ini. Pembuatan ruang, sinkronisasi siswa, dan kontrol pertandingan langsung memerlukan Firebase pada tahap berikutnya.</div><div class="stats"><div class="stat"><span class="muted">Pemain tersimpan</span><b id="player-count">0</b></div><div class="stat"><span class="muted">Poin terkumpul</span><b id="point-count">0</b></div><div class="stat"><span class="muted">Mode</span><b style="font-size:18px">Uji coba</b></div></div><h3 style="margin-top:20px">Buat kode ruang contoh</h3><button class="btn" onclick="makeRoom()">Buat kode ruang</button> <strong id="room-code"></strong><h3 style="margin-top:20px">Riwayat skor di perangkat ini</h3><div id="score-list" class="muted">Belum ada skor.</div><button class="btn secondary" onclick="clearScores()">Reset skor lokal</button></section>
 <div class="footer">Versi prototipe awal • Data skor disimpan di browser perangkat ini.</div>
 </main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
 const questions=[
 {q:'Bacalah: “Rani menyiram bunga setiap pagi agar tetap segar.” Mengapa Rani menyiram bunga?',a:['Agar bunga tetap segar','Agar bunga cepat layu','Agar pot menjadi besar'],c:0,why:'Rani menyiram bunga supaya bunga tetap segar.'},
@@ -391,6 +413,124 @@ function finishBattle(){
 function openTeacherPage(){
  document.querySelectorAll('#app-pages .app-screen').forEach(s=>s.classList.add('hidden'));
  const teacher=document.getElementById('teacher');teacher.style.display='block';teacher.classList.remove('hidden');showTeacher();window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+const firebaseConfig={apiKey:"AIzaSyDzEFqW3HylbvAstQBC6hnJIRxnc_0bl6U",authDomain:"petualangan-literasi-digital.firebaseapp.com",databaseURL:"https://petualangan-literasi-digital-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"petualangan-literasi-digital",storageBucket:"petualangan-literasi-digital.firebasestorage.app",messagingSenderId:"259136282493",appId:"1:259136282493:web:b9eae92234f744a9747614"};
+let onlineDb=null,onlineAuth=null,onlineUid=null,onlineRoomCode=null,onlineRoomData=null,onlineRoomRef=null,onlineTick=null,onlineTickKey='';
+const onlineReady=(async()=>{
+ try{
+  if(!window.firebase){throw new Error('Pustaka Firebase belum termuat. Periksa koneksi internet lalu muat ulang.')}
+  if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+  onlineAuth=firebase.auth();onlineDb=firebase.database();
+  const credential=await onlineAuth.signInAnonymously();
+  onlineUid=credential.user.uid;
+  document.getElementById('online-status').textContent='Terhubung ke Firebase. Guru dapat membuat ruang atau siswa dapat bergabung.';
+  return true;
+ }catch(error){
+  document.getElementById('online-status').textContent='Belum dapat terhubung: '+(error.message||error);
+  return false;
+ }
+})();
+function onlineSetStatus(message){const el=document.getElementById('online-status');if(el)el.textContent=message}
+function onlineMakeCode(){return 'LIT'+Math.floor(10000+Math.random()*90000).toString().slice(0,3)}
+async function onlineCreateRoom(){
+ const ok=await onlineReady;if(!ok)return;
+ const host=document.getElementById('online-host-name').value.trim();
+ if(!host){onlineSetStatus('Isi nama guru terlebih dahulu.');return}
+ const code=onlineMakeCode(),count=Number(document.getElementById('online-count').value),seconds=Number(document.getElementById('online-seconds').value);
+ const chosen=[...questions].sort(()=>Math.random()-.5).slice(0,Math.min(count,questions.length));
+ const data={code,hostName:host,hostUid:onlineUid,status:'waiting',settings:{seconds,count:chosen.length},questions:chosen,qIndex:0,startedAt:0,players:{},answers:{}};
+ try{
+  const ref=onlineDb.ref('battleRooms/'+code);
+  const snap=await ref.once('value');
+  if(snap.exists()){onlineSetStatus('Kode ruang bentrok. Tekan buat ruang sekali lagi.');return}
+  await ref.set(data);onlineWatchRoom(code,true);
+ }catch(error){onlineSetStatus('Gagal membuat ruang: '+error.message)}
+}
+async function onlineJoinRoom(){
+ const ok=await onlineReady;if(!ok)return;
+ const name=document.getElementById('online-player-name').value.trim(),code=document.getElementById('online-room-code').value.trim().toUpperCase();
+ if(!name||!code){onlineSetStatus('Isi nama siswa dan kode ruang.');return}
+ try{
+  const ref=onlineDb.ref('battleRooms/'+code),snap=await ref.once('value');
+  if(!snap.exists()){onlineSetStatus('Kode ruang tidak ditemukan. Periksa kembali kode dari guru.');return}
+  const room=snap.val();
+  if(room.status!=='waiting'){onlineSetStatus('Pertandingan sudah dimulai atau selesai. Minta guru membuat ruang baru.');return}
+  await ref.child('players/'+onlineUid).set({name,score:0,joinedAt:firebase.database.ServerValue.TIMESTAMP});
+  onlineWatchRoom(code,false);
+ }catch(error){onlineSetStatus('Gagal bergabung: '+error.message)}
+}
+function onlineWatchRoom(code,isHost){
+ if(onlineRoomRef)onlineRoomRef.off();
+ if(onlineTick){clearInterval(onlineTick);onlineTick=null}
+ onlineRoomCode=code;onlineRoomRef=onlineDb.ref('battleRooms/'+code);
+ onlineSetStatus((isHost?'Ruang guru dibuat.':'Berhasil masuk ruang.')+' Kode: '+code);
+ onlineRoomRef.on('value',snap=>{
+  if(!snap.exists()){onlineSetStatus('Ruang tidak ditemukan.');return}
+  onlineRoomData=snap.val();onlineRenderRoom(isHost);
+  if(isHost&&onlineRoomData.status==='playing'){
+   const key=String(onlineRoomData.qIndex)+'_'+String(onlineRoomData.startedAt);
+   if(key!==onlineTickKey){
+    onlineTickKey=key;if(onlineTick)clearInterval(onlineTick);
+    onlineTick=setInterval(async()=>{
+     if(!onlineRoomData||onlineRoomData.status!=='playing')return;
+     const duration=Number(onlineRoomData.settings.seconds)*1000;
+     if(Date.now()-Number(onlineRoomData.startedAt)>=duration){
+      clearInterval(onlineTick);onlineTick=null;
+      const next=Number(onlineRoomData.qIndex)+1;
+      if(next>=onlineRoomData.questions.length){await onlineRoomRef.update({status:'finished'});}
+      else{await onlineRoomRef.update({qIndex:next,startedAt:Date.now()});}
+     }
+    },400);
+   }
+  }else if(onlineTick){clearInterval(onlineTick);onlineTick=null;onlineTickKey=''}
+ });
+}
+function onlineRenderRoom(isHost){
+ const room=onlineRoomData,view=document.getElementById('online-room-view');
+ if(!room||!view)return;
+ const players=room.players||{},names=Object.values(players).map(p=>escapeHtml(p.name||'Siswa'));
+ const code='<div class="notice"><b>Kode ruang: '+escapeHtml(room.code)+'</b><br>Bagikan kode ini kepada siswa. Jumlah siswa: '+names.length+'</div>';
+ const list='<h3>Peserta ('+names.length+')</h3><ul>'+names.map(n=>'<li>'+n+'</li>').join('')+'</ul>';
+ if(room.status==='waiting'){
+  view.innerHTML=code+list+(isHost?'<button class="btn" onclick="onlineStartMatch()">Mulai pertandingan</button>':'<p class="muted">Menunggu guru memulai pertandingan…</p>');
+  return;
+ }
+ if(room.status==='finished'){
+  const ranked=Object.values(players).sort((a,b)=>(b.score||0)-(a.score||0));
+  view.innerHTML=code+'<h3>🏆 Hasil pertandingan</h3><ol>'+ranked.map(p=>'<li><b>'+escapeHtml(p.name)+'</b> — '+(p.score||0)+' poin</li>').join('')+'</ol><p>Pertandingan selesai. Guru dapat membuat ruang baru untuk pertandingan berikutnya.</p>';
+  return;
+ }
+ const q=room.questions[room.qIndex],answers=(room.answers&&room.answers[room.qIndex])||{},me=players[onlineUid],already=!!answers[onlineUid];
+ const elapsed=Math.max(0,Math.floor((Date.now()-Number(room.startedAt))/1000)),remaining=Math.max(0,Number(room.settings.seconds)-elapsed);
+ const scoreboard=Object.values(players).sort((a,b)=>(b.score||0)-(a.score||0)).map(p=>'<li>'+escapeHtml(p.name)+': <b>'+(p.score||0)+'</b> poin</li>').join('');
+ if(isHost){
+  view.innerHTML=code+'<h3>Soal '+(room.qIndex+1)+' / '+room.questions.length+'</h3><p class="question">'+escapeHtml(q.q)+'</p><p><b>Waktu tersisa sekitar '+remaining+' detik</b></p><h3>Skor sementara</h3><ol>'+scoreboard+'</ol><p class="muted">Siswa menjawab dari perangkat masing-masing. Soal berganti otomatis setelah waktu habis.</p>';
+ }else if(!me){
+  view.innerHTML=code+'<p class="notice">Nama perangkat ini belum terdaftar pada ruang tersebut. Masuk kembali dengan kode ruang.</p>';
+ }else{
+  const choices=already?'<div class="notice">Jawaban sudah diterima. Tunggu soal berikutnya.</div>':'<div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="onlineSubmitAnswer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div>';
+  view.innerHTML=code+'<h3>Soal '+(room.qIndex+1)+' / '+room.questions.length+'</h3><p class="muted">Waktu tersisa sekitar '+remaining+' detik</p><p class="question">'+escapeHtml(q.q)+'</p>'+choices+'<h3>Skor sementara</h3><ol>'+scoreboard+'</ol>';
+ }
+}
+async function onlineStartMatch(){
+ if(!onlineRoomRef||!onlineRoomData||onlineRoomData.hostUid!==onlineUid)return;
+ if(Object.keys(onlineRoomData.players||{}).length<1){onlineSetStatus('Belum ada siswa yang bergabung.');return}
+ await onlineRoomRef.update({status:'playing',qIndex:0,startedAt:Date.now()});
+}
+async function onlineSubmitAnswer(index){
+ if(!onlineRoomRef||!onlineRoomData||onlineRoomData.status!=='playing')return;
+ const qIndex=Number(onlineRoomData.qIndex),q=onlineRoomData.questions[qIndex];
+ const answerRef=onlineRoomRef.child('answers/'+qIndex+'/'+onlineUid);
+ const existing=await answerRef.once('value');if(existing.exists())return;
+ const correct=index===q.c,points=correct?100:0;
+ try{
+  await answerRef.set({choice:index,correct,answeredAt:firebase.database.ServerValue.TIMESTAMP});
+  await onlineRoomRef.child('players/'+onlineUid+'/score').transaction(value=>(Number(value)||0)+points);
+  const view=document.getElementById('online-room-view');
+  if(view)view.insertAdjacentHTML('afterbegin','<div class="notice">'+(correct?'✅ Jawaban benar! +100 poin.':'💡 Jawaban belum tepat.')+'</div>');
+ }catch(error){onlineSetStatus('Jawaban belum tersimpan: '+error.message)}
 }
 
 updateTeacher();
