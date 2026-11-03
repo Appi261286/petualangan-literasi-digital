@@ -110,9 +110,10 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
  </section>
  <section class="app-screen hidden" id="screen-student-team">
   <button class="back-link" onclick="goScreen('screen-multiplayer')">← Kembali</button>
-  <div class="screen-heading"><span>🤝 TIM SISWA</span><h1>Buat tim atau gabung tim teman</h1><p>Ketua tim dapat membagikan kode undangan kepada teman-temannya.</p></div>
-  <div class="form-card"><h2>➕ Buat tim baru</h2><label>Nama ketua tim</label><input id="student-leader-name" class="field" placeholder="Masukkan nama kamu"><button class="btn" onclick="createStudentTeamPage()">Buat tim dan kode undangan</button><div id="student-team-code" class="room-display hidden"></div></div>
-  <div class="form-card"><h2>🔑 Gabung tim teman</h2><label>Nama siswa</label><input id="student-member-name" class="field" placeholder="Masukkan nama kamu"><label>Kode undangan tim</label><input id="student-member-code" class="field" placeholder="Contoh: TIM123" maxlength="10"><button class="btn gold" onclick="joinStudentTeamPage()">Gabung ke tim</button><p id="student-team-message" class="muted small-note"></p></div>
+  <div class="screen-heading"><span>🤝 MAIN TIM ONLINE</span><h1>Kerja sama dalam satu tim</h1><p>Buat ruang tim, bagikan kode undangan, lalu ajak teman bergabung. Semua anggota mendapat soal yang sama.</p></div>
+  <div class="form-card"><h2>➕ Buat ruang tim</h2><label>Nama ketua tim</label><input id="student-leader-name" class="field" placeholder="Masukkan nama kamu"><label>Nama tim</label><input id="student-team-name" class="field" placeholder="Contoh: Tim Cerdas"><label>Permainan</label><select id="student-team-game" class="field"><option>Petualangan Literasi</option><option>Duel Kuis Literasi</option><option>Tebak Kata</option><option>Susun Cerita</option><option>Detektif Bacaan</option><option>Puzzle Literasi</option><option>Battle Literasi</option><option>Misi Penyelamatan Buku</option></select><button class="btn" onclick="createStudentTeamPage()">Buat ruang & kode undangan</button><div id="student-team-code" class="room-display hidden"></div></div>
+  <div class="form-card"><h2>🔑 Gabung ruang tim</h2><label>Nama siswa</label><input id="student-member-name" class="field" placeholder="Masukkan nama kamu"><label>Kode undangan tim</label><input id="student-member-code" class="field" placeholder="Contoh: TIM1234" maxlength="10"><button class="btn gold" onclick="joinStudentTeamPage()">Gabung ke tim</button><p id="student-team-message" class="muted small-note"></p></div>
+  <div class="form-card hidden" id="student-team-live"><div id="student-team-live-content"></div></div>
  </section>
  <section class="app-screen hidden" id="screen-teacher-join">
   <button class="back-link" onclick="goScreen('screen-multiplayer')">← Kembali</button>
@@ -341,16 +342,79 @@ function selectStudentMode(mode){
  if(mode==='single'){goScreen('screen-games');}
  else{goScreen('screen-multiplayer');}
 }
-function createStudentTeamPage(){
+let studentTeamRef=null,studentTeamData=null,studentTeamIsHost=false,studentTeamUid=null;
+function teamMessage(msg){const el=document.getElementById('student-team-message');if(el)el.textContent=msg;}
+function teamCode(){return 'TIM'+Math.floor(1000+Math.random()*9000);}
+async function createStudentTeamPage(){
+ const ok=await onlineReady;if(!ok){teamMessage('Koneksi Firebase belum tersedia. Periksa internet dan muat ulang.');return;}
  const name=document.getElementById('student-leader-name').value.trim();
- if(!name){document.getElementById('student-team-code').classList.remove('hidden');document.getElementById('student-team-code').textContent='Isi nama ketua tim terlebih dahulu.';return}
- const code='TIM'+Math.floor(100+Math.random()*900);
- const box=document.getElementById('student-team-code');box.classList.remove('hidden');
- box.innerHTML='<b>Tim berhasil dibuat (simulasi)</b><strong>'+code+'</strong><small>Ketua tim: '+escapeHtml(name)+'. Bagikan kode ini kepada teman. Anggota belum dapat terhubung sebelum fitur multiplayer Firebase aktif.</small>';
+ const teamName=document.getElementById('student-team-name').value.trim()||'Tim Literasi';
+ if(!name){teamMessage('Isi nama ketua tim terlebih dahulu.');return;}
+ const code=teamCode(),game=document.getElementById('student-team-game').value;
+ const ref=onlineDb.ref('teamRooms/'+code);
+ try{
+  const exists=await ref.once('value');if(exists.exists()){teamMessage('Kode undangan bentrok. Coba buat lagi.');return;}
+  const data={code,teamName,game,hostUid:onlineUid,hostName:name,status:'waiting',createdAt:firebase.database.ServerValue.TIMESTAMP,players:{},qIndex:0,score:0,answers:{}};
+  data.players[onlineUid]={name,role:'ketua',joinedAt:firebase.database.ServerValue.TIMESTAMP};
+  await ref.set(data);watchStudentTeam(code,true);
+ }catch(e){teamMessage('Ruang tim gagal dibuat: '+e.message);}
 }
-function joinStudentTeamPage(){
+async function joinStudentTeamPage(){
+ const ok=await onlineReady;if(!ok){teamMessage('Koneksi Firebase belum tersedia. Periksa internet dan muat ulang.');return;}
  const name=document.getElementById('student-member-name').value.trim(),code=document.getElementById('student-member-code').value.trim().toUpperCase();
- document.getElementById('student-team-message').textContent=(!name||!code)?'Isi nama dan kode undangan terlebih dahulu.':'Kode '+code+' diterima untuk simulasi, '+name+'. Bergabung secara langsung akan aktif setelah Firebase dihubungkan.';
+ if(!name||!code){teamMessage('Isi nama dan kode undangan.');return;}
+ try{
+  const ref=onlineDb.ref('teamRooms/'+code),snap=await ref.once('value');
+  if(!snap.exists()){teamMessage('Kode tim tidak ditemukan. Periksa kembali.');return;}
+  const room=snap.val();if(room.status!=='waiting'){teamMessage('Permainan tim sudah dimulai. Minta ketua membuat ruang baru.');return;}
+  await ref.child('players/'+onlineUid).set({name,role:'anggota',joinedAt:firebase.database.ServerValue.TIMESTAMP});
+  watchStudentTeam(code,false);
+ }catch(e){teamMessage('Tidak dapat bergabung: '+e.message);}
+}
+function watchStudentTeam(code,isHost){
+ if(studentTeamRef)studentTeamRef.off();
+ studentTeamUid=onlineUid;studentTeamIsHost=isHost;studentTeamRef=onlineDb.ref('teamRooms/'+code);
+ studentTeamRef.on('value',snap=>{if(!snap.exists()){teamMessage('Ruang tim sudah tidak tersedia.');return;}studentTeamData=snap.val();renderStudentTeamRoom();});
+}
+function renderStudentTeamRoom(){
+ const room=studentTeamData,wrap=document.getElementById('student-team-live'),view=document.getElementById('student-team-live-content');
+ if(!room||!view)return;wrap.classList.remove('hidden');
+ const people=Object.entries(room.players||{}),members=people.map(([uid,p])=>'<li>'+escapeHtml(p.name)+(p.role==='ketua'?' — ketua tim':'')+'</li>').join('');
+ let out='<div class="notice"><h2>🤝 '+escapeHtml(room.teamName)+'</h2><p>Kode undangan: <b style="font-size:25px;letter-spacing:2px">'+escapeHtml(room.code)+'</b></p><p>Permainan: '+escapeHtml(room.game)+'</p><p>Anggota: '+people.length+'</p></div><h3>Anggota tim</h3><ul>'+members+'</ul>';
+ if(room.status==='waiting'){
+  out+='<p class="muted">'+(studentTeamIsHost?'Bagikan kode kepada teman. Permainan dapat dimulai setelah minimal dua anggota bergabung.':'Menunggu ketua tim memulai permainan.')+'</p>';
+  if(studentTeamIsHost)out+='<button class="btn" onclick="startStudentTeamGame()" '+(people.length<2?'disabled':'')+'>Mulai permainan bersama</button>';
+ }else if(room.status==='finished'){
+  out+='<h3>🏆 Permainan tim selesai!</h3><p>Skor bersama: <b>'+Number(room.score||0)+'</b> poin</p><p>Hebat, kalian sudah bekerja sama!</p>';
+ }else{
+  const q=questions[Number(room.qIndex)||0],answers=room.answers||{},mine=answers[room.qIndex]||null;
+  out+='<div class="notice"><b>Soal '+(Number(room.qIndex)+1)+' dari '+room.questions.length+'</b><p>'+escapeHtml(q.q)+'</p></div>';
+  if(mine)out+='<div class="notice">Jawaban tim sudah dikirim oleh '+escapeHtml(mine.byName)+'. Hasil: '+(mine.correct?'benar':'belum tepat')+'. Tunggu soal berikutnya.</div>';
+  else out+='<p>Pilih jawaban bersama teman satu tim. Jawaban pertama yang dikirim akan menjadi jawaban tim.</p><div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="submitStudentTeamAnswer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div>';
+  out+='<p>Skor tim: <b>'+Number(room.score||0)+'</b> poin</p>';
+  if(studentTeamIsHost)out+='<button class="btn secondary" onclick="advanceStudentTeamQuestion()">Lanjut ke soal berikutnya →</button>';
+ }
+ view.innerHTML=out;
+}
+async function startStudentTeamGame(){
+ if(!studentTeamIsHost||!studentTeamRef||!studentTeamData)return;
+ if(Object.keys(studentTeamData.players||{}).length<2){teamMessage('Ajak minimal satu teman terlebih dahulu.');return;}
+ const chosen=shuffleGameItems(questions).slice(0,10);
+ await studentTeamRef.update({status:'playing',questions:chosen,qIndex:0,score:0,answers:{}});
+}
+async function submitStudentTeamAnswer(index){
+ if(!studentTeamRef||!studentTeamData||studentTeamData.status!=='playing')return;
+ const q=studentTeamData.questions[studentTeamData.qIndex],ref=studentTeamRef.child('answers/'+studentTeamData.qIndex);
+ try{
+  const result=await ref.transaction(existing=>existing||{choice:index,correct:index===q.c,by:onlineUid,byName:document.getElementById('student-member-name').value.trim()||document.getElementById('student-leader-name').value.trim()||'Anggota',at:firebase.database.ServerValue.TIMESTAMP});
+  if(result.committed&&index===q.c)await studentTeamRef.child('score').transaction(v=>(Number(v)||0)+20);
+ }catch(e){teamMessage('Jawaban belum tersimpan: '+e.message);}
+}
+async function advanceStudentTeamQuestion(){
+ if(!studentTeamIsHost||!studentTeamRef||!studentTeamData)return;
+ const next=Number(studentTeamData.qIndex)+1;
+ if(next>=studentTeamData.questions.length)await studentTeamRef.update({status:'finished'});
+ else await studentTeamRef.update({qIndex:next});
 }
 function joinTeacherRoomPage(){
  const name=document.getElementById('class-student-name').value.trim(),code=document.getElementById('class-room-code').value.trim().toUpperCase();
