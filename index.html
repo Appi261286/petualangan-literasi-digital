@@ -309,6 +309,58 @@ const contentBank = {
  ]
 };
 const questions=contentBank.questions;
+
+const gameQuestionBanks = {
+ 'Petualangan Literasi':[
+  {q:'Mengapa kelompok Raka perlu mencari informasi sebelum menyimpulkan buku hilang?',a:['Agar keputusan berdasarkan bukti','Agar cepat pulang','Agar dapat menyalahkan teman'],c:0,why:'Informasi dan bukti membantu kelompok memahami kejadian dengan tepat.',level:'Mudah'},
+  {q:'Informasi mana yang paling membantu menemukan buku?',a:['Warna tas Nisa','Bu Mira membawa buku ke dekat jendela','Jumlah siswa di kelas'],c:1,why:'Petunjuk tentang lokasi buku mengarahkan kelompok ke rak perbaikan.',level:'Mudah'},
+  {q:'Apa langkah pertama yang masuk akal ketika buku tidak ada di tempat semula?',a:['Memeriksa petunjuk dan bertanya kepada petugas','Langsung menuduh peminjam terakhir','Mengakhiri pencarian'],c:0,why:'Pemeriksaan petunjuk merupakan langkah awal yang adil dan masuk akal.',level:'Mudah'},
+  {q:'Jika kamu menjadi anggota kelompok Raka, bukti apa yang perlu dicocokkan?',a:['Waktu buku dikembalikan dan waktu dipindahkan','Warna pakaian semua siswa','Judul buku lain di rak'],c:0,why:'Urutan waktu membantu menjelaskan kapan dan mengapa buku berpindah.',level:'Sedang'},
+  {q:'Kesimpulan mana yang paling kuat didukung seluruh bukti?',a:['Buku sengaja disembunyikan','Buku dipindahkan untuk diperbaiki setelah sampulnya rusak','Buku dibawa pulang oleh siswa'],c:1,why:'Kondisi sampul, keterangan petugas, dan lokasi temuan saling menguatkan.',level:'Menantang'}
+ ],
+ 'Duel Kuis Literasi':[
+  {q:'Pada pukul berapa Bu Mira memindahkan buku?',a:['08.30','09.00','09.10'],c:2,why:'Catatan dan bacaan menyebut pukul 09.10.',level:'Mudah'},
+  {q:'Siapa petugas perpustakaan dalam cerita?',a:['Bu Mira','Nisa','Raka'],c:0,why:'Bu Mira bertugas di perpustakaan dan memindahkan buku.',level:'Mudah'},
+  {q:'Apa yang rusak pada buku ensiklopedia?',a:['Halaman terakhir','Salah satu sisi sampul','Tulisan judul'],c:1,why:'Salah satu sisi sampul buku terlepas.',level:'Mudah'},
+  {q:'Berapa lama setelah Nisa mengembalikan buku Bu Mira memindahkannya?',a:['10 menit','20 menit','30 menit'],c:0,why:'Nisa mengembalikan pukul 09.00 dan Bu Mira memindahkan pukul 09.10.',level:'Sedang'},
+  {q:'Urutan waktu yang benar adalah ...',a:['Bu Mira memindahkan, Nisa membaca, Raka mencari','Nisa membaca, mengembalikan buku, Bu Mira memindahkan','Raka menemukan, Nisa membaca, Bu Mira memindahkan'],c:1,why:'Urutan tersebut sesuai waktu 08.30, 09.00, lalu 09.10.',level:'Menantang'}
+ ],
+ 'Tebak Kata':[
+  {q:'Kata untuk kumpulan keterangan yang dipakai dalam penyelidikan adalah ...',a:['Petunjuk','Hukuman','Hiasan'],c:0,why:'Petunjuk membantu seseorang menemukan informasi atau lokasi.',level:'Mudah'},
+  {q:'Tempat menyimpan buku yang sedang diperbaiki disebut ...',a:['Rak perbaikan','Meja upacara','Papan tulis'],c:0,why:'Dalam cerita, buku diletakkan di rak perbaikan.',level:'Mudah'},
+  {q:'Kegiatan mencari kebenaran dengan memeriksa bukti disebut ...',a:['Penyelidikan','Perayaan','Perlombaan'],c:0,why:'Penyelidikan dilakukan untuk mengetahui apa yang sebenarnya terjadi.',level:'Mudah'},
+  {q:'Keterangan yang dapat dibuktikan kebenarannya disebut ...',a:['Fakta','Dugaan','Harapan'],c:0,why:'Fakta didukung oleh kejadian atau bukti yang dapat diperiksa.',level:'Sedang'},
+  {q:'Sikap tidak langsung menyalahkan orang sebelum ada bukti disebut ...',a:['Objektif','Ceroboh','Prasangka'],c:0,why:'Bersikap objektif berarti menilai berdasarkan fakta, bukan prasangka.',level:'Menantang'}
+ ],
+ 'Detektif Bacaan':[
+  {q:'Petunjuk waktu manakah yang menunjukkan buku sudah tidak berada di meja pengembalian?',a:['Pukul 10.00 kelompok Raka mencarinya','Pukul 08.30 Nisa mulai membaca','Pukul 09.00 Nisa mengembalikan'],c:0,why:'Pada pukul 10.00 kelompok Raka tidak menemukan buku di tempat semula.',level:'Mudah'},
+  {q:'Pernyataan yang merupakan dugaan sebelum penyelidikan selesai adalah ...',a:['Buku pasti dicuri seseorang','Sampul buku terlepas','Bu Mira memindahkan buku'],c:0,why:'Dugaan pencurian belum didukung bukti dalam cerita.',level:'Mudah'},
+  {q:'Apa hubungan antara sampul rusak dan pemindahan buku?',a:['Kerusakan menjadi alasan buku dipindahkan','Keduanya tidak berhubungan','Buku dipindahkan agar dipinjam'],c:0,why:'Bu Mira memindahkan buku agar kerusakannya tidak bertambah.',level:'Mudah'},
+  {q:'Bukti mana yang paling langsung menjelaskan lokasi akhir buku?',a:['Catatan bahwa buku berada di rak perbaikan dekat jendela','Nisa membaca pukul 08.30','Kelompok Raka sedang mencari ensiklopedia'],c:0,why:'Petunjuk lokasi menyebut tempat buku ditemukan secara spesifik.',level:'Sedang'},
+  {q:'Mengapa kesimpulan bahwa buku dicuri tidak tepat?',a:['Tidak ada bukti pencurian dan buku ditemukan di rak perbaikan','Buku memiliki sampul','Nisa datang ke perpustakaan'],c:0,why:'Bukti menunjukkan pemindahan oleh petugas untuk perbaikan, bukan pencurian.',level:'Menantang'}
+ ],
+ 'Puzzle Literasi':[
+  {q:'Lengkapi hubungan: buku rusak → dipindahkan ke ...',a:['Rak perbaikan','Lapangan','Kantin'],c:0,why:'Rak perbaikan merupakan tempat yang tepat untuk buku yang sampulnya rusak.',level:'Mudah'},
+  {q:'Pilih pasangan tokoh dan tindakan yang benar.',a:['Nisa — membaca buku','Raka — memperbaiki sampul','Bu Mira — mencari buku untuk dipinjam'],c:0,why:'Nisa adalah siswa yang membaca ensiklopedia.',level:'Mudah'},
+  {q:'Pilih urutan waktu yang tepat.',a:['08.30 → 09.00 → 09.10','09.10 → 08.30 → 09.00','09.00 → 09.10 → 08.30'],c:0,why:'Nisa membaca, mengembalikan buku, lalu Bu Mira memindahkannya.',level:'Mudah'},
+  {q:'Informasi mana yang tidak sesuai dengan cerita?',a:['Buku ditemukan di rak perbaikan','Sampul buku terlepas','Buku ditemukan di halaman sekolah'],c:2,why:'Buku ditemukan di rak perbaikan dekat jendela, bukan di halaman.',level:'Sedang'},
+  {q:'Pilih alasan yang paling logis untuk menempatkan buku di rak perbaikan.',a:['Mencegah kerusakan bertambah','Menyembunyikan buku dari siswa','Mengubah judul ensiklopedia'],c:0,why:'Buku dipindahkan agar sampul yang terlepas dapat diperbaiki.',level:'Menantang'}
+ ],
+ 'Battle Literasi':[
+  {q:'Manakah tindakan yang menunjukkan tanggung jawab terhadap buku perpustakaan?',a:['Melaporkan buku yang rusak kepada petugas','Menyembunyikan buku','Membiarkan buku rusak'],c:0,why:'Melaporkan kerusakan membantu buku dirawat dan digunakan kembali.',level:'Mudah'},
+  {q:'Siapa yang menemukan buku setelah mengikuti petunjuk?',a:['Kelompok Raka','Nisa seorang diri','Kepala sekolah'],c:0,why:'Kelompok Raka memeriksa rak perbaikan dan menemukan buku.',level:'Mudah'},
+  {q:'Apa tujuan Bu Mira memindahkan buku?',a:['Melindungi buku agar dapat diperbaiki','Menghilangkan buku dari perpustakaan','Menghukum Nisa'],c:0,why:'Pemindahan dilakukan untuk mencegah kerusakan bertambah.',level:'Mudah'},
+  {q:'Jika informasi dari dua petunjuk tampak berbeda, apa yang sebaiknya dilakukan?',a:['Memeriksa kembali sumber dan waktunya','Memilih informasi yang paling disukai','Mengabaikan semua bukti'],c:0,why:'Pemeriksaan ulang membantu memastikan informasi saling sesuai.',level:'Sedang'},
+  {q:'Apa prinsip paling penting yang dapat diterapkan saat menghadapi masalah serupa?',a:['Menilai berdasarkan bukti dan berkomunikasi dengan baik','Menyebarkan dugaan secepatnya','Menyalahkan orang yang terakhir memakai barang'],c:0,why:'Bukti dan komunikasi mencegah kesalahpahaman serta tuduhan yang tidak adil.',level:'Menantang'}
+ ],
+ 'Misi Penyelamatan Buku':[
+  {q:'Kamu melihat sampul buku perpustakaan terlepas. Apa yang harus dilakukan?',a:['Memberi tahu petugas perpustakaan','Menyelipkan buku ke tas','Membuang buku'],c:0,why:'Petugas dapat membantu memperbaiki buku dan mencegah kerusakan lebih lanjut.',level:'Mudah'},
+  {q:'Sebelum menyatakan buku hilang, tempat mana yang perlu diperiksa?',a:['Meja pengembalian dan rak perbaikan','Hanya halaman sekolah','Hanya ruang guru'],c:0,why:'Periksa lokasi yang berkaitan dengan alur peminjaman dan perawatan buku.',level:'Mudah'},
+  {q:'Apa informasi yang perlu dicatat untuk menelusuri perpindahan buku?',a:['Waktu dan lokasi','Warna sepatu siswa','Makanan kesukaan petugas'],c:0,why:'Waktu dan lokasi membantu menyusun urutan kejadian.',level:'Mudah'},
+  {q:'Temanmu menuduh Nisa tanpa bukti. Tindakan terbaik adalah ...',a:['Mengajak memeriksa fakta terlebih dahulu','Ikut menyebarkan tuduhan','Mengakhiri pencarian'],c:0,why:'Setiap orang perlu diberi perlakuan adil; periksa fakta sebelum menuduh.',level:'Sedang'},
+  {q:'Buku berhasil ditemukan dan sampulnya perlu diperbaiki. Apa langkah akhir yang tepat?',a:['Serahkan kepada petugas untuk diperbaiki dan dicatat','Simpan diam-diam di kelas','Langsung pinjamkan tanpa pemeriksaan'],c:0,why:'Petugas perlu menangani perbaikan dan memastikan buku kembali tercatat.',level:'Menantang'}
+ ]
+};
 let current=0,score=0,player='';
 function getScores(){try{return JSON.parse(localStorage.getItem('literasiScores')||'[]')}catch(e){return[]}}
 function saveScore(name,points,game){const s=getScores();s.unshift({name,points,game,date:new Date().toLocaleDateString('id-ID')});localStorage.setItem('literasiScores',JSON.stringify(s.slice(0,50)));updateTeacher()}
@@ -765,7 +817,9 @@ function startGame(name){
  player=document.getElementById('nama').value.trim()||'Pemain';
  const level=document.getElementById('level')?.value||'Mudah';
  const total=(level==='Mudah'?5:level==='Sedang'?8:10);
- let selected=shuffleGameItems(contentBank.questions.filter(q=>level==='Mudah'?q.level==='Mudah':level==='Sedang'?q.level!=='Menantang':true)).slice(0,total);
+ const gameBank=name==='Susun Cerita'?[]:(gameQuestionBanks[name]||contentBank.questions);
+ const targetCount=level==='Mudah'?3:level==='Sedang'?4:5;
+ let selected=shuffleGameItems(gameBank.filter(q=>level==='Mudah'?q.level==='Mudah':level==='Sedang'?q.level!=='Menantang':true)).slice(0,targetCount);
  gameSession={name,items:selected,index:0,score:0,streak:0,lives:3,finished:false,started:false,seconds:45,order:shuffleGameItems(storyOrderItems),orderChecked:false};
  current=0;score=0;
  document.getElementById('game-title').textContent=name;
