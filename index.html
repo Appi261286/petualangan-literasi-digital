@@ -20,6 +20,7 @@ h1,h2,h3,p{margin-top:0}.hero h1{font-size:clamp(25px,4vw,38px);margin-bottom:10
 
 .device-support{margin:18px 0 4px;padding:18px;background:#eaf5f6;border:1px solid #d4e8e9;border-radius:18px}.device-support-heading{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-bottom:13px}.device-support-heading span{font-size:13px;color:var(--muted)}.device-support-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.device-support-card{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:10px;row-gap:3px;padding:13px;background:white;border:1px solid var(--line);border-radius:13px}.device-support-card>span{grid-row:span 2;font-size:29px}.device-support-card b{font-size:15px}.device-support-card small{color:var(--muted);line-height:1.4}.device-support-note{font-size:13px;color:#315c63;margin:12px 0 0}@media(max-width:650px){.device-support-grid{grid-template-columns:1fr}.device-support-card{grid-template-columns:38px 1fr}.device-support-card>span{font-size:26px}}
 
+.battle-progress{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:14px}.battle-timer{font-size:32px;font-weight:850;color:var(--teal);margin:8px 0}.battle-timer.low{color:#b45309}.battle-question{font-size:20px;font-weight:800;line-height:1.5;margin:12px 0}.battle-score-table{width:100%;border-collapse:collapse}.battle-score-table th,.battle-score-table td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}.battle-score-table th{background:#f1f7f9}.battle-rank{font-weight:850;color:var(--teal)}
 /* Separate, guided screens */
 body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section.games,body>main>#teacher,body>main>#play{display:none}
 #app-pages{min-height:60vh}.app-screen{animation:screenIn .18s ease-out}.app-screen.hidden{display:none!important}@keyframes screenIn{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}
@@ -78,6 +79,10 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
  <section class="app-screen hidden" id="screen-games">
   <button class="back-link" onclick="goScreen('screen-student')">← Kembali ke area siswa</button>
   <div class="screen-heading"><span>🎮 PILIH PERMAINAN</span><h1>Ayo mulai petualangan!</h1><p>Pilih permainan literasi yang ingin kamu mainkan.</p></div>
+  <div class="form-card" style="max-width:none;background:#eff8f7">
+   <h2>🏆 Ruang Battle</h2><p class="muted">Ikuti pertandingan individu atau antartim dengan timer dan papan peringkat.</p>
+   <button class="btn gold" onclick="goScreen('screen-battle')">Atur Battle Individu / Antartim →</button>
+  </div>
   <div class="games">
    <button class="game" onclick="launchGamePage('Petualangan Literasi')"><span class="emoji">🗺️</span><strong>Petualangan Literasi</strong><small>Jelajahi cerita dan selesaikan misi.</small></button>
    <button class="game" onclick="launchGamePage('Duel Kuis Literasi')"><span class="emoji">⚔️</span><strong>Duel Kuis Literasi</strong><small>Uji pengetahuan melalui kuis.</small></button>
@@ -88,6 +93,30 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
    <button class="game" onclick="launchGamePage('Battle Literasi')"><span class="emoji">🏆</span><strong>Battle Literasi</strong><small>Kumpulkan poin dari tantangan.</small></button>
    <button class="game" onclick="launchGamePage('Misi Penyelamatan Buku')"><span class="emoji">📖</span><strong>Misi Penyelamatan Buku</strong><small>Selesaikan misi penyelamatan buku.</small></button>
   </div>
+ </section>
+ <section class="app-screen hidden" id="screen-battle">
+  <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
+  <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Atur pertandingan literasi</h1><p>Buat pertandingan di satu perangkat untuk uji coba. IFD, HP, dan laptop akan dapat tersinkron setelah Firebase dipasang.</p></div>
+  <div class="form-card" style="max-width:none">
+   <div class="setup-grid">
+    <div><label for="battle-mode"><b>Jenis pertandingan</b></label><select id="battle-mode" class="field" onchange="updateBattleHint()"><option value="individual">Battle Individu</option><option value="team">Battle Antartim</option></select></div>
+    <div><label for="battle-level"><b>Tingkat kesulitan</b></label><select id="battle-level" class="field" onchange="applyBattleLevel()"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit">Sulit</option><option value="Sangat Sulit">Sangat Sulit</option></select></div>
+    <div><label for="battle-count"><b>Jumlah soal</b></label><select id="battle-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
+   </div>
+   <div class="setup-grid">
+    <div><label for="battle-seconds"><b>Waktu per soal</b></label><select id="battle-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
+    <div><label for="battle-room"><b>Kode ruang (contoh lokal)</b></label><input id="battle-room" class="field" placeholder="Dibuat otomatis" readonly></div>
+    <div><label for="battle-penalty"><b>Jawaban salah / waktu habis</b></label><select id="battle-penalty" class="field"><option value="0">0 poin</option><option value="-10">-10 poin</option></select></div>
+   </div>
+   <label for="battle-players"><b id="battle-participants-label">Nama peserta (satu nama per baris)</b></label>
+   <textarea id="battle-players" class="field" rows="5" placeholder="Contoh:&#10;Alya&#10;Bima&#10;Citra"></textarea>
+   <p id="battle-hint" class="muted small-note">Mode individu: tulis satu nama siswa pada setiap baris.</p>
+   <button class="btn" onclick="startBattle()">Buat ruang & mulai pertandingan</button>
+   <p class="muted small-note">Aturan awal: jawaban benar +100 poin, jawaban salah atau waktu habis 0 poin (dapat diubah). Jika seri, waktu total tercepat menjadi penentu.</p>
+  </div>
+  <div id="battle-play-area" class="form-card hidden" style="max-width:none" aria-live="polite"></div>
+  <div id="battle-scoreboard" class="form-card hidden" style="max-width:none"></div>
+  <div class="notice">⚠️ Tahap ini adalah simulasi lokal pada satu perangkat. Kode ruang belum menghubungkan HP/laptop lain. Jangan gunakan untuk penilaian resmi sebelum Firebase aktif.</div>
  </section>
 </section>
 
@@ -143,7 +172,22 @@ const questions=[
 {q:'Tokoh utama dalam sebuah cerita adalah …',a:['Tempat cerita berlangsung','Tokoh yang paling banyak diceritakan','Pesan di akhir cerita'],c:1,why:'Tokoh utama merupakan tokoh yang menjadi pusat cerita.'},
 {q:'Apa yang sebaiknya dilakukan setelah meminjam buku perpustakaan?',a:['Mencoret halaman','Mengembalikan tepat waktu','Menyimpan selamanya'],c:1,why:'Buku pinjaman harus dijaga dan dikembalikan tepat waktu.'},
 {q:'Kalimat yang berisi ajakan adalah …',a:['Ayo kita membaca bersama!','Buku itu berwarna biru.','Kemarin hujan turun.'],c:0,why:'Kata “ayo” menunjukkan ajakan.'},
-{q:'Saat menemukan informasi di bacaan, langkah terbaik adalah …',a:['Membaca dengan teliti','Menebak tanpa membaca','Langsung menutup buku'],c:0,why:'Membaca teliti membantu menemukan informasi yang benar.'}
+{q:'Saat menemukan informasi di bacaan, langkah terbaik adalah …',a:['Membaca dengan teliti','Menebak tanpa membaca','Langsung menutup buku'],c:0,why:'Membaca teliti membantu menemukan informasi yang benar.'},
+{q:'Gagasan utama paragraf biasanya berisi …',a:['Pokok pembahasan paragraf','Nama penulis','Jumlah kalimat'],c:0,why:'Gagasan utama adalah inti pembahasan.'},
+{q:'Sinonim kata “rajin” adalah …',a:['Tekun','Malas','Lalai'],c:0,why:'Rajin memiliki makna tekun dalam melakukan sesuatu.'},
+{q:'Antonim kata “hemat” adalah …',a:['Boros','Cermat','Irit'],c:0,why:'Boros merupakan lawan kata hemat.'},
+{q:'Kalimat fakta adalah …',a:['Air mendidih jika dipanaskan','Bakso adalah makanan paling enak','Hari ini terasa paling indah'],c:0,why:'Kalimat fakta dapat dibuktikan kebenarannya.'},
+{q:'Pesan yang ingin disampaikan penulis dalam cerita disebut …',a:['Amanat','Latar','Tokoh'],c:0,why:'Amanat adalah pesan atau pelajaran dalam cerita.'},
+{q:'“Angin berbisik di antara pepohonan” menggunakan majas …',a:['Personifikasi','Hiperbola','Perumpamaan'],c:0,why:'Angin digambarkan seolah-olah dapat berbisik seperti manusia.'},
+{q:'Bagian teks prosedur yang berisi hal yang perlu disiapkan adalah …',a:['Alat dan bahan','Kesimpulan cerita','Tokoh utama'],c:0,why:'Teks prosedur biasanya memuat alat dan bahan sebelum langkah kerja.'},
+{q:'Pantun biasanya terdiri atas …',a:['Empat baris','Dua baris','Enam baris'],c:0,why:'Pantun umumnya terdiri atas empat baris.'},
+{q:'Dua baris pertama dalam pantun disebut …',a:['Sampiran','Isi','Judul'],c:0,why:'Baris pertama dan kedua merupakan sampiran.'},
+{q:'Makna denotatif adalah makna …',a:['Sebenarnya','Kiasan','Sindiran'],c:0,why:'Makna denotatif merupakan makna lugas atau sebenarnya.'},
+{q:'Ungkapan “buah tangan” berarti …',a:['Oleh-oleh','Buah yang dipetik','Tangan yang terluka'],c:0,why:'Buah tangan adalah oleh-oleh.'},
+{q:'Jika hujan turun sangat deras, kemungkinan akibatnya adalah …',a:['Jalan menjadi tergenang','Matahari semakin terik','Tanah menjadi kering'],c:0,why:'Hujan deras dapat menyebabkan genangan air.'},
+{q:'Kalimat yang menunjukkan pendapat adalah …',a:['Menurut saya, cerita itu menarik','Buku itu memiliki 50 halaman','Perpustakaan buka pukul delapan'],c:0,why:'Pendapat berisi pandangan atau penilaian seseorang.'},
+{q:'Urutan yang tepat dalam membuat teh adalah …',a:['Siapkan gelas, masukkan teh, tuang air panas','Tuang air, minum, lalu siapkan gelas','Minum teh, masukkan gula, siapkan gelas'],c:0,why:'Langkah harus disusun secara runtut dari persiapan hingga penyajian.'},
+{q:'Kesimpulan bacaan sebaiknya memuat …',a:['Inti informasi bacaan','Cerita yang tidak berkaitan','Daftar nama pembaca'],c:0,why:'Kesimpulan merangkum inti informasi.'}
 ];
 let current=0,score=0,player='';
 function getScores(){try{return JSON.parse(localStorage.getItem('literasiScores')||'[]')}catch(e){return[]}}
@@ -233,6 +277,99 @@ function launchGamePage(game){
  document.getElementById('play').prepend(back);
  window.scrollTo({top:0,behavior:'smooth'});
 }
+
+let battleState=null,battleTimer=null,battleSecondsLeft=0;
+function updateBattleHint(){
+ const team=document.getElementById('battle-mode').value==='team';
+ document.getElementById('battle-participants-label').textContent=team?'Daftar tim dan anggota (format: Tim A | Nama 1, Nama 2, Nama 3)':'Nama peserta (satu nama per baris)';
+ document.getElementById('battle-players').placeholder=team?'Tim A | Alya, Bima, Citra\nTim B | Dodi, Eka, Fani':'Alya\nBima\nCitra';
+ document.getElementById('battle-hint').textContent=team?'Mode tim: setiap tim harus memiliki 3 sampai 5 anggota. Satu tim menjawab bersama pada satu perangkat secara bergiliran.':'Mode individu: tulis satu nama siswa pada setiap baris.';
+}
+function applyBattleLevel(){
+ const level=document.getElementById('battle-level').value;
+ const config={'Mudah':[5,30],'Sedang':[10,25],'Sulit':[15,20],'Sangat Sulit':[20,15]}[level];
+ document.getElementById('battle-count').value=String(config[0]);
+ document.getElementById('battle-seconds').value=String(config[1]);
+}
+function startBattle(){
+ const mode=document.getElementById('battle-mode').value;
+ const lines=document.getElementById('battle-players').value.split('\n').map(x=>x.trim()).filter(Boolean);
+ const entities=[];
+ if(mode==='team'){
+  for(const line of lines){
+   const parts=line.split('|');
+   if(parts.length!==2){alert('Format tim harus: Tim A | Nama 1, Nama 2, Nama 3');return}
+   const members=parts[1].split(',').map(x=>x.trim()).filter(Boolean);
+   if(members.length<3||members.length>5){alert(parts[0]+' harus memiliki 3 sampai 5 anggota.');return}
+   entities.push({name:parts[0].trim(),members,score:0,time:0});
+  }
+ }else{
+  lines.forEach(name=>entities.push({name, members:[],score:0,time:0}));
+ }
+ if(entities.length<2){alert('Masukkan minimal dua peserta atau dua tim untuk memulai battle.');return}
+ if(mode==='team'&&entities.length>8){alert('Untuk uji coba, maksimal 8 tim.');return}
+ if(mode==='individual'&&entities.length>30){alert('Untuk uji coba, maksimal 30 peserta.');return}
+ const count=Number(document.getElementById('battle-count').value);
+ const available=Math.min(count,questions.length);
+ const shuffled=[...questions].sort(()=>Math.random()-.5).slice(0,available);
+ const code='BTL'+Math.floor(100+Math.random()*900);
+ document.getElementById('battle-room').value=code;
+ battleState={mode,entities,questions:shuffled,qIndex:0,entityIndex:0,seconds:Number(document.getElementById('battle-seconds').value),penalty:Number(document.getElementById('battle-penalty').value),started:false};
+ document.getElementById('battle-play-area').classList.remove('hidden');
+ document.getElementById('battle-scoreboard').classList.add('hidden');
+ if(count>questions.length)document.getElementById('battle-play-area').innerHTML='<div class="notice">Bank contoh saat ini berisi '+questions.length+' soal. Pertandingan uji coba menggunakan '+questions.length+' soal dulu; jumlah 10–20 akan aktif setelah bank soal ditambah.</div>';
+ renderBattleTurn();
+}
+function renderBattleTurn(){
+ if(!battleState)return;
+ if(battleState.qIndex>=battleState.questions.length){finishBattle();return}
+ const p=battleState.entities[battleState.entityIndex],q=battleState.questions[battleState.qIndex];
+ const area=document.getElementById('battle-play-area');
+ area.innerHTML='<div class="battle-progress"><span>Ruang: <b>'+document.getElementById('battle-room').value+'</b></span><span>Soal '+(battleState.qIndex+1)+' / '+battleState.questions.length+'</span></div><h2>'+(battleState.mode==='team'?'Giliran '+escapeHtml(p.name):'Giliran '+escapeHtml(p.name))+'</h2>'+(p.members.length?'<p class="muted">Anggota: '+escapeHtml(p.members.join(', '))+'</p>':'')+'<div class="battle-timer" id="battle-clock">'+battleState.seconds+' detik</div><div class="battle-question">'+escapeHtml(q.q)+'</div><div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="submitBattleAnswer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div><p class="muted small-note">Jawaban benar +100 poin. Jawaban salah atau waktu habis: '+battleState.penalty+' poin.</p>';
+ startBattleClock();
+}
+function startBattleClock(){
+ clearInterval(battleTimer);battleSecondsLeft=battleState.seconds;
+ const clock=document.getElementById('battle-clock');
+ battleTimer=setInterval(()=>{
+  battleSecondsLeft--;
+  if(clock){clock.textContent=battleSecondsLeft+' detik';clock.classList.toggle('low',battleSecondsLeft<=5)}
+  if(battleSecondsLeft<=0){clearInterval(battleTimer);resolveBattleAnswer(false,true)}
+ },1000);
+}
+function submitBattleAnswer(index){
+ const q=battleState.questions[battleState.qIndex];
+ resolveBattleAnswer(index===q.c,false);
+}
+function resolveBattleAnswer(correct,timeout){
+ clearInterval(battleTimer);
+ const p=battleState.entities[battleState.entityIndex];
+ const elapsed=battleState.seconds-battleSecondsLeft;
+ if(correct)p.score+=100;else p.score+=battleState.penalty;
+ p.time+=elapsed;
+ const area=document.getElementById('battle-play-area');
+ area.innerHTML='<div class="notice">'+(timeout?'⏰ Waktu habis.':correct?'✅ Jawaban benar! +100 poin.':'💡 Jawaban belum tepat.')+' '+(correct?'':('Jawaban benar: '+escapeHtml(battleState.questions[battleState.qIndex].a[battleState.questions[battleState.qIndex].c])))+'</div><p><b>'+escapeHtml(p.name)+'</b> — skor sementara '+p.score+'</p><button class="btn" onclick="nextBattleTurn()">Lanjutkan</button>';
+}
+function nextBattleTurn(){
+ battleState.entityIndex++;
+ if(battleState.entityIndex>=battleState.entities.length){battleState.entityIndex=0;battleState.qIndex++}
+ renderBattleTurn();
+}
+function finishBattle(){
+ clearInterval(battleTimer);
+ const ranked=[...battleState.entities].sort((a,b)=>b.score-a.score||a.time-b.time);
+ const rows=ranked.map((p,i)=>{
+  const max=battleState.questions.length*100,ratio=max?p.score/max:0;
+  const stars=ratio>=.8?'⭐⭐⭐⭐⭐':ratio>=.6?'⭐⭐⭐⭐':ratio>=.4?'⭐⭐⭐':ratio>=.2?'⭐⭐':'⭐';
+  return '<tr><td class="battle-rank">'+(i+1)+'</td><td><b>'+escapeHtml(p.name)+'</b>'+(p.members.length?'<br><small>'+escapeHtml(p.members.join(', '))+'</small>':'')+'</td><td>'+p.score+'</td><td>'+p.time+' dtk</td><td>'+stars+'</td></tr>';
+ }).join('');
+ document.getElementById('battle-play-area').classList.add('hidden');
+ const board=document.getElementById('battle-scoreboard');board.classList.remove('hidden');
+ board.innerHTML='<h2>🏆 Papan Peringkat</h2><p class="muted">Ruang '+document.getElementById('battle-room').value+' • '+(battleState.mode==='team'?'Battle Antartim':'Battle Individu')+'</p><table class="battle-score-table"><thead><tr><th>Rank</th><th>Peserta / Tim</th><th>Skor</th><th>Waktu</th><th>Bintang</th></tr></thead><tbody>'+rows+'</tbody></table><p class="muted small-note">Peringkat ditentukan dari skor tertinggi. Jika skor sama, waktu total tercepat menang.</p><button class="btn" onclick="goScreen('screen-battle');document.getElementById('battle-scoreboard').classList.add('hidden')">Atur pertandingan baru</button>';
+ ranked.forEach(p=>saveScore(p.name,p.score,'Battle Literasi'));
+ board.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 function openTeacherPage(){
  document.querySelectorAll('#app-pages .app-screen').forEach(s=>s.classList.add('hidden'));
  const teacher=document.getElementById('teacher');teacher.style.display='block';teacher.classList.remove('hidden');showTeacher();window.scrollTo({top:0,behavior:'smooth'});
