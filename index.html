@@ -69,6 +69,16 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 .cloze-story-text{font-size:18px;line-height:2.2}.cloze-blank{display:inline-block;width:min(155px,30vw);padding:5px 8px;border:2px dashed #91b9b4;border-radius:9px;font:inherit;font-size:16px;background:#fbfefd;color:var(--ink);vertical-align:middle}.cloze-blank:focus{outline:3px solid #bde4dc;border-color:var(--teal)}.cloze-blank.correct{border:2px solid #16845b;background:#e9f8ef}.cloze-blank.wrong{border:2px solid #c65b50;background:#fff0ed}.cloze-hint{display:block;font-size:12px;color:var(--muted);line-height:1.3;margin:1px 0 8px}
 .cloze-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.cloze-feedback{margin-top:15px;font-weight:650;line-height:1.6}.cloze-feedback:empty{display:none}@media(max-width:600px){.cloze-promo{align-items:flex-start;flex-direction:column}.cloze-story-text{font-size:16px;line-height:2.3}.cloze-blank{width:min(125px,34vw);font-size:15px}}
 
+
+.battle-team-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}
+.battle-team-panel{border:2px solid #ddd;border-radius:18px;padding:16px;min-width:0;background:#fff}
+.battle-team-panel.red{border-color:#e36b6b;background:#fff5f5}
+.battle-team-panel.blue{border-color:#5b9de6;background:#f2f8ff}
+.battle-team-panel h2{margin:0 0 6px;font-size:clamp(18px,2vw,28px)}
+.battle-team-score{font-size:clamp(30px,4vw,48px);font-weight:800;line-height:1.1}
+.battle-team-panel ul{padding-left:20px;margin-bottom:0}
+.battle-live-question{padding:18px;border-radius:16px;background:var(--card,#f5f5f5);margin-top:16px}
+@media(max-width:600px){.battle-team-board{gap:8px}.battle-team-panel{padding:10px}.battle-team-panel ul{font-size:12px;padding-left:16px}}
 </style>
 </head>
 <body>
@@ -158,11 +168,11 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
   <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
   <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Atur pertandingan literasi</h1><p>Buat pertandingan di satu perangkat untuk uji coba. IFD, HP, dan laptop akan dapat tersinkron setelah Firebase dipasang.</p></div>
   <div class="online-battle-wrap" id="online-battle">
-   <div class="online-intro"><span class="online-kicker">🌐 MODE TERHUBUNG INTERNET</span><h2>Battle Literasi Online</h2><p>Satu pemain membuat ruang pertandingan. Teman-teman bergabung menggunakan kode dari HP atau laptop masing-masing.</p></div>
+   <div class="online-intro"><span class="online-kicker">🌐 MODE TERHUBUNG INTERNET</span><h2>Battle Literasi Online</h2><p>Dua tim bergabung menggunakan satu kode. Setiap siswa menjawab sendiri melalui HP; skor dihitung untuk timnya.</p></div>
    <div class="online-columns">
     <div class="online-card teacher-card">
-     <div class="online-card-icon">🎯</div><h3>1. BUAT PERTANDINGAN</h3><p class="online-help">Satu pemain membuat ruang dan membagikan kode kepada teman-temannya.</p>
-     <label for="online-host-name">Nama pembuat ruang</label><input id="online-host-name" class="field" placeholder="Masukkan nama pemain">
+     <div class="online-card-icon">🎯</div><h3>1. BUAT PERTANDINGAN</h3><p class="online-help">Pembuat pertandingan memilih timnya, lalu membagikan kode kepada kedua tim.</p>
+     <label for="online-host-name">Nama pembuat ruang</label><input id="online-host-name" class="field" placeholder="Masukkan nama pemain"><label for="online-host-team">Tim yang diwakili</label><select id="online-host-team" class="field"><option value="red">Tim Merah</option><option value="blue">Tim Biru</option></select>
      <div class="online-settings">
       <div><label for="online-count">Jumlah soal</label><select id="online-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
       <div><label for="online-seconds">Waktu setiap soal</label><select id="online-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
@@ -171,9 +181,9 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
      <p class="online-footnote">Setelah ruang dibuat, bagikan kode yang tampil kepada siswa.</p>
     </div>
     <div class="online-card student-card">
-     <div class="online-card-icon">📱</div><h3>2. GABUNG PERTANDINGAN</h3><p class="online-help">Setiap siswa membuka website di HP atau laptop sendiri.</p>
+     <div class="online-card-icon">📱</div><h3>2. GABUNG PERTANDINGAN</h3><p class="online-help">Setiap siswa memilih Tim Merah atau Tim Biru dan menjawab melalui HP masing-masing.</p>
      <label for="online-player-name">Nama siswa</label><input id="online-player-name" class="field" placeholder="Ketik nama lengkap">
-     <label for="online-room-code">Kode pertandingan</label><input id="online-room-code" class="field" placeholder="Contoh: LIT123" maxlength="8" style="text-transform:uppercase">
+     <label for="online-room-code">Kode pertandingan</label><input id="online-room-code" class="field" placeholder="Contoh: LIT123" maxlength="8" style="text-transform:uppercase"><label for="online-player-team">Pilih tim</label><select id="online-player-team" class="field"><option value="red">Tim Merah</option><option value="blue">Tim Biru</option></select>
      <button class="btn gold online-action" onclick="onlineJoinRoom()">Gabung ke pertandingan</button>
      <p class="online-footnote">Masukkan kode yang dibagikan oleh pembuat pertandingan.</p>
     </div>
@@ -588,12 +598,12 @@ async function onlineCreateRoom(){
  if(!host){onlineSetStatus('Isi nama kamu terlebih dahulu.');return}
  const code=onlineMakeCode(),count=Number(document.getElementById('online-count').value),seconds=Number(document.getElementById('online-seconds').value);
  const chosen=[...questions].sort(()=>Math.random()-.5).slice(0,Math.min(count,questions.length));
- const data={code,hostName:host,hostUid:onlineUid,status:'waiting',settings:{seconds,count:chosen.length},questions:chosen,qIndex:0,startedAt:0,players:{},answers:{}};
+ const hostTeam=document.getElementById('online-host-team').value;const data={code,hostName:host,hostUid:onlineUid,status:'waiting',teams:{red:{name:'Tim Merah'},blue:{name:'Tim Biru'}},settings:{seconds,count:chosen.length},questions:chosen,qIndex:0,startedAt:0,players:{},answers:{}};
  try{
   const ref=onlineDb.ref('battleRooms/'+code);
   const snap=await ref.once('value');
   if(snap.exists()){onlineSetStatus('Kode ruang bentrok. Tekan buat ruang sekali lagi.');return}
-  data.players[onlineUid]={name:host,score:0,host:true,joinedAt:firebase.database.ServerValue.TIMESTAMP};
+  data.players[onlineUid]={name:host,team:hostTeam,score:0,host:true,joinedAt:firebase.database.ServerValue.TIMESTAMP};
   await ref.set(data);onlineWatchRoom(code,true);
  }catch(error){onlineSetStatus('Gagal membuat ruang: '+error.message)}
 }
@@ -606,7 +616,7 @@ async function onlineJoinRoom(){
   if(!snap.exists()){onlineSetStatus('Kode pertandingan tidak ditemukan. Periksa kembali kodenya.');return}
   const room=snap.val();
   if(room.status!=='waiting'){onlineSetStatus('Pertandingan sudah dimulai atau selesai. Minta pembuat ruang membuat pertandingan baru.');return}
-  await ref.child('players/'+onlineUid).set({name,score:0,joinedAt:firebase.database.ServerValue.TIMESTAMP});
+  const team=document.getElementById('online-player-team').value;await ref.child('players/'+onlineUid).set({name,team,score:0,joinedAt:firebase.database.ServerValue.TIMESTAMP});
   onlineWatchRoom(code,false);
  }catch(error){onlineSetStatus('Gagal bergabung: '+error.message)}
 }
@@ -639,31 +649,33 @@ function onlineWatchRoom(code,isHost){
 function onlineRenderRoom(isHost){
  const room=onlineRoomData,view=document.getElementById('online-room-view');
  if(!room||!view)return;
- const players=room.players||{},playerList=Object.values(players);
- const names=playerList.map(p=>escapeHtml(p.name||'Siswa'));
- const code='<div class="notice"><b>Kode pertandingan: '+escapeHtml(room.code)+'</b><br>Bagikan kode ini kepada teman-teman. Peserta: '+names.length+'</div>';
- const list='<h3>Peserta ('+names.length+')</h3><ul>'+playerList.map(p=>'<li>'+escapeHtml(p.name||'Siswa')+(p.host?' — pembuat pertandingan':'')+'</li>').join('')+'</ul>';
+ const players=room.players||{},list=Object.entries(players),all=list.map(x=>x[1]);
+ const code='<div class="notice"><b>Kode Battle: '+escapeHtml(room.code)+'</b><br>Bagikan kode ini kepada kedua tim. Peserta: '+all.length+'</div>';
+ const red=all.filter(p=>p.team==='red'),blue=all.filter(p=>p.team==='blue');
+ const teamScore=arr=>arr.reduce((sum,p)=>sum+(Number(p.score)||0),0);
+ const teamPanel=(name,arr,color)=>'<div class="battle-team-panel '+color+'"><h2>'+name+'</h2><div class="battle-team-score">'+teamScore(arr)+'</div><p>'+arr.length+' pemain</p><ul>'+arr.map(p=>'<li>'+escapeHtml(p.name||'Siswa')+' · '+(Number(p.score)||0)+' poin'+(p.host?' · host':'')+'</li>').join('')+'</ul></div>';
+ const board='<div class="battle-team-board">'+teamPanel('🔴 Tim Merah',red,'red')+teamPanel('🔵 Tim Biru',blue,'blue')+'</div>';
+ const members='<h3>Daftar peserta</h3><p>Merah: '+red.length+' siswa · Biru: '+blue.length+' siswa</p>';
  if(room.status==='waiting'){
-  view.innerHTML=code+list+(isHost?'<p class="muted">Kamu juga ikut bermain sebagai peserta. Mulai setelah minimal satu teman bergabung.</p><button class="btn" onclick="onlineStartMatch()" '+(playerList.length<2?'disabled':'')+'>Mulai pertandingan</button>':'<p class="muted">Menunggu pembuat pertandingan memulai permainan…</p>');
+  view.innerHTML=code+board+members+(isHost?'<p class="muted">Pastikan kedua tim memiliki anggota. Kamu juga ikut bermain sebagai peserta.</p><button class="btn" onclick="onlineStartMatch()" '+(!red.length||!blue.length?'disabled':'')+'>Mulai Battle Antartim</button>':'<p class="muted">Menunggu pembuat pertandingan memulai Battle…</p>');
   return;
  }
  if(room.status==='finished'){
-  const ranked=playerList.sort((a,b)=>(b.score||0)-(a.score||0));
-  view.innerHTML=code+'<h3>🏆 Hasil pertandingan</h3><ol>'+ranked.map(p=>'<li><b>'+escapeHtml(p.name)+'</b> — '+(p.score||0)+' poin</li>').join('')+'</ol><p>Pertandingan selesai. Buat ruang baru untuk pertandingan berikutnya.</p>';
+  const rs=teamScore(red),bs=teamScore(blue),winner=rs===bs?'Pertandingan seri!':rs>bs?'🏆 Tim Merah menang!':'🏆 Tim Biru menang!';
+  view.innerHTML=code+board+'<div class="notice"><h2>'+winner+'</h2><p>Hasil akhir: Merah '+rs+' — '+bs+' Biru</p></div>';
   return;
  }
- const q=room.questions&&room.questions[room.qIndex];
- if(!q){view.innerHTML=code+'<p>Soal belum tersedia.</p>';return;}
- const answers=(room.answers&&room.answers[room.qIndex])||{},me=players[onlineUid],already=!!answers[onlineUid];
+ const q=room.questions&&room.questions[room.qIndex],me=players[onlineUid];
+ if(!q){view.innerHTML=code+board+'<p>Soal belum tersedia.</p>';return;}
+ if(!me){view.innerHTML=code+board+'<p class="notice">Perangkat ini belum terdaftar sebagai peserta.</p>';return;}
+ const answers=(room.answers&&room.answers[room.qIndex])||{},already=!!answers[onlineUid];
  const elapsed=Math.max(0,Math.floor((Date.now()-Number(room.startedAt))/1000)),remaining=Math.max(0,Number(room.settings.seconds)-elapsed);
- const scoreboard=playerList.sort((a,b)=>(b.score||0)-(a.score||0)).map(p=>'<li>'+escapeHtml(p.name)+': <b>'+(p.score||0)+'</b> poin</li>').join('');
- if(!me){view.innerHTML=code+'<p class="notice">Perangkat ini belum terdaftar sebagai peserta.</p>';return;}
- const choices=already?'<div class="notice">Jawaban sudah diterima. Tunggu soal berikutnya.</div>':'<div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="onlineSubmitAnswer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div>';
- view.innerHTML=code+'<h3>Soal '+(room.qIndex+1)+' / '+room.questions.length+'</h3><p class="muted">Waktu tersisa sekitar '+remaining+' detik</p><p class="question">'+escapeHtml(q.q)+'</p>'+choices+'<h3>Skor sementara</h3><ol>'+scoreboard+'</ol>';
+ const choices=already?'<div class="notice">Jawabanmu sudah diterima. Tunggu soal berikutnya.</div>':'<div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="onlineSubmitAnswer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div>';
+ view.innerHTML=code+'<div class="notice"><b>Soal '+(Number(room.qIndex)+1)+' / '+room.questions.length+'</b> · Waktu '+remaining+' detik · Kamu: '+escapeHtml(me.team==='red'?'Tim Merah':'Tim Biru')+'</div>'+board+'<div class="battle-live-question"><h2>'+escapeHtml(q.q)+'</h2>'+choices+'</div>';
 }
 async function onlineStartMatch(){
  if(!onlineRoomRef||!onlineRoomData||onlineRoomData.hostUid!==onlineUid)return;
- if(Object.keys(onlineRoomData.players||{}).length<2){onlineSetStatus('Minimal dua pemain diperlukan, termasuk pembuat pertandingan.');return}
+ const ps=Object.values(onlineRoomData.players||{});if(!ps.some(p=>p.team==='red')||!ps.some(p=>p.team==='blue')){onlineSetStatus('Minimal satu pemain Tim Merah dan satu pemain Tim Biru harus bergabung.');return}
  await onlineRoomRef.update({status:'playing',qIndex:0,startedAt:Date.now()});
 }
 async function onlineSubmitAnswer(index){
