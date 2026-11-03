@@ -18,6 +18,8 @@ h1,h2,h3,p{margin-top:0}.hero h1{font-size:clamp(25px,4vw,38px);margin-bottom:10
 .mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.mode-card{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;background:#f7fbfc;border:2px solid var(--line);border-radius:15px;padding:16px;cursor:pointer;color:var(--ink)}.mode-card span{font-size:29px}.mode-card b{font-size:18px}.mode-card small,.team-option small{display:block;color:var(--muted);line-height:1.45}.mode-card.active{border-color:var(--teal);background:#eaf7f5}.team-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.team-option{display:flex;align-items:flex-start;gap:10px;padding:14px;border:1px solid var(--line);border-radius:13px;cursor:pointer}.team-option input{margin-top:4px;accent-color:var(--teal)}.team-option span{display:block}.room-display{margin:12px 0;padding:15px;border:1px dashed #9bb9c4;background:#f3fafb;border-radius:14px}.room-display strong{display:block;font-size:28px;letter-spacing:3px;color:var(--teal);margin:6px 0}.room-display small{color:var(--muted)}.join-fields{display:flex;gap:8px;max-width:600px}.join-fields input{min-width:0;flex:1;padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit}.setup-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:15px 0}.setup-grid>div{min-width:0}.small-note{font-size:13px;margin-top:12px}@media(max-width:650px){.mode-grid,.team-choice,.setup-grid{grid-template-columns:1fr}.join-fields{flex-direction:column}}
 
 
+.device-support{margin:18px 0 4px;padding:18px;background:#eaf5f6;border:1px solid #d4e8e9;border-radius:18px}.device-support-heading{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-bottom:13px}.device-support-heading span{font-size:13px;color:var(--muted)}.device-support-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.device-support-card{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:10px;row-gap:3px;padding:13px;background:white;border:1px solid var(--line);border-radius:13px}.device-support-card>span{grid-row:span 2;font-size:29px}.device-support-card b{font-size:15px}.device-support-card small{color:var(--muted);line-height:1.4}.device-support-note{font-size:13px;color:#315c63;margin:12px 0 0}@media(max-width:650px){.device-support-grid{grid-template-columns:1fr}.device-support-card{grid-template-columns:38px 1fr}.device-support-card>span{font-size:26px}}
+
 /* Separate, guided screens */
 body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section.games,body>main>#teacher,body>main>#play{display:none}
 #app-pages{min-height:60vh}.app-screen{animation:screenIn .18s ease-out}.app-screen.hidden{display:none!important}@keyframes screenIn{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}
@@ -32,6 +34,15 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 <section id="app-pages">
  <section class="app-screen" id="screen-home">
   <div class="welcome-card"><div class="welcome-icon">📚</div><div><span class="eyebrow">SD Negeri 1 Lamappoloware</span><h1>Selamat datang di Petualangan Literasi!</h1><p>Pilih pintu masuk sesuai peranmu agar langkah-langkahnya lebih mudah diikuti.</p></div></div>
+  <div class="device-support">
+   <div class="device-support-heading"><b>🎮 Satu permainan, tiga pilihan perangkat</b><span>Gunakan perangkat yang tersedia di kelasmu.</span></div>
+   <div class="device-support-grid">
+    <div class="device-support-card"><span>🖥️</span><b>IFD</b><small>Guru menampilkan soal dan papan skor untuk seluruh kelas.</small></div>
+    <div class="device-support-card"><span>📱</span><b>HP Android</b><small>Siswa bergabung dan menjawab melalui HP masing-masing.</small></div>
+    <div class="device-support-card"><span>💻</span><b>Laptop / Komputer</b><small>Siswa dapat bermain melalui browser seperti di HP.</small></div>
+   </div>
+   <p class="device-support-note">💡 Semua perangkat membuka alamat website yang sama. Tampilan akan menyesuaikan ukuran layar secara otomatis.</p>
+  </div>
   <div class="role-grid">
    <button class="role-card" onclick="goScreen('screen-student')"><span>🎒</span><h2>Masuk sebagai Siswa</h2><p>Bermain sendiri, membuat tim, atau bergabung ke ruang permainan.</p><b>Masuk ke area siswa →</b></button>
    <button class="role-card teacher-role" onclick="openTeacherPage()"><span>👩‍🏫</span><h2>Masuk sebagai Guru</h2><p>Membuat ruang, mengatur permainan, dan membagi siswa ke dalam tim.</p><b>Masuk ke panel guru →</b></button>
