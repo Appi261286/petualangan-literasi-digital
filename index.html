@@ -82,12 +82,12 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 </style>
 </head>
 <body>
-<header><div class="top"><div><div class="brand">📚 Petualangan Literasi Digital</div><div class="sub">Belajar membaca, memahami cerita, dan bermain bersama!</div></div><span class="tag">SD Negeri 1 Lamappoloware</span></div></header>
+<header><div class="top"><div><div class="brand">📚 Petualangan Literasi Digital</div><div class="sub">Belajar membaca, memahami cerita, dan bermain bersama!</div></div></div></header>
 <main>
 
 <section id="app-pages">
  <section class="app-screen" id="screen-home">
-  <div class="welcome-card"><div class="welcome-icon">📚</div><div><span class="eyebrow">SD Negeri 1 Lamappoloware</span><h1>Selamat datang di Petualangan Literasi!</h1><p>Belajar membaca jadi petualangan seru. Pilih cara bermain dan mulai tantanganmu!</p></div></div>
+  <div class="welcome-card"><div class="welcome-icon">📚</div><div><h1>Selamat datang di Petualangan Literasi!</h1><p>Belajar membaca jadi petualangan seru. Pilih cara bermain dan mulai tantanganmu!</p></div></div>
   <div class="device-support">
    <div class="device-support-heading"><b>🎮 Main dari perangkat apa saja</b><span>Di kelas atau di rumah.</span></div>
    <div class="device-support-grid">
@@ -261,7 +261,7 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 </section>
 <section id="play" class="panel hidden" aria-live="polite"><div class="section-head"><div><span class="muted">Permainan pilihan</span><h2 id="game-title">Kuis Literasi</h2></div><button class="btn secondary" onclick="closeGame()">Tutup</button></div><div class="actions" style="margin-bottom:14px"><label>Kesulitan <select id="level" class="field" style="width:auto;margin:0" onchange="resetQuiz()"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit">Sulit</option></select></label></div><div id="quiz-area"></div></section>
 <section id="teacher" class="panel hidden"><div class="section-head"><div><span class="muted">Area pengelolaan</span><h2>👩‍🏫 Panel Guru</h2></div><button class="btn secondary" onclick="document.getElementById('teacher').classList.add('hidden')">Tutup</button></div><div class="notice">Panel ini masih berupa contoh lokal di perangkat ini. Pembuatan ruang, sinkronisasi siswa, dan kontrol pertandingan langsung memerlukan Firebase pada tahap berikutnya.</div><div class="stats"><div class="stat"><span class="muted">Pemain tersimpan</span><b id="player-count">0</b></div><div class="stat"><span class="muted">Poin terkumpul</span><b id="point-count">0</b></div><div class="stat"><span class="muted">Mode</span><b style="font-size:18px">Uji coba</b></div></div><h3 style="margin-top:20px">Buat kode ruang contoh</h3><button class="btn" onclick="makeRoom()">Buat kode ruang</button> <strong id="room-code"></strong><h3 style="margin-top:20px">Riwayat skor di perangkat ini</h3><div id="score-list" class="muted">Belum ada skor.</div><button class="btn secondary" onclick="clearScores()">Reset skor lokal</button></section>
-<div class="footer">Versi prototipe awal • Data skor disimpan di browser perangkat ini.</div>
+<div class="footer">Data skor disimpan di browser perangkat ini.</div>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
