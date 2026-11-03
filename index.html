@@ -892,6 +892,126 @@ renderClozeStory();
 updateTeacher();
 
 /* Mesin permainan dengan mekanisme berbeda untuk setiap jenis game */
+gameQuestionBanks["Petualangan Literasi"].push(
+{"q":"Tujuan membaca petunjuk sebelum mencari buku adalah ...","a":["Menentukan langkah pencarian","Menghabiskan waktu","Mengganti judul"],"c":0,"why":"Petunjuk membuat pencarian terarah.","level":"Mudah"},
+{"q":"Jika buku tidak ada di rak, tindakan pertama adalah ...","a":["Memeriksa sekitar dan bertanya kepada petugas","Menuduh teman","Membawa buku lain"],"c":0,"why":"Pemeriksaan awal mencegah kesimpulan terburu-buru.","level":"Mudah"},
+{"q":"Siapa yang menemukan buku di rak perbaikan?","a":["Raka","Nisa","Bu Mira"],"c":0,"why":"Raka menemukan buku tersebut.","level":"Mudah"},
+{"q":"Apa yang berguna untuk mencatat petunjuk?","a":["Buku catatan dan alat tulis","Mainan","Peralatan olahraga"],"c":0,"why":"Catatan membantu mengingat informasi.","level":"Mudah"},
+{"q":"Apa arti petunjuk dalam penyelidikan?","a":["Informasi yang membantu menemukan jawaban","Hukuman","Cerita khayalan"],"c":0,"why":"Petunjuk memberi arah pemecahan masalah.","level":"Mudah"},
+{"q":"Bagaimana memilih petunjuk paling relevan?","a":["Memilih informasi yang berkaitan dengan buku","Memilih yang lucu","Memilih yang terpanjang"],"c":0,"why":"Petunjuk relevan berkaitan langsung dengan objek.","level":"Sedang"},
+{"q":"Setelah buku ditemukan, apa yang dilakukan?","a":["Memeriksa kondisi dan memberi tahu petugas","Membawanya pulang","Menyembunyikannya"],"c":0,"why":"Buku perlu diperiksa bersama petugas.","level":"Sedang"},
+{"q":"Mengapa pencarian dibagi menjadi beberapa tugas?","a":["Agar pekerjaan teratur dan efisien","Agar semua melakukan hal sama","Agar tidak mencatat"],"c":0,"why":"Pembagian tugas membantu kerja kelompok.","level":"Sedang"},
+{"q":"Informasi apa yang membantu menguji dugaan pemindahan?","a":["Keterangan petugas dan lokasi temuan","Warna sepatu","Menu kantin"],"c":0,"why":"Keduanya saling mendukung.","level":"Sedang"},
+{"q":"Apa yang dilakukan jika petunjuk belum cukup?","a":["Mencari informasi tambahan","Langsung menyimpulkan","Menghentikan pencatatan"],"c":0,"why":"Kesimpulan memerlukan informasi memadai.","level":"Sedang"},
+{"q":"Dua petunjuk menunjukkan waktu berbeda. Bagaimana mengujinya?","a":["Membandingkan sumber dan catatan waktu","Memilih waktu yang disukai","Mengabaikan keduanya"],"c":0,"why":"Sumber perlu diperiksa silang.","level":"Menantang"},
+{"q":"Kesimpulan yang baik harus ...","a":["Sesuai bukti yang diperiksa","Paling cepat dibuat","Mengikuti dugaan terbanyak"],"c":0,"why":"Kesimpulan wajib didukung bukti.","level":"Menantang"},
+{"q":"Mengapa sumber informasi perlu dicatat?","a":["Agar keterangan dapat diperiksa kembali","Agar catatan panjang","Agar tak perlu berdiskusi"],"c":0,"why":"Sumber memungkinkan verifikasi.","level":"Menantang"},
+{"q":"Jika bukti baru membantah dugaan awal, sikap terbaik adalah ...","a":["Memperbaiki kesimpulan berdasarkan bukti baru","Memaksakan dugaan","Membuang bukti"],"c":0,"why":"Kesimpulan harus terbuka terhadap bukti baru.","level":"Menantang"},
+{"q":"Apa ciri laporan pencarian yang dapat dipercaya?","a":["Runtut, jelas, dan menyertakan bukti","Penuh dugaan","Tanpa sumber"],"c":0,"why":"Laporan menjelaskan proses dan bukti.","level":"Menantang"}
+);
+gameQuestionBanks["Duel Kuis Literasi"].push(
+{"q":"Siapa nama petugas perpustakaan dalam cerita?","a":["Bu Mira","Bu Rina","Pak Raka"],"c":0,"why":"Petugas perpustakaan adalah Bu Mira.","level":"Mudah"},
+{"q":"Siapa tokoh yang membaca ensiklopedia?","a":["Nisa","Raka","Bu Mira"],"c":0,"why":"Nisa membaca ensiklopedia.","level":"Mudah"},
+{"q":"Buku dipindahkan ke rak untuk ...","a":["Diperbaiki","Dijual","Dipinjamkan"],"c":0,"why":"Sampul buku rusak dan perlu diperbaiki.","level":"Mudah"},
+{"q":"Siapa yang ikut mencari buku?","a":["Kelompok Raka","Penjaga kantin","Tim olahraga"],"c":0,"why":"Kelompok Raka melakukan pencarian.","level":"Mudah"},
+{"q":"Apa bagian buku yang rusak?","a":["Sampul","Meja perpustakaan","Jendela"],"c":0,"why":"Bagian sampul buku rusak.","level":"Mudah"},
+{"q":"Mengapa buku tidak berada di rak semula?","a":["Dipindahkan petugas ke rak perbaikan","Dibawa pulang Nisa","Dibuang Raka"],"c":0,"why":"Bu Mira memindahkannya untuk perawatan.","level":"Sedang"},
+{"q":"Pernyataan yang sesuai cerita adalah ...","a":["Buku ditemukan setelah petunjuk diperiksa","Buku ditemukan di kantin","Buku tidak dikembalikan"],"c":0,"why":"Kelompok mengikuti petunjuk hingga menemukan buku.","level":"Sedang"},
+{"q":"Apa yang dilakukan Nisa setelah membaca?","a":["Mengembalikan buku","Menyobek sampul","Menyimpan di rumah"],"c":0,"why":"Nisa mengembalikan buku setelah membaca.","level":"Sedang"},
+{"q":"Apa hubungan sampul rusak dengan rak perbaikan?","a":["Kerusakan menjadi alasan buku dipindahkan","Buku menjadi bertambah","Tidak berhubungan"],"c":0,"why":"Buku rusak ditempatkan untuk dirawat.","level":"Sedang"},
+{"q":"Siapa yang mengetahui alasan pemindahan buku?","a":["Bu Mira","Penjual kantin","Siswa yang tidak hadir"],"c":0,"why":"Bu Mira yang memindahkan buku.","level":"Sedang"},
+{"q":"Jika pengembalian pukul 09.00 dan pemindahan 09.10, selisihnya ...","a":["10 menit","20 menit","30 menit"],"c":0,"why":"Selisih waktunya 10 menit.","level":"Menantang"},
+{"q":"Bukti terkuat bahwa buku tidak dicuri adalah ...","a":["Buku ditemukan di rak perbaikan dan dijelaskan petugas","Ada siswa menebak","Rak lain penuh"],"c":0,"why":"Lokasi dan keterangan petugas menjelaskan keberadaan buku.","level":"Menantang"},
+{"q":"Peristiwa yang terjadi lebih dahulu adalah ...","a":["Bu Mira memindahkan buku","Raka menemukan buku","Pencarian selesai"],"c":0,"why":"Pemindahan terjadi sebelum pencarian.","level":"Menantang"},
+{"q":"Pernyataan yang merupakan opini adalah ...","a":["Menurutku rak perbaikan paling menarik","Buku ditemukan di rak perbaikan","Bu Mira petugas perpustakaan"],"c":0,"why":"Ungkapan menurutku menunjukkan pendapat.","level":"Menantang"},
+{"q":"Mengapa jawaban kuis harus sesuai bacaan?","a":["Agar pemahaman berdasarkan informasi teks","Agar semua jawaban sama","Agar tidak membaca"],"c":0,"why":"Jawaban perlu didukung informasi dalam bacaan.","level":"Menantang"}
+);
+gameQuestionBanks["Tebak Kata"].push(
+{"q":"Kumpulan huruf yang membentuk makna disebut ...","a":["Kata","Angka","Garis"],"c":0,"why":"Kata tersusun dari huruf dan memiliki makna.","level":"Mudah"},
+{"q":"Tempat menyimpan dan membaca koleksi buku disebut ...","a":["Perpustakaan","Laboratorium","Lapangan"],"c":0,"why":"Perpustakaan menyediakan koleksi bacaan.","level":"Mudah"},
+{"q":"Orang yang memberikan keterangan tentang kejadian disebut ...","a":["Saksi","Penonton","Pemain"],"c":0,"why":"Saksi memberi keterangan tentang peristiwa.","level":"Mudah"},
+{"q":"Buku yang berisi pengetahuan berbagai bidang disebut ...","a":["Ensiklopedia","Buku gambar","Buku tulis"],"c":0,"why":"Ensiklopedia memuat informasi berbagai bidang.","level":"Mudah"},
+{"q":"Kegiatan membaca untuk memahami isi teks disebut ...","a":["Membaca pemahaman","Menggambar","Menghafal angka"],"c":0,"why":"Membaca pemahaman bertujuan menangkap isi bacaan.","level":"Mudah"},
+{"q":"Persamaan arti dua kata disebut ...","a":["Sinonim","Antonim","Akronim"],"c":0,"why":"Sinonim bermakna sama atau mirip.","level":"Sedang"},
+{"q":"Lawan kata tertib adalah ...","a":["Kacau","Teratur","Rapi"],"c":0,"why":"Kacau berlawanan makna dengan tertib.","level":"Sedang"},
+{"q":"Kalimat ajakan biasanya menggunakan kata ...","a":["Mari","Karena","Tetapi"],"c":0,"why":"Mari sering digunakan untuk mengajak.","level":"Sedang"},
+{"q":"Gagasan utama dalam paragraf disebut ...","a":["Ide pokok","Tanda baca","Kata sambung"],"c":0,"why":"Ide pokok adalah gagasan utama paragraf.","level":"Sedang"},
+{"q":"Kata depan yang dapat menunjukkan tempat adalah ...","a":["Di","Sangat","Akan"],"c":0,"why":"Kata di dapat menunjukkan tempat.","level":"Sedang"},
+{"q":"Pernyataan yang dapat dibuktikan kebenarannya disebut ...","a":["Fakta","Imajinasi","Harapan"],"c":0,"why":"Fakta dapat diuji atau dibuktikan.","level":"Menantang"},
+{"q":"Objektif berarti menilai berdasarkan ...","a":["Fakta, bukan prasangka","Perasaan sesaat","Kabar yang belum jelas"],"c":0,"why":"Objektif berarti tidak memihak dan berdasarkan fakta.","level":"Menantang"},
+{"q":"Kata penghubung yang menjelaskan alasan adalah ...","a":["Karena","Wah","Aduh"],"c":0,"why":"Karena menghubungkan sebab atau alasan.","level":"Menantang"},
+{"q":"Informasi yang belum terbukti kebenarannya disebut ...","a":["Dugaan","Fakta pasti","Data terverifikasi"],"c":0,"why":"Dugaan masih perlu diperiksa.","level":"Menantang"},
+{"q":"Ringkasan menyajikan isi teks secara ...","a":["Singkat dengan gagasan penting","Lebih panjang dari teks asli","Berbeda dari isi teks"],"c":0,"why":"Ringkasan memuat inti bacaan secara singkat.","level":"Menantang"}
+);
+gameQuestionBanks["Detektif Bacaan"].push(
+{"q":"Apa yang diperhatikan saat membaca teks kasus?","a":["Informasi penting dalam bacaan","Jumlah huruf judul","Warna kertas"],"c":0,"why":"Informasi penting menjadi dasar penyelidikan.","level":"Mudah"},
+{"q":"Kalimat 'Bu Mira memindahkan buku' termasuk ...","a":["Informasi kejadian","Hiasan cerita","Pertanyaan"],"c":0,"why":"Kalimat tersebut menyampaikan peristiwa.","level":"Mudah"},
+{"q":"Apa yang dicari detektif dari bacaan?","a":["Petunjuk dan bukti","Kata paling panjang","Gambar paling besar"],"c":0,"why":"Detektif mencari bukti untuk memahami kejadian.","level":"Mudah"},
+{"q":"Tokoh yang menjelaskan alasan pemindahan buku adalah ...","a":["Bu Mira","Penjaga lapangan","Penjual keliling"],"c":0,"why":"Bu Mira mengetahui alasan buku dipindahkan.","level":"Mudah"},
+{"q":"Mengapa teks perlu dibaca teliti?","a":["Agar tidak melewatkan petunjuk","Agar cepat menebak","Agar tidak memahami isi"],"c":0,"why":"Ketelitian membantu menemukan informasi.","level":"Mudah"},
+{"q":"Kalimat yang merupakan dugaan adalah ...","a":["Mungkin ada orang membawa buku itu","Buku ada di rak perbaikan","Bu Mira memindahkan buku"],"c":0,"why":"Kata mungkin menunjukkan hal yang belum pasti.","level":"Sedang"},
+{"q":"Apa perbedaan bukti dan pendapat?","a":["Bukti dapat diperiksa, pendapat berisi pandangan","Keduanya selalu sama","Pendapat selalu lebih kuat"],"c":0,"why":"Bukti dapat diuji, pendapat merupakan pandangan.","level":"Sedang"},
+{"q":"Apa yang dicocokkan untuk menyusun kronologi?","a":["Urutan waktu setiap peristiwa","Warna pakaian","Jumlah kursi"],"c":0,"why":"Waktu membantu mengurutkan kejadian.","level":"Sedang"},
+{"q":"Mengapa sumber keterangan perlu diketahui?","a":["Untuk menilai keandalan informasi","Agar cerita panjang","Untuk memilih tokoh favorit"],"c":0,"why":"Sumber membantu menilai kepercayaan informasi.","level":"Sedang"},
+{"q":"Apa tindakan saat menemukan informasi yang tidak cocok?","a":["Memeriksa ulang teks dan sumbernya","Mengabaikan semua teks","Mengubah fakta"],"c":0,"why":"Informasi yang tidak cocok perlu diperiksa.","level":"Sedang"},
+{"q":"Bagaimana menguji kesimpulan berdasarkan bacaan?","a":["Menelusuri kalimat dan bukti relevan","Menghitung jumlah tokoh","Memilih jawaban terpanjang"],"c":0,"why":"Kesimpulan harus didukung teks.","level":"Menantang"},
+{"q":"Jika dua bukti saling melengkapi, manfaatnya adalah ...","a":["Kesimpulan menjadi lebih kuat","Kesimpulan pasti salah","Penyelidikan tak diperlukan"],"c":0,"why":"Bukti yang mendukung memperkuat penjelasan.","level":"Menantang"},
+{"q":"Inferensi saat membaca berarti ...","a":["Menarik kesimpulan dari petunjuk teks","Menyalin paragraf","Menghafal judul"],"c":0,"why":"Inferensi dibuat dari petunjuk dan pengetahuan.","level":"Menantang"},
+{"q":"Mengapa tidak boleh menambahkan fakta yang tidak ada di bacaan?","a":["Agar kesimpulan tetap akurat","Agar cerita berubah","Agar dugaan dianggap bukti"],"c":0,"why":"Informasi tanpa dasar dapat menyesatkan.","level":"Menantang"},
+{"q":"Laporan penyelidikan sebaiknya membedakan ...","a":["Fakta, pendapat, dan kesimpulan","Warna, ukuran, dan bentuk","Tokoh utama dan tokoh lucu"],"c":0,"why":"Pembedaan menjaga ketepatan laporan.","level":"Menantang"}
+);
+gameQuestionBanks["Puzzle Literasi"].push(
+{"q":"Huruf pertama pada kata buku adalah ...","a":["B","K","U"],"c":0,"why":"Kata buku diawali huruf B.","level":"Mudah"},
+{"q":"Huruf disusun menjadi ...","a":["Kata","Gambar","Angka"],"c":0,"why":"Huruf disusun menjadi kata bermakna.","level":"Mudah"},
+{"q":"Lengkapi kalimat: Nisa ... buku di perpustakaan.","a":["Membaca","Memasak","Berlari"],"c":0,"why":"Membaca sesuai konteks kegiatan Nisa.","level":"Mudah"},
+{"q":"Pasangan yang tepat: buku — ...","a":["Dibaca","Dimasak","Ditanam"],"c":0,"why":"Buku merupakan bahan bacaan.","level":"Mudah"},
+{"q":"Urutan yang benar adalah ...","a":["Membaca lalu mengembalikan buku","Mengembalikan sebelum meminjam","Memperbaiki lalu merusak"],"c":0,"why":"Buku dikembalikan setelah dibaca.","level":"Mudah"},
+{"q":"Sampul rusak menyebabkan ...","a":["Buku perlu diperbaiki","Buku menjadi lebih baru","Buku berubah menjadi majalah"],"c":0,"why":"Sampul rusak perlu dirawat.","level":"Sedang"},
+{"q":"Lawan kata rapi adalah ...","a":["Berantakan","Teratur","Bersih"],"c":0,"why":"Berantakan berlawanan makna dengan rapi.","level":"Sedang"},
+{"q":"Bu Mira memindahkan buku ...","a":["Karena sampulnya rusak","Walaupun tak ada buku","Sebelum buku dibuat"],"c":0,"why":"Sampul rusak menjadi alasan pemindahan.","level":"Sedang"},
+{"q":"Urutan proses membaca yang logis adalah ...","a":["Memilih buku, membaca, lalu mengembalikan","Mengembalikan, memilih, lalu mencari","Menyimpan, merusak, lalu membaca"],"c":0,"why":"Urutan sesuai kebiasaan meminjam buku.","level":"Sedang"},
+{"q":"Ide pokok berarti ...","a":["Gagasan utama paragraf","Nama pengarang","Nomor halaman"],"c":0,"why":"Ide pokok merupakan gagasan utama.","level":"Sedang"},
+{"q":"Sampul rusak dan buku ada di rak perbaikan. Simpulannya ...","a":["Buku dipindahkan untuk dirawat","Buku sengaja dihilangkan","Buku tak boleh dibaca"],"c":0,"why":"Petunjuk mendukung simpulan perawatan.","level":"Menantang"},
+{"q":"Urutan penalaran yang tepat adalah ...","a":["Baca bukti, bandingkan, lalu simpulkan","Simpulkan, abaikan bukti, lalu menebak","Tuduh, sebarkan, lalu mencari"],"c":0,"why":"Kesimpulan dibuat setelah bukti diperiksa.","level":"Menantang"},
+{"q":"Ringkasan yang paling tepat adalah ...","a":["Buku dipindahkan ke rak perbaikan karena sampulnya rusak","Buku sangat bagus dan semua menyukainya","Raka berlari di halaman"],"c":0,"why":"Ringkasan mempertahankan informasi inti.","level":"Menantang"},
+{"q":"Hubungan kata cepat dan lambat adalah ...","a":["Antonim","Sinonim","Kata benda"],"c":0,"why":"Cepat dan lambat memiliki makna berlawanan.","level":"Menantang"},
+{"q":"Informasi acak sebaiknya disusun berdasarkan ...","a":["Urutan waktu dan sebab-akibat","Panjang kalimat saja","Warna huruf"],"c":0,"why":"Kronologi dan sebab-akibat membantu menyusun informasi.","level":"Menantang"}
+);
+gameQuestionBanks["Battle Literasi"].push(
+{"q":"Teman meminjam buku. Sikap baik adalah ...","a":["Mengingatkan agar merawat dan mengembalikannya","Mencoret halaman","Menyembunyikan buku"],"c":0,"why":"Buku bersama harus dijaga.","level":"Mudah"},
+{"q":"Saat berdiskusi, kita sebaiknya ...","a":["Mendengarkan pendapat teman","Memotong pembicaraan","Menertawakan jawaban"],"c":0,"why":"Saling mendengarkan membuat diskusi nyaman.","level":"Mudah"},
+{"q":"Melihat sampul buku terlepas, kamu ...","a":["Melapor kepada petugas","Membuangnya","Menarik halaman"],"c":0,"why":"Petugas dapat membantu memperbaiki buku.","level":"Mudah"},
+{"q":"Sikap bertanggung jawab adalah ...","a":["Mengembalikan buku tepat waktu","Membawa pulang tanpa izin","Menyembunyikan buku"],"c":0,"why":"Tanggung jawab ditunjukkan dengan mematuhi aturan.","level":"Mudah"},
+{"q":"Jika teman menemukan buku, kamu ...","a":["Membantu menyerahkannya kepada petugas","Menyuruh membawa pulang","Menyembunyikannya"],"c":0,"why":"Buku perpustakaan harus dikembalikan.","level":"Mudah"},
+{"q":"Teman memiliki jawaban berbeda. Sikapmu ...","a":["Meminta alasan dan membandingkan bukti","Mengejek","Memaksakan jawaban sendiri"],"c":0,"why":"Perbedaan diselesaikan dengan diskusi.","level":"Sedang"},
+{"q":"Mengapa aturan perpustakaan dipatuhi semua siswa?","a":["Agar semua nyaman menggunakan fasilitas","Agar hanya petugas membaca","Agar tak ada yang membaca"],"c":0,"why":"Aturan menjaga kenyamanan bersama.","level":"Sedang"},
+{"q":"Jika tidak sengaja merusak buku, kamu ...","a":["Jujur melapor kepada petugas","Menyembunyikan kerusakan","Menyalahkan teman"],"c":0,"why":"Kejujuran membantu kerusakan ditangani.","level":"Sedang"},
+{"q":"Pembagian tugas kelompok yang adil adalah ...","a":["Sesuai kemampuan dan kesepakatan","Semua tugas ke satu orang","Tanpa pembagian"],"c":0,"why":"Pembagian adil membuat semua berperan.","level":"Sedang"},
+{"q":"Manfaat memberi kesempatan teman berbicara adalah ...","a":["Semua anggota menyampaikan gagasan","Diskusi jadi pertengkaran","Hanya satu pendapat didengar"],"c":0,"why":"Kesempatan bicara membuat diskusi inklusif.","level":"Sedang"},
+{"q":"Teman dituduh tanpa bukti. Sikap tepat adalah ...","a":["Meminta semua pihak memeriksa fakta","Menyebarkan tuduhan","Mengucilkan teman"],"c":0,"why":"Tuduhan perlu diperiksa agar tidak merugikan orang.","level":"Menantang"},
+{"q":"Keputusan kelompok yang bertanggung jawab dibuat ...","a":["Berdasarkan bukti dan kesepakatan","Berdasarkan suara paling keras","Berdasarkan prasangka"],"c":0,"why":"Keputusan adil mempertimbangkan bukti.","level":"Menantang"},
+{"q":"Mengapa informasi pribadi teman tak boleh disebarkan?","a":["Menghormati privasi dan menjaga kepercayaan","Menjadi bahan candaan","Agar semua tahu"],"c":0,"why":"Privasi harus dihormati.","level":"Menantang"},
+{"q":"Aturan permainan dirasa tidak adil. Tindakanmu ...","a":["Menyampaikan alasan sopan dan usul perbaikan","Merusak permainan","Mengejek pembuat aturan"],"c":0,"why":"Masukan sopan membantu perbaikan.","level":"Menantang"},
+{"q":"Mengapa kerja sama lebih baik daripada saling menyalahkan?","a":["Fokus pada solusi dan tujuan bersama","Membuat masalah bertambah","Menghilangkan bukti"],"c":0,"why":"Kerja sama membantu menyelesaikan masalah.","level":"Menantang"}
+);
+gameQuestionBanks["Misi Penyelamatan Buku"].push(
+{"q":"Sebelum memperbaiki buku perpustakaan, kamu ...","a":["Meminta bantuan petugas","Mencoba dengan api","Mencuci dengan air"],"c":0,"why":"Petugas mengetahui cara perawatan aman.","level":"Mudah"},
+{"q":"Buku yang basah sebaiknya ...","a":["Segera dilaporkan kepada petugas","Dijemur tanpa arahan","Dilipat halamannya"],"c":0,"why":"Petugas menentukan penanganan sesuai.","level":"Mudah"},
+{"q":"Mengapa buku diberi label atau nomor inventaris?","a":["Agar mudah dikenali dan dicatat","Agar terlihat berat","Agar tak boleh dipinjam"],"c":0,"why":"Identitas membantu pengelolaan koleksi.","level":"Mudah"},
+{"q":"Saat menemukan buku terjatuh, kamu ...","a":["Mengambil hati-hati dan menaruh sesuai arahan","Menendangnya","Membiarkannya terinjak"],"c":0,"why":"Penanganan hati-hati mencegah kerusakan.","level":"Mudah"},
+{"q":"Siapa yang mengatur perawatan koleksi?","a":["Petugas perpustakaan","Pengunjung sendiri-sendiri","Penjual kantin"],"c":0,"why":"Petugas mengelola koleksi dan perawatannya.","level":"Mudah"},
+{"q":"Informasi penting saat melaporkan buku rusak adalah ...","a":["Judul buku dan jenis kerusakan","Makanan favorit","Warna sepatu"],"c":0,"why":"Judul dan kerusakan membantu mengenali buku.","level":"Sedang"},
+{"q":"Mengapa buku yang diperbaiki perlu diberi tanda?","a":["Agar pengguna tahu buku belum siap dipinjam","Agar terlihat baru","Agar tak ditemukan"],"c":0,"why":"Tanda menunjukkan status buku.","level":"Sedang"},
+{"q":"Setelah buku diperbaiki, langkah berikutnya ...","a":["Memeriksa dan mencatat status buku","Membuang label","Menyimpan sembarang"],"c":0,"why":"Pemeriksaan memastikan buku siap digunakan.","level":"Sedang"},
+{"q":"Bagaimana menjaga buku saat membawanya?","a":["Tangan bersih dan tidak melipat halaman","Menarik sampul","Menaruh minuman di atasnya"],"c":0,"why":"Kebiasaan baik mencegah kerusakan.","level":"Sedang"},
+{"q":"Manfaat mengembalikan buku ke rak benar adalah ...","a":["Memudahkan pembaca menemukannya","Membuat buku hilang","Membuat rak tak teratur"],"c":0,"why":"Penempatan tepat memudahkan pencarian.","level":"Sedang"},
+{"q":"Jika beberapa buku rusak, bagaimana menentukan prioritas?","a":["Mencatat kondisi dan meminta petugas menilai","Memperbaiki asal","Membuang semuanya"],"c":0,"why":"Penilaian petugas menentukan penanganan aman.","level":"Menantang"},
+{"q":"Mengapa pencatatan setelah perbaikan penting?","a":["Agar riwayat kondisi dan status buku jelas","Agar halaman bertambah","Agar tak dibaca"],"c":0,"why":"Catatan membantu pengelolaan koleksi.","level":"Menantang"},
+{"q":"Jika label buku tidak cocok dengan judul, tindakan tepat ...","a":["Meminta petugas memeriksa data inventaris","Mengganti label sendiri","Menghapus nomor"],"c":0,"why":"Pencocokan data harus dilakukan dengan cermat.","level":"Menantang"},
+{"q":"Bagaimana mencegah buku rusak saat digunakan bersama?","a":["Mengikuti kesepakatan merawat buku","Membiarkan dicoret","Menyimpan makanan di dalamnya"],"c":0,"why":"Kesepakatan melindungi koleksi bersama.","level":"Menantang"},
+{"q":"Tanda misi penyelamatan selesai adalah ...","a":["Buku aman, tercatat, dan ditempatkan sesuai status","Buku disembunyikan","Tidak melapor petugas"],"c":0,"why":"Penyelesaian mencakup perawatan dan pencatatan.","level":"Menantang"}
+);
+
 var gameSession = null;
 var gameClock = null;
 var storyOrderItems = contentBank.sequence;
@@ -903,7 +1023,15 @@ function startGame(name){
  const level=document.getElementById('level')?.value||'Mudah';
  const gameBank=name==='Susun Cerita'?[]:(gameQuestionBanks[name]||contentBank.questions);
  const targetCount=5;
- let selected=shuffleGameItems(gameBank.filter(q=>q.level===(level==='Mudah'?'Mudah':level==='Sedang'?'Sedang':'Menantang'))).slice(0,targetCount);
+ const levelKey=level==='Mudah'?'Mudah':level==='Sedang'?'Sedang':'Menantang';
+ const levelBank=gameBank.filter(q=>q.level===levelKey);
+ const historyKey='literasiSeen_'+name+'_'+levelKey;
+ let seen=[];
+ try{seen=JSON.parse(localStorage.getItem(historyKey)||'[]');if(!Array.isArray(seen))seen=[];}catch(e){seen=[];}
+ let fresh=levelBank.filter(q=>!seen.includes(q.q));
+ if(fresh.length<targetCount){seen=[];fresh=levelBank;}
+ let selected=shuffleGameItems(fresh).slice(0,targetCount);
+ try{localStorage.setItem(historyKey,JSON.stringify(seen.concat(selected.map(q=>q.q))));}catch(e){}
  gameSession={name,items:selected,index:0,score:0,streak:0,lives:3,finished:false,started:false,seconds:45,order:shuffleGameItems(storyOrderItems),orderChecked:false};
  current=0;score=0;
  document.getElementById('game-title').textContent=name;
