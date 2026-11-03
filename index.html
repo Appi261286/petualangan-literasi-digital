@@ -174,8 +174,8 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
      <div class="online-card-icon">🎯</div><h3>1. BUAT PERTANDINGAN</h3><p class="online-help">Pembuat pertandingan memilih timnya, lalu membagikan kode kepada kedua tim.</p>
      <label for="online-host-name">Nama pembuat ruang</label><input id="online-host-name" class="field" placeholder="Masukkan nama pemain"><label for="online-host-team">Tim yang diwakili</label><select id="online-host-team" class="field"><option value="red">Tim Merah</option><option value="blue">Tim Biru</option></select>
      <div class="online-settings">
-      <div><label for="online-count">Jumlah soal</label><select id="online-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option><option value="15">15 soal</option><option value="20">20 soal</option></select></div>
-      <div><label for="online-seconds">Waktu setiap soal</label><select id="online-seconds" class="field"><option value="30">30 detik</option><option value="25">25 detik</option><option value="20">20 detik</option><option value="15">15 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
+      <div><label for="online-count">Jumlah soal</label><select id="online-count" class="field"><option value="5">5 soal</option><option value="10">10 soal</option></select></div>
+      <div><label for="online-seconds">Waktu setiap soal</label><select id="online-seconds" class="field"><option value="5">5 detik</option><option value="10">10 detik</option><option value="15">15 detik</option><option value="20">20 detik</option><option value="25">25 detik</option><option value="30" selected>30 detik</option></select></div>
      </div>
      <button class="btn online-action" onclick="onlineCreateRoom()">Buat ruang pertandingan</button>
      <p class="online-footnote">Setelah ruang dibuat, bagikan kode yang tampil kepada siswa.</p>
@@ -664,7 +664,7 @@ function onlineRenderRoom(isHost){
  }
  if(room.status==='finished'){
   const rs=teamScore(red),bs=teamScore(blue),winner=rs===bs?'Pertandingan seri!':rs>bs?'🏆 Tim Merah menang!':'🏆 Tim Biru menang!';
-  view.innerHTML=code+board+'<div class="notice"><h2>'+winner+'</h2><p>Hasil akhir: Merah '+rs+' — '+bs+' Biru</p></div>';
+  view.innerHTML=code+board+'<div class="notice"><h2>'+winner+'</h2><p>Hasil akhir: Merah '+rs+' — '+bs+' Biru</p></div><button class="btn" onclick="onlinePrintResults()">🖨️ Cetak hasil lomba</button>';
   return;
  }
  const q=room.questions&&room.questions[room.qIndex],me=players[onlineUid];
@@ -684,7 +684,18 @@ async function onlineStartMatch(){
  try{await onlineRoomRef.update({status:'playing',qIndex:0,startedAt:Date.now()});onlineSetStatus('Battle Antartim dimulai! Semua peserta mendapat soal yang sama.');}
  catch(error){onlineSetStatus('Gagal memulai pertandingan: '+error.message);}
 }
-async function onlineSubmitAnswer(index){
+async function onlinePrintResults(){
+ if(!onlineRoomData)return;
+ const room=onlineRoomData,players=Object.values(room.players||{});
+ const teams=[{key:'red',name:'Tim Merah'},{key:'blue',name:'Tim Biru'}];
+ const score=t=>players.filter(p=>p.team===t.key).reduce((s,p)=>s+(Number(p.score)||0),0);
+ const rows=teams.map(t=>'<tr><th>'+t.name+'</th><td>'+players.filter(p=>p.team===t.key).map(p=>escapeHtml(p.name||'Siswa')).join(', ')+'</td><td>'+score(t)+'</td></tr>').join('');
+ const win=score(teams[0])===score(teams[1])?'Seri':score(teams[0])>score(teams[1])?'Tim Merah':'Tim Biru';
+ const w=window.open('','_blank');if(!w){onlineSetStatus('Izinkan pop-up untuk mencetak hasil.');return;}
+ w.document.write('<!doctype html><html><head><title>Hasil Battle '+escapeHtml(room.code)+'</title><style>body{font:16px Arial;padding:28px;color:#222}h1{text-align:center}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #999;padding:12px;text-align:left}button{padding:10px 18px;margin-top:20px}@media print{button{display:none}}</style></head><body><h1>Hasil Battle Antartim</h1><p>Kode pertandingan: <b>'+escapeHtml(room.code)+'</b></p><p>Jumlah soal: '+(room.questions||[]).length+'</p><table><tr><th>Tim</th><th>Peserta</th><th>Skor</th></tr>'+rows+'</table><h2>Pemenang: '+win+'</h2><button onclick="window.print()">Cetak</button></body></html>');
+ w.document.close();
+}
+function onlineSubmitAnswer(index){
  if(!onlineRoomRef||!onlineRoomData||onlineRoomData.status!=='playing')return;
  const qIndex=Number(onlineRoomData.qIndex),q=onlineRoomData.questions[qIndex];
  const answerRef=onlineRoomRef.child('answers/'+qIndex+'/'+onlineUid);
