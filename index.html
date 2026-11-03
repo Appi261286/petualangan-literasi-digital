@@ -189,7 +189,7 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
     </div>
    </div>
    <p id="online-status" class="notice online-status" aria-live="polite">Menghubungkan ke Firebase…</p>
-   <div id="online-room-view" class="online-room-view"></div>
+   <div id="online-room-view" class="online-room-view"></div><div class="online-card" style="margin-top:18px"><h3>🖥️ Tampilan IFD / Layar Proyektor</h3><p class="online-help">Masukkan kode Battle untuk menampilkan papan skor kedua tim tanpa ikut menjawab.</p><label for="online-display-code">Kode Battle</label><input id="online-display-code" class="field" placeholder="Contoh: LIT123" maxlength="8" style="text-transform:uppercase"><button class="btn secondary online-action" onclick="onlineWatchDisplay()">Tampilkan papan skor IFD</button></div>
   </div>
   <details class="local-options">
    <summary>Pengaturan Battle Lokal (uji coba satu perangkat)</summary>
@@ -590,7 +590,7 @@ const onlineReady=(async()=>{
   return false;
  }
 })();
-function onlineSetStatus(message){const el=document.getElementById('online-status');if(el)el.textContent=message}
+var onlineDisplayOnly=false;\nfunction onlineWatchDisplay(){const code=document.getElementById("online-display-code").value.trim().toUpperCase();if(!code){onlineSetStatus("Masukkan kode Battle terlebih dahulu.");return}onlineReady.then(ok=>{if(!ok)return;onlineDisplayOnly=true;onlineWatchRoom(code,false);onlineSetStatus("Mode layar IFD aktif. Kode: "+code)})}\nfunction onlineSetStatus(message){const el=document.getElementById('online-status');if(el)el.textContent=message}
 function onlineMakeCode(){return 'LIT'+Math.floor(10000+Math.random()*90000).toString().slice(0,3)}
 async function onlineCreateRoom(){
  const ok=await onlineReady;if(!ok)return;
@@ -667,7 +667,7 @@ function onlineRenderRoom(isHost){
  }
  const q=room.questions&&room.questions[room.qIndex],me=players[onlineUid];
  if(!q){view.innerHTML=code+board+'<p>Soal belum tersedia.</p>';return;}
- if(!me){view.innerHTML=code+board+'<p class="notice">Perangkat ini belum terdaftar sebagai peserta.</p>';return;}
+ if(!me){if(onlineDisplayOnly){view.innerHTML=code+board+'<div class="battle-live-question"><h2>'+escapeHtml(q.q)+'</h2><p class="muted">Layar IFD · siswa menjawab melalui HP masing-masing</p></div>';return;}view.innerHTML=code+board+'<p class="notice">Perangkat ini belum terdaftar sebagai peserta. Gunakan kode pada bagian Tampilan IFD.</p>';return;}
  const answers=(room.answers&&room.answers[room.qIndex])||{},already=!!answers[onlineUid];
  const elapsed=Math.max(0,Math.floor((Date.now()-Number(room.startedAt))/1000)),remaining=Math.max(0,Number(room.settings.seconds)-elapsed);
  const choices=already?'<div class="notice">Jawabanmu sudah diterima. Tunggu soal berikutnya.</div>':'<div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="onlineSubmitAnswer('+i+')">'+escapeHtml(a)+'</button>').join('')+'</div>';
