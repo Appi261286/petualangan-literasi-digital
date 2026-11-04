@@ -166,7 +166,7 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
      <label for="lobby-mode">Mode pertandingan</label><select id="lobby-mode" class="field"><option value="individual">Battle Individu · maksimal 5 pemain</option><option value="team">Battle Tim · maksimal 4 tim × 3 pemain</option></select>
      <label for="lobby-game">Jenis permainan</label><select id="lobby-game" class="field"><option>Petualangan Literasi</option><option>Duel Kuis Literasi</option><option>Tebak Kata</option><option>Susun Cerita</option><option>Detektif Bacaan</option><option>Puzzle Literasi</option><option>Battle Literasi</option><option>Misi Penyelamatan Buku</option></select>
      <label for="lobby-level">Tingkat kesulitan</label><select id="lobby-level" class="field"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Menantang">Menantang</option></select>
-     <label for="lobby-duration">Batas waktu Battle Tim</label><select id="lobby-duration" class="field"><option value="10">10 menit</option><option value="15" selected>15 menit</option></select><p class="online-footnote">Batas waktu ini digunakan untuk Battle Tim. Battle Individu berjalan mandiri sampai semua soal selesai.</p>
+     <label for="lobby-duration">Durasi pertandingan</label><select id="lobby-duration" class="field"><option value="5">5 menit</option><option value="10">10 menit</option><option value="15" selected>15 menit</option></select><p class="online-footnote">Durasi berlaku untuk Battle Individu maupun Battle Tim. Jawaban yang sudah masuk tetap dihitung saat waktu habis.</p>
      <button class="btn online-action" onclick="createBattleLobby()">Buat kode ruang</button>
     </div>
     <div class="online-card student-card"><h3>📱 Gabung ruang</h3>
@@ -657,7 +657,7 @@ async function createBattleLobby(){
  const ok=await onlineReady;if(!ok){lobbyMessage('Firebase belum terhubung. Muat ulang halaman dan coba lagi.');return;}
  const name=battleLobbyName('lobby-host-name');if(!name){lobbyMessage('Isi nama panggilan terlebih dahulu.');return;}
  const mode=document.getElementById('lobby-mode').value,game=document.getElementById('lobby-game').value,level=document.getElementById('lobby-level').value;
- const durationMinutes=mode==='team'?Number(document.getElementById('lobby-duration').value||15):null;
+ const durationMinutes=Number(document.getElementById('lobby-duration').value||15);
  const code=battleLobbyCode(),now=Date.now(),maxPlayers=mode==='individual'?5:12;
  const room={code,mode,game,level,durationMinutes,maxPlayers,status:'waiting',hostUid:onlineUid,createdAt:now,expiresAt:now+BATTLE_LOBBY_WAIT_MS,participants:{}};
  room.participants[onlineUid]={name,seat:0,team:mode==='team'?battleLobbyTeamForSeat(0):null,joinedAt:now,isHost:true};
