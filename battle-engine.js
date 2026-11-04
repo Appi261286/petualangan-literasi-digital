@@ -12,8 +12,19 @@
   if(!Array.isArray(source)||!source.length){
    source=(typeof contentBank!=='undefined'&&contentBank.questions)||[];
   }
-  let valid=source.filter(q=>q&&typeof q.q==='string'&&Array.isArray(q.a)&&q.a.length>=2&&Number.isInteger(Number(q.c))&&Number(q.c)>=0&&Number(q.c)<q.a.length);
-  if(!valid.length&&typeof contentBank!=='undefined')valid=(contentBank.questions||[]).filter(q=>q&&Array.isArray(q.a)&&q.a.length>=2&&Number.isInteger(Number(q.c)));
+  const raw=source.filter(q=>q&&typeof q.q==='string'&&Array.isArray(q.a)&&q.a.length>0);
+  const answerPool=[...new Set(raw.flatMap(q=>q.a.map(v=>String(v))).filter(Boolean))];
+  let valid=raw.map(q=>{
+   if(q.a.length>=2&&Number.isInteger(Number(q.c))&&Number(q.c)>=0&&Number(q.c)<q.a.length)return q;
+   const answer=String(q.a[0]),distractors=shuffle(answerPool.filter(v=>v!==answer)).slice(0,3);
+   if(!distractors.length)return null;
+   const choices=shuffle([answer,...distractors.slice(0,2)]);
+   return {...q,a:choices,c:choices.indexOf(answer)};
+  }).filter(Boolean);
+  if(!valid.length&&typeof contentBank!=='undefined'){
+   const fallback=(contentBank.questions||[]).filter(q=>q&&typeof q.q==='string'&&Array.isArray(q.a)&&q.a.length>=2&&Number.isInteger(Number(q.c)));
+   valid=fallback;
+  }
   const requested=levelRank(room.level);
   if(room.mode==='team'){
    let harder=valid.filter(q=>levelRank(q.level)>=Math.max(2,requested));
@@ -100,7 +111,7 @@
   return '<h3>🏆 Papan Peringkat Individu</h3><table style="width:100%"><tr><th>Rank</th><th>Nama</th><th>Skor</th><th>Waktu</th><th>Status</th></tr>'+rows.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+escapeText(r.p.name||'Siswa')+'</td><td>'+Number(r.p.score||0)+'</td><td>'+r.elapsed+' dtk</td><td>'+(r.p.completed?'Selesai':'Mengerjakan')+'</td></tr>').join('')+'</table>';
  }
  async function maybeFinish(room,live){
-  if(!onlineUid||onlineUid!==room.hostUid||!live||live.status!=='playing')return;
+  if(!onlineUid||!live||live.status!=='playing')return;
   const people=Object.keys(room.participants||{}),progress=live.progress||{};
   const everyone=people.length>0&&people.every(uid=>progress[uid]&&progress[uid].completed);
   const expired=!!live.deadlineAt&&Date.now()>=live.deadlineAt;
