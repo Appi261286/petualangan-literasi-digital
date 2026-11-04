@@ -153,7 +153,14 @@
   window.renderBattleLobbyRoom=function(room){
    original(room);
    if(room&&room.status==='playing'){listenRoom(room);startTicker();}
-   else if(room&&room.status==='completed'&&lastLive)draw(room,lastLive);
+   else if(room&&room.status==='completed'&&lastLive){
+    if(lastLive.status==='playing'&&onlineUid===room.hostUid&&onlineDb){
+     onlineDb.ref('battleLobbyRooms/'+room.code+'/live').transaction(cur=>{
+      if(!cur||cur.status!=='playing')return;cur.status='completed';cur.finishedAt=Date.now();cur.finishReason='host_ended';return cur;
+     });
+    }
+    draw(room,lastLive);
+   }
   };
  }
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&lastRoom&&lastLive)draw(lastRoom,lastLive);});
