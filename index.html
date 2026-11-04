@@ -270,7 +270,7 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 <button class="game" onclick="startGame('Battle Literasi')"><span class="emoji">🏆</span><strong>Battle Literasi</strong><small>Kumpulkan poin dari tantangan.</small></button>
 <button class="game" onclick="startGame('Misi Penyelamatan Buku')"><span class="emoji">📖</span><strong>Misi Penyelamatan Buku</strong><small>Selesaikan misi untuk menyelamatkan buku.</small></button>
 </section>
-<section id="play" class="panel hidden" aria-live="polite"><div class="section-head"><div><span class="muted">Permainan pilihan</span><h2 id="game-title">Kuis Literasi</h2></div><button class="btn secondary" onclick="closeGame()">Tutup</button></div><div class="actions" style="margin-bottom:14px"><label>Kesulitan <select id="level" class="field" style="width:auto;margin:0" onchange="resetQuiz()"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit">Sulit</option></select></label></div><div id="quiz-area"></div></section>
+<section id="play" class="panel hidden" aria-live="polite"><div class="section-head"><div><span class="muted">Permainan pilihan</span><h2 id="game-title">Kuis Literasi</h2></div><button class="btn secondary" onclick="closeGame()">Tutup</button></div><div class="actions" style="margin-bottom:14px"><label>Kesulitan <select id="level" class="field" style="width:auto;margin:0" onchange="changeGameLevel(this.value)"><option value="">Pilih tingkat kesulitan</option><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Menantang">Menantang</option></select></label></div><div id="quiz-area"></div></section>
 <section id="teacher" class="panel hidden"><div class="section-head"><div><span class="muted">Area pengelolaan</span><h2>👩‍🏫 Panel Guru</h2></div><button class="btn secondary" onclick="document.getElementById('teacher').classList.add('hidden')">Tutup</button></div><div class="notice">Panel ini masih berupa contoh lokal di perangkat ini. Pembuatan ruang, sinkronisasi siswa, dan kontrol pertandingan langsung memerlukan Firebase pada tahap berikutnya.</div><div class="stats"><div class="stat"><span class="muted">Pemain tersimpan</span><b id="player-count">0</b></div><div class="stat"><span class="muted">Poin terkumpul</span><b id="point-count">0</b></div><div class="stat"><span class="muted">Mode</span><b style="font-size:18px">Uji coba</b></div></div><h3 style="margin-top:20px">Buat kode ruang contoh</h3><button class="btn" onclick="makeRoom()">Buat kode ruang</button> <strong id="room-code"></strong><h3 style="margin-top:20px">Riwayat skor di perangkat ini</h3><div id="score-list" class="muted">Belum ada skor.</div><button class="btn secondary" onclick="clearScores()">Reset skor lokal</button></section>
 <div class="footer">Data skor disimpan di browser perangkat ini.</div>
 </main>
@@ -533,6 +533,8 @@ function joinTeacherRoom(){
 
 let studentGameMode='single';
 function goScreen(id){
+ const play=document.getElementById('play');
+ if(play&&!play.classList.contains('hidden')&&!confirmGameProgressExit('berpindah halaman'))return;
  document.querySelectorAll('#app-pages .app-screen').forEach(s=>s.classList.add('hidden'));
  const target=document.getElementById(id);if(target)target.classList.remove('hidden');
  window.scrollTo({top:0,behavior:'smooth'});
@@ -622,13 +624,11 @@ function joinTeacherRoomPage(){
 }
 function launchGamePage(game){
  document.getElementById('nama').value=document.getElementById('class-student-name').value.trim()||document.getElementById('student-leader-name').value.trim()||document.getElementById('student-member-name').value.trim()||'Pemain';
- startGame(game);
+ if(!startGame(game))return;
  document.querySelectorAll('#app-pages .app-screen').forEach(s=>s.classList.add('hidden'));
- document.getElementById('play').style.display='block';
- document.getElementById('play').classList.remove('hidden');
- const back=document.createElement('button');back.className='back-link';back.textContent='← Kembali ke pilihan permainan';back.onclick=()=>{document.getElementById('play').style.display='none';goScreen('screen-games')};
- document.getElementById('play').prepend(back);
- window.scrollTo({top:0,behavior:'smooth'});
+ document.getElementById('play').style.display='block';document.getElementById('play').classList.remove('hidden');
+ const back=document.createElement('button');back.className='back-link';back.textContent='← Kembali ke pilihan permainan';back.onclick=()=>{if(!confirmGameProgressExit('kembali ke pilihan permainan'))return;document.getElementById('play').style.display='none';goScreen('screen-games')};
+ document.getElementById('play').prepend(back);window.scrollTo({top:0,behavior:'smooth'});
 }
 
 let battleLobbyRef=null,battleLobbyCurrentRef=null,battleLobbyCurrentCode=null,battleLobbyCurrentUid=null,battleLobbyTimer=null,battleLobbyIsHost=false;
@@ -1627,26 +1627,48 @@ var gameClock = null;
 var storyOrderItems = contentBank.sequence;
 function stopGameClock(){if(gameClock){clearInterval(gameClock);gameClock=null;}}
 function shuffleGameItems(items){return [...items].sort(()=>Math.random()-.5);}
+let pendingGameName=null;
+function hasGameProgress(){return !!(gameSession&&!gameSession.finished&&(gameSession.index>0||gameSession.score>0||gameSession.answered||gameSession.started));}
+function confirmGameProgressExit(action){
+ if(!hasGameProgress())return true;
+ return confirm('Progres permainan '+gameSession.name+' akan hilang jika '+(action||'melanjutkan')+'. Yakin ingin melanjutkan?');
+}
 function startGame(name){
- stopGameClock();
- player=document.getElementById('nama').value.trim()||'Pemain';
- const level=document.getElementById('level')?.value||'Mudah';
+ if(gameSession&&!gameSession.finished&&!confirmGameProgressExit(gameSession.name===name?'memulai ulang permainan ini':'berpindah ke permainan lain'))return false;
+ stopGameClock();pendingGameName=name;player=document.getElementById('nama').value.trim()||'Pemain';
+ current=0;score=0;gameSession=null;
+ const levelSelect=document.getElementById('level');if(levelSelect)levelSelect.value='';
+ document.getElementById('game-title').textContent=name;document.getElementById('play').classList.remove('hidden');
+ const area=document.getElementById('quiz-area');
+ if(area)area.innerHTML='<div class="notice"><h3>🎯 Pilih tingkat kesulitan</h3><p>Pilih Mudah, Sedang, atau Menantang. Soal akan ditampilkan setelah pilihan dibuat.</p></div>';
+ document.getElementById('play').scrollIntoView({behavior:'smooth'});return true;
+}
+function startGameAtLevel(name,level){
+ stopGameClock();player=document.getElementById('nama').value.trim()||'Pemain';
  const gameBank=name==='Susun Cerita'?storyQuestionBank:(gameQuestionBanks[name]||contentBank.questions);
- const targetCount=5;
- const levelKey=level==='Mudah'?'Mudah':level==='Sedang'?'Sedang':'Menantang';
+ const targetCount=5,levelKey=level==='Mudah'?'Mudah':level==='Sedang'?'Sedang':'Menantang';
  const levelBank=gameBank.filter(q=>q.level===levelKey);
- const historyKey='literasiSeen_'+name+'_'+levelKey;
- let seen=[];
+ if(!levelBank.length){document.getElementById('quiz-area').innerHTML='<div class="notice">Belum ada soal untuk tingkat kesulitan ini. Silakan pilih tingkat lain.</div>';return;}
+ const historyKey='literasiSeen_'+name+'_'+levelKey;let seen=[];
  try{seen=JSON.parse(localStorage.getItem(historyKey)||'[]');if(!Array.isArray(seen))seen=[];}catch(e){seen=[];}
- let fresh=levelBank.filter(q=>!seen.includes(q.q));
- if(fresh.length<targetCount){seen=[];fresh=levelBank;}
- let selected=shuffleGameItems(fresh).slice(0,targetCount);
+ let fresh=levelBank.filter(q=>!seen.includes(q.q));if(fresh.length<targetCount){seen=[];fresh=levelBank;}
+ const selected=shuffleGameItems(fresh).slice(0,targetCount);
  try{localStorage.setItem(historyKey,JSON.stringify(seen.concat(selected.map(q=>q.q))));}catch(e){}
- gameSession={name,items:selected,index:0,score:0,streak:0,lives:3,finished:false,started:false,seconds:45,order:[],orderChecked:false};
- current=0;score=0;
- document.getElementById('game-title').textContent=name;
- document.getElementById('play').classList.remove('hidden');
- renderQuestion();
+ gameSession={name,level:levelKey,items:selected,index:0,score:0,streak:0,lives:3,finished:false,started:false,answered:false,seconds:45,order:[],orderChecked:false};
+ current=0;score=0;document.getElementById('game-title').textContent=name;renderQuestion();
+}
+function changeGameLevel(level){
+ const select=document.getElementById('level');if(!pendingGameName)return;
+ if(!level){if(gameSession&&hasGameProgress()){select.value=gameSession.level;return;}gameSession=null;document.getElementById('quiz-area').innerHTML='<div class="notice">Pilih tingkat kesulitan untuk menampilkan soal.</div>';return;}
+ if(gameSession&&!gameSession.finished&&gameSession.level!==level&&!confirmGameProgressExit('mengganti tingkat kesulitan')){select.value=gameSession.level;return;}
+ startGameAtLevel(pendingGameName,level);
+}
+function resetQuiz(){
+ if(!pendingGameName)return;
+ if(!confirmGameProgressExit('mengulang permainan'))return;
+ const level=document.getElementById('level')?.value||'';
+ if(level)startGameAtLevel(pendingGameName,level);
+ else{gameSession=null;document.getElementById('quiz-area').innerHTML='<div class="notice">Pilih tingkat kesulitan untuk menampilkan soal.</div>';}
 }
 function finishGame(reason){
  if(!gameSession||gameSession.finished)return;
@@ -1688,6 +1710,7 @@ function renderQuestion(){
  }
 }
 function showGameFeedback(ok,message){
+ if(gameSession)gameSession.answered=true;
  const el=document.getElementById('feedback');if(!el)return;
  el.innerHTML='<div class="notice">'+(ok?'✅ Tepat! ':'💡 Belum tepat. ')+escapeHtml(message)+'</div><button class="btn" onclick="nextGameQuestion()">Lanjutkan →</button>';
 }
@@ -1733,13 +1756,14 @@ function renderStoryOrder(){
 }
 function moveStoryItem(i,d){const j=i+d;if(j<0||j>=gameSession.order.length)return;[gameSession.order[i],gameSession.order[j]]=[gameSession.order[j],gameSession.order[i]];renderStoryOrder();}
 function checkStoryOrder(){
+ gameSession.answered=true;
  const q=gameSession.items[gameSession.index],ok=gameSession.order.every((item,i)=>item[1]===i+1),feedback=document.getElementById('feedback');
  if(ok){gameSession.score+=20;score=gameSession.score;feedback.innerHTML='<div class="notice">🌟 Tepat! Urutan peristiwa sudah benar.</div><button class="btn" onclick="nextStoryChallenge()">Lanjut ke tantangan berikutnya</button>';}
  else feedback.innerHTML='<div class="notice">Belum tepat. Baca kembali sumber, perhatikan hubungan waktu dan sebab-akibat, lalu coba susun lagi.</div><button class="btn" onclick="renderStoryOrder()">Coba lagi</button>';
 }
 function nextStoryChallenge(){if(!gameSession)return;gameSession.index++;gameSession.order=[];renderQuestion();}
 function resetQuiz(){if(gameSession)startGame(gameSession.name);}
-function closeGame(){stopGameClock();document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';}
+function closeGame(){if(!confirmGameProgressExit('menutup permainan'))return;stopGameClock();document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';}
 
 </script>
 </body></html>
