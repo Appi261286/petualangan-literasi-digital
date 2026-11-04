@@ -110,10 +110,11 @@
    panel.innerHTML='<h3>🏁 Pertandingan selesai!</h3><p>'+escapeText(mine?('Skor kamu: '+mine.score+' · Benar: '+mine.correct+'/'+total):'Hasil pertandingan tersedia di bawah.')+'</p>'+scoreboard(room,live);
    return;
   }
+  const anyCompleted=Object.values(progress).some(p=>p&&p.completed);
   if(mine&&mine.completed){
    const finished=Object.values(progress).filter(p=>p&&p.completed).length;
    const totalPlayers=Object.keys(participants).length;
-   panel.innerHTML='<h3>✅ Kamu sudah menyelesaikan semua soal!</h3><div class="notice">⏳ Jawabanmu sudah tersimpan. Hasil dan skor akan dibuka setelah semua peserta selesai atau waktu pertandingan habis. Kamu tidak perlu menjawab ulang.</div><p class="muted">Progres penyelesaian: '+finished+' dari '+totalPlayers+' peserta. Tetap tunggu di ruang Battle.</p>';
+   panel.innerHTML='<h3>✅ Kamu sudah menyelesaikan semua soal!</h3><div class="notice">⏳ Jawabanmu sudah tersimpan. Papan skor sementara sudah dibuka dan akan diperbarui saat peserta lain selesai. Pertandingan berakhir setelah semua peserta selesai atau waktu habis.</div><p class="muted">Progres penyelesaian: '+finished+' dari '+totalPlayers+' peserta.</p>'+scoreboard(room,live);
    return;
   }
   if(!mine){panel.innerHTML='<h3>Menyiapkan peserta…</h3>';return;}
@@ -121,7 +122,7 @@
   const q=live.questions[Math.min(mine.qIndex,total-1)];
   if(!q){panel.innerHTML='<h3>Semua soal selesai</h3>'+scoreboard(room,live);return;}
   const options=q.a.map((a,i)=>'<button class="btn '+(i===0?'':'secondary')+'" style="display:block;width:100%;text-align:left;margin:8px 0" onclick="battleLiveAnswer('+i+')">'+String.fromCharCode(65+i)+'. '+escapeText(a)+'</button>').join('');
-  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b>🎮 '+escapeText(room.game)+' · '+escapeText(room.mode==='team'?'Battle Tim':'Battle Individu')+'</b><b id="battle-live-timer">'+escapeText(timer)+'</b></div><p>Kesulitan: '+escapeText(room.level)+(room.mode==='team'?' · Batas '+(Number(room.durationMinutes)||15)+' menit':'')+'</p><p><b>Soal '+(mine.qIndex+1)+' dari '+total+'</b> · Skor '+Number(mine.score||0)+'</p><h3>'+escapeText(q.q)+'</h3>'+options+'<p class="muted">Kamu menjawab secara mandiri. Tidak perlu menunggu peserta lain.</p>';
+  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b>🎮 '+escapeText(room.game)+' · '+escapeText(room.mode==='team'?'Battle Tim':'Battle Individu')+'</b><b id="battle-live-timer">'+escapeText(timer)+'</b></div><p>Kesulitan: '+escapeText(room.level)+(room.mode==='team'?' · Batas '+(Number(room.durationMinutes)||15)+' menit':'')+'</p><p><b>Soal '+(mine.qIndex+1)+' dari '+total+'</b> · Skor '+Number(mine.score||0)+'</p><h3>'+escapeText(q.q)+'</h3>'+options+'<p class="muted">Kamu menjawab secara mandiri. Tidak perlu menunggu peserta lain.</p>'+(anyCompleted?'<div class="notice">🏆 Papan skor sementara telah dibuka dan diperbarui saat peserta menyelesaikan soal.</div>'+scoreboard(room,live):'');
  }
  function scoreboard(room,live){
   const all=live.progress||{},rows=Object.entries(all).map(([uid,p])=>({uid,p,elapsed:elapsed(p,live,Date.now())}));
