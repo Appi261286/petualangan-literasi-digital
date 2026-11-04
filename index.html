@@ -722,7 +722,7 @@ function watchBattleLobbyList(){
    const people=Object.values(room.participants||{}),limit=Number(room.maxPlayers)||0,full=people.length>=limit;
    const isMember=!!(onlineUid&&(room.hostUid===onlineUid||(room.participants&&room.participants[onlineUid])));
    const status=room.status==='waiting'?'Menunggu':'Sedang bermain';
-   const action=isMember?'<button class="btn gold" onclick="resumeBattleLobbyRoom(\\''+escapeHtml(room.code)+'\\')">Masuk kembali ke pertandingan</button>':(room.status==='waiting'&&!full?'<button class="btn gold" onclick="joinBattleLobbyByCode(\\''+escapeHtml(room.code)+'\\')">Gabung ruang ini</button>':(room.status==='waiting'?'<span class="muted">Ruang penuh · menunggu mulai otomatis</span>':'<span class="muted">Pertandingan sudah dimulai</span>'));
+   const action=isMember?"<button class=\"btn gold\" onclick=\"resumeBattleLobbyRoom('"+escapeHtml(room.code)+"')\">Masuk kembali ke pertandingan</button>":(room.status==='waiting'&&!full?"<button class=\"btn gold\" onclick=\"joinBattleLobbyByCode('"+escapeHtml(room.code)+"')\">Gabung ruang ini</button>":(room.status==='waiting?'<span class="muted">Ruang penuh · menunggu mulai otomatis</span>':'<span class="muted">Pertandingan sudah dimulai</span>'));
    return '<div class="notice" style="margin:10px 0"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b>'+escapeHtml(room.code)+'</b><span>'+status+'</span></div><p><b>'+escapeHtml(room.game)+'</b> · '+escapeHtml(room.mode==='team'?'Battle Tim':'Battle Individu')+' · '+escapeHtml(room.level||'Mudah')+'</p><p>'+people.length+' / '+limit+' pemain'+(room.mode==='team'?' · '+Math.min(4,Math.ceil(people.length/3))+' tim terisi':'')+'</p>'+action+'</div>';
   }).join('');
  });
