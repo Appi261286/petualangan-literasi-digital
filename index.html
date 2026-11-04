@@ -205,7 +205,7 @@ main{margin:7px auto;padding:0 12px 24px}
   <button class="back-link" onclick="goScreen('screen-game-mode')">← Kembali ke pilihan mode</button>
   <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Buat ruang Battle multiplayer</h1><p>Pilih permainan dan tingkat kesulitan, bagikan kode ruang, lalu tunggu teman bergabung. Ruang dikelola melalui Firebase.</p></div>
   <div id="battle-lobby" class="form-card" style="max-width:none;margin-bottom:20px">
-   <div class="online-intro"><span class="online-kicker">🏆 BATTLE</span><h2>Atur dan gabung Battle</h2><p>Pilih Battle Individu atau Battle Tim, atur pertandingan, lalu tunggu peserta bergabung. Permainan dimulai otomatis setelah hitung mundur 2 menit.</p></div>
+   <div class="online-intro"><span class="online-kicker">🏆 BATTLE</span><h2>Atur dan gabung Battle</h2><p>Pilih Battle Individu atau Battle Tim, atur pertandingan, lalu tunggu peserta bergabung. Permainan dimulai otomatis setelah hitung mundur 1 menit.</p></div>
    <div class="online-columns">
     <div class="online-card teacher-card"><h3>🎯 Buat ruang baru</h3>
      <label for="lobby-host-name">Nama / nama panggilan</label><input id="lobby-host-name" class="field" maxlength="24" placeholder="Contoh: Alya">
@@ -705,7 +705,7 @@ function launchGamePage(game){
 }
 
 let battleLobbyRef=null,battleLobbyCurrentRef=null,battleLobbyCurrentCode=null,battleLobbyCurrentUid=null,battleLobbyTimer=null,battleLobbyIsHost=false;
-const BATTLE_LOBBY_WAIT_MS=120000;
+const BATTLE_LOBBY_WAIT_MS=60000;
 function lobbyMessage(message){const el=document.getElementById('lobby-status');if(el)el.textContent=message;}
 function battleLobbyCode(){return 'BTL'+Math.floor(10000+Math.random()*90000);}
 function battleLobbyName(id){const el=document.getElementById(id);return (el?.value||'').trim().slice(0,24);}
@@ -751,7 +751,7 @@ async function createBattleLobby(){
  try{
   const ref=onlineDb.ref('battleLobbyRooms/'+code),result=await ref.transaction(existing=>existing||room);
   if(!result.committed){lobbyMessage('Kode ruang bentrok. Tekan Buat kode ruang sekali lagi.');return;}
-  lobbyMessage('Ruang berhasil dibuat. Bagikan kode '+code+'. Ruang akan mulai otomatis setelah 2 menit jika ada peserta lain yang bergabung.');
+  lobbyMessage('Ruang berhasil dibuat. Bagikan kode '+code+'. Ruang akan mulai otomatis setelah 1 menit jika ada peserta lain yang bergabung.');
   watchBattleLobbyRoom(code,true);
  }catch(e){lobbyMessage('Ruang gagal dibuat: '+(e.message||e));}
 }
@@ -776,7 +776,7 @@ async function joinBattleLobbyByCode(code){
    lobbyMessage(!room?'Kode ruang tidak ditemukan.':room.status!=='waiting'?'Pertandingan sudah dimulai.':Date.now()>=Number(room.expiresAt)?'Waktu bergabung sudah habis.':'Ruang sudah penuh.');
    return;
   }
-  lobbyMessage('Berhasil bergabung ke ruang '+code+'. Tunggu waktu 2 menit berakhir; tim ditentukan otomatis sesuai urutan bergabung.');
+  lobbyMessage('Berhasil bergabung ke ruang '+code+'. Tunggu waktu 1 menit berakhir; tim ditentukan otomatis sesuai urutan bergabung.');
   watchBattleLobbyRoom(code,false);
  }catch(e){lobbyMessage('Tidak dapat bergabung: '+(e.message||e));}
 }
@@ -802,7 +802,7 @@ async function resolveBattleLobbyExpiry(code){
  const people=Object.keys(room.participants||{}).length;
  if(people<=1){
   await ref.remove();
-  if(battleLobbyCurrentCode===code)lobbyMessage('Ruang dihapus otomatis karena tidak ada peserta lain yang bergabung dalam 2 menit.');
+  if(battleLobbyCurrentCode===code)lobbyMessage('Ruang dihapus otomatis karena tidak ada peserta lain yang bergabung dalam 1 menit.');
  }else{
   await ref.transaction(current=>{
    if(!current||current.status!=='waiting'||Date.now()<Number(current.expiresAt))return;
