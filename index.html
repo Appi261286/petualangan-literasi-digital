@@ -730,7 +730,13 @@ function renderBattleLobbyRoom(room){
   return '<div class="notice"><b>Tim '+n+'</b><ul>'+(members||'<li class="muted">Menunggu anggota</li>')+'</ul></div>';
  }).join(''):'<ol>'+participants.map(([uid,p])=>'<li>'+escapeHtml(p.name)+(p.isHost?' · pembuat':'')+'</li>').join('')+'</ol>';
  const state=room.status==='waiting'?'Menunggu · mulai otomatis dalam '+remaining+' detik':room.status==='playing'?'Sedang bermain':'Selesai';
- view.innerHTML='<div class="notice"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><h2>Ruang '+escapeHtml(room.code)+'</h2><b>'+state+'</b></div><p>'+escapeHtml(room.game)+' · '+escapeHtml(room.mode==='team'?'Battle Tim':'Battle Individu')+' · Kesulitan '+escapeHtml(room.level)+'</p><p>Peserta: '+participants.length+' / '+room.maxPlayers+'</p><h3>'+(room.mode==='team'?'Pembagian tim otomatis':'Pemain')+'</h3>'+roster+(room.status==='waiting'?'<p class="muted">Kode berlaku 2 menit. '+(room.mode==='team'?'Setiap 3 pemain pertama masuk ke Tim 1, berikutnya Tim 2, dan seterusnya.':'Maksimal 5 pemain termasuk pembuat ruang.')+'</p>':'<p>Ruang sudah dimulai. Jenis permainan dan tingkat kesulitan tersimpan pada ruang ini.</p>')+(battleLobbyIsHost&&room.status==='waiting'?'<button class="btn secondary" onclick="closeBattleLobbyRoom()">Tutup ruang</button>':'')+'</div>';
+ view.innerHTML='<div class="notice"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><h2>Ruang '+escapeHtml(room.code)+'</h2><b>'+state+'</b></div><p>'+escapeHtml(room.game)+' · '+escapeHtml(room.mode==='team'?'Battle Tim':'Battle Individu')+' · Kesulitan '+escapeHtml(room.level)+'</p><p>Peserta: '+participants.length+' / '+room.maxPlayers+'</p><h3>'+(room.mode==='team'?'Pembagian tim otomatis':'Pemain')+'</h3>'+roster+(room.status==='waiting'?'<p class="muted">Kode berlaku 2 menit. '+(room.mode==='team'?'Setiap 3 pemain pertama masuk ke Tim 1, berikutnya Tim 2, dan seterusnya.':'Maksimal 5 pemain termasuk pembuat ruang.')+'</p>':'<p>Ruang sudah dimulai. Jenis permainan dan tingkat kesulitan tersimpan pada ruang ini.</p>')+(battleLobbyIsHost&&room.status==='waiting'?'<button class="btn secondary" onclick="closeBattleLobbyRoom()">Tutup ruang</button>':battleLobbyIsHost&&room.status==='playing'?'<button class="btn secondary" onclick="completeBattleLobbyRoom()">Akhiri ruang</button>':room.status==='completed'?'<p class="muted">Ruang telah diselesaikan oleh pembuat.</p>':'')+'</div>';
+}
+async function completeBattleLobbyRoom(){
+ if(!battleLobbyCurrentRef||!battleLobbyIsHost)return;
+ if(!confirm('Tandai ruang ini selesai untuk semua peserta?'))return;
+ try{await battleLobbyCurrentRef.update({status:'completed',completedAt:Date.now()});lobbyMessage('Ruang ditandai selesai.');}
+ catch(e){lobbyMessage('Gagal menyelesaikan ruang: '+(e.message||e));}
 }
 async function closeBattleLobbyRoom(){
  if(!battleLobbyCurrentRef||!battleLobbyIsHost)return;
