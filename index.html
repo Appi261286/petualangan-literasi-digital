@@ -166,7 +166,7 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
      <label for="lobby-mode">Mode pertandingan</label><select id="lobby-mode" class="field"><option value="individual">Battle Individu · maksimal 5 pemain</option><option value="team">Battle Tim · maksimal 4 tim × 3 pemain</option></select>
      <label for="lobby-game">Jenis permainan</label><select id="lobby-game" class="field"><option>Petualangan Literasi</option><option>Duel Kuis Literasi</option><option>Tebak Kata</option><option>Susun Cerita</option><option>Detektif Bacaan</option><option>Puzzle Literasi</option><option>Battle Literasi</option><option>Misi Penyelamatan Buku</option></select>
      <label for="lobby-level">Tingkat kesulitan</label><select id="lobby-level" class="field"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Menantang">Menantang</option></select>
-     <label for="lobby-duration">Batas waktu Battle Tim</label><select id="lobby-duration" class="field"><option value="10">10 menit</option><option value="15" selected>15 menit</option></select><p class="online-footnote">Batas waktu ini digunakan untuk Battle Tim. Battle Individu berjalan mandiri sampai semua soal selesai.</p>
+     <label for="lobby-duration">Batas waktu pertandingan</label><select id="lobby-duration" class="field"><option value="10">10 menit</option><option value="15" selected>15 menit</option></select><p class="online-footnote">Berlaku untuk Battle Individu dan Battle Tim. Saat waktu habis, jawaban tersimpan tetap dihitung.</p>
      <button class="btn online-action" onclick="createBattleLobby()">Buat kode ruang</button>
     </div>
     <div class="online-card student-card"><h3>📱 Gabung ruang</h3>
@@ -643,7 +643,17 @@ function watchBattleLobbyList(){
  if(battleLobbyRef)battleLobbyRef.off();
  battleLobbyRef=onlineDb.ref('battleLobbyRooms');
  battleLobbyRef.on('value',snap=>{
-  const data=snap.val()||{},rooms=Object.values(data).filter(r=>r&&['waiting','playing'].includes(r.status)).sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
+  const data=snap.val()||{};
+  Object.entries(data).forEach(([code,room])=>{
+   if(room&&room.status==='waiting'){
+    const expiry=Number(room.expiresAt)||(Number(room.createdAt)||0)+BATTLE_LOBBY_WAIT_MS;
+    if(Date.now()>=expiry)resolveBattleLobbyExpiry(code).catch(error=>console.warn('Pembersihan ruang kedaluwarsa gagal:',error));
+   }
+  });
+  const rooms=Object.values(data).filter(r=>r&&(
+   r.status==='playing'||
+   (r.status==='waiting'&&Date.now()<(Number(r.expiresAt)||(Number(r.createdAt)||0)+BATTLE_LOBBY_WAIT_MS))
+  )).sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
   const el=document.getElementById('lobby-active-list');if(!el)return;
   if(!rooms.length){el.innerHTML='<p class="muted">Belum ada ruang aktif. Buat ruang pertama untuk memulai.</p>';return;}
   el.innerHTML=rooms.map(room=>{
@@ -657,7 +667,7 @@ async function createBattleLobby(){
  const ok=await onlineReady;if(!ok){lobbyMessage('Firebase belum terhubung. Muat ulang halaman dan coba lagi.');return;}
  const name=battleLobbyName('lobby-host-name');if(!name){lobbyMessage('Isi nama panggilan terlebih dahulu.');return;}
  const mode=document.getElementById('lobby-mode').value,game=document.getElementById('lobby-game').value,level=document.getElementById('lobby-level').value;
- const durationMinutes=mode==='team'?Number(document.getElementById('lobby-duration').value||15):null;
+ const durationMinutes=Number(document.getElementById('lobby-duration').value||15);
  const code=battleLobbyCode(),now=Date.now(),maxPlayers=mode==='individual'?5:12;
  const room={code,mode,game,level,durationMinutes,maxPlayers,status:'waiting',hostUid:onlineUid,createdAt:now,expiresAt:now+BATTLE_LOBBY_WAIT_MS,participants:{}};
  room.participants[onlineUid]={name,seat:0,team:mode==='team'?battleLobbyTeamForSeat(0):null,joinedAt:now,isHost:true};
@@ -698,12 +708,16 @@ function watchBattleLobbyRoom(code,isHost){
  if(battleLobbyTimer){clearInterval(battleLobbyTimer);battleLobbyTimer=null;}
  battleLobbyCurrentCode=code;battleLobbyIsHost=isHost;battleLobbyCurrentUid=onlineUid;
  battleLobbyCurrentRef=onlineDb.ref('battleLobbyRooms/'+code);
+ let latestRoom=null;
  battleLobbyCurrentRef.on('value',snap=>{
   if(!snap.exists()){const el=document.getElementById('lobby-current-room');if(el)el.innerHTML='<div class="notice">Ruang '+escapeHtml(code)+' sudah ditutup atau kedaluwarsa.</div>';return;}
-  const room=snap.val();renderBattleLobbyRoom(room);
+  const room=snap.val();latestRoom=room;renderBattleLobbyRoom(room);
   if(room.status==='waiting'){
    if(battleLobbyTimer)clearInterval(battleLobbyTimer);
-   battleLobbyTimer=setInterval(()=>resolveBattleLobbyExpiry(code),1000);
+   battleLobbyTimer=setInterval(()=>{
+    if(latestRoom&&latestRoom.status==='waiting')renderBattleLobbyRoom(latestRoom);
+    resolveBattleLobbyExpiry(code);
+   },1000);
    resolveBattleLobbyExpiry(code);
   }else if(battleLobbyTimer){clearInterval(battleLobbyTimer);battleLobbyTimer=null;}
  });
@@ -711,14 +725,16 @@ function watchBattleLobbyRoom(code,isHost){
 async function resolveBattleLobbyExpiry(code){
  const ref=onlineDb.ref('battleLobbyRooms/'+code),snap=await ref.once('value');
  if(!snap.exists())return;
- const room=snap.val();if(room.status!=='waiting'||Date.now()<Number(room.expiresAt))return;
+ const room=snap.val(),expiry=Number(room.expiresAt)||(Number(room.createdAt)||0)+BATTLE_LOBBY_WAIT_MS;
+ if(room.status!=='waiting'||Date.now()<expiry)return;
  const people=Object.keys(room.participants||{}).length;
  if(people<=1){
   await ref.remove();
   if(battleLobbyCurrentCode===code)lobbyMessage('Ruang dihapus otomatis karena tidak ada peserta lain yang bergabung dalam 2 menit.');
  }else{
   await ref.transaction(current=>{
-   if(!current||current.status!=='waiting'||Date.now()<Number(current.expiresAt))return;
+   const currentExpiry=current&&(Number(current.expiresAt)||(Number(current.createdAt)||0)+BATTLE_LOBBY_WAIT_MS);
+   if(!current||current.status!=='waiting'||Date.now()<currentExpiry)return;
    current.status='playing';current.startedAt=Date.now();current.startedAutomatically=true;return current;
   });
  }
@@ -731,7 +747,8 @@ function renderBattleLobbyRoom(room){
   const members=participants.filter(([uid,p])=>p.team==='Tim '+n).map(([uid,p])=>'<li>'+escapeHtml(p.name)+(p.isHost?' · pembuat':'')+'</li>').join('');
   return '<div class="notice"><b>Tim '+n+'</b><ul>'+(members||'<li class="muted">Menunggu anggota</li>')+'</ul></div>';
  }).join(''):'<ol>'+participants.map(([uid,p])=>'<li>'+escapeHtml(p.name)+(p.isHost?' · pembuat':'')+'</li>').join('')+'</ol>';
- const state=room.status==='waiting'?'Menunggu · mulai otomatis dalam '+remaining+' detik':room.status==='playing'?'Sedang bermain':'Selesai';
+ const countdown=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');
+ const state=room.status==='waiting'?'⏳ Menunggu · mulai dalam '+countdown:room.status==='playing'?'▶ Sedang bermain':'Selesai';
  view.innerHTML='<div class="notice"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><h2>Ruang '+escapeHtml(room.code)+'</h2><b>'+state+'</b></div><p>'+escapeHtml(room.game)+' · '+escapeHtml(room.mode==='team'?'Battle Tim':'Battle Individu')+' · Kesulitan '+escapeHtml(room.level)+'</p><p>Peserta: '+participants.length+' / '+room.maxPlayers+'</p><h3>'+(room.mode==='team'?'Pembagian tim otomatis':'Pemain')+'</h3>'+roster+(room.status==='waiting'?'<p class="muted">Kode berlaku 2 menit. '+(room.mode==='team'?'Setiap 3 pemain pertama masuk ke Tim 1, berikutnya Tim 2, dan seterusnya.':'Maksimal 5 pemain termasuk pembuat ruang.')+'</p>':'<p>Ruang sudah dimulai. Jenis permainan dan tingkat kesulitan tersimpan pada ruang ini.</p>')+(battleLobbyIsHost&&room.status==='waiting'?'<button class="btn secondary" onclick="closeBattleLobbyRoom()">Tutup ruang</button>':battleLobbyIsHost&&room.status==='playing'?'<button class="btn secondary" onclick="completeBattleLobbyRoom()">Akhiri ruang</button>':room.status==='completed'?'<p class="muted">Ruang telah diselesaikan oleh pembuat.</p>':'')+'</div>';
 }
 async function completeBattleLobbyRoom(){
