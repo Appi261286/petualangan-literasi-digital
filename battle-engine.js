@@ -58,10 +58,12 @@
   });
  }
  async function ensureProgress(room,live){
-  if(!onlineUid||!live||!Array.isArray(live.questions))return;
-  const participant=(room.participants||{})[onlineUid];if(!participant)return;
+  if(!onlineUid||!live||!Array.isArray(live.questions))return false;
+  const participant=(room.participants||{})[onlineUid];
+  if(!participant){status('Identitas perangkat belum cocok dengan daftar peserta. Keluar dari ruang lalu gabung kembali menggunakan kode ruang.');return false;}
   const ref=onlineDb.ref('battleLobbyRooms/'+room.code+'/live/progress/'+onlineUid);
-  await ref.transaction(current=>current||{name:participant.name||'Siswa',team:participant.team||null,qIndex:0,score:0,correct:0,wrong:0,completed:false,startedAt:Date.now(),finishedAt:null,answers:{}});
+  const result=await ref.transaction(current=>current||{name:participant.name||'Siswa',team:participant.team||null,qIndex:0,score:0,correct:0,wrong:0,completed:false,startedAt:Date.now(),finishedAt:null,answers:{}});
+  return !!(result.snapshot&&result.snapshot.exists());
  }
  function listenRoom(room){
   if(activeCode===room.code&&liveRef)return;
@@ -163,20 +165,37 @@
   }catch(e){status('Gagal memeriksa akhir pertandingan: '+(e.message||e));}
  }
  window.battleLiveAnswer=async function(choice){
-  const room=lastRoom,live=lastLive;if(!room||!live||live.status!=='playing'||!onlineUid)return;
-  const ref=onlineDb.ref('battleLobbyRooms/'+room.code+'/live/progress/'+onlineUid);
+  const room=lastRoom;
+  if(!room||!onlineUid||!onlineDb){status('Koneksi Battle belum siap. Muat ulang halaman lalu masuk kembali.');return;}
+  const participant=(room.participants||{})[onlineUid];
+  if(!participant){status('Nama perangkat ini tidak cocok dengan daftar peserta. Silakan masuk kembali ke ruang Battle.');return;}
+  const base='battleLobbyRooms/'+room.code;
   try{
-   await ref.transaction(p=>{
-    if(!p||p.completed||p.qIndex>=live.questions.length)return;
-    const index=Number(p.qIndex),q=live.questions[index];
+   // Baca status dan soal terbaru sebelum menyimpan agar klik tidak memakai data lama.
+   const freshSnap=await onlineDb.ref(base).once('value');
+   if(!freshSnap.exists()){status('Ruang Battle sudah tidak tersedia.');return;}
+   const freshRoom=freshSnap.val(),live=freshRoom.live;
+   if(!live||live.status!=='playing'||!Array.isArray(live.questions)){status('Pertandingan belum aktif atau sudah selesai.');return;}
+   const freshParticipant=(freshRoom.participants||{})[onlineUid];
+   if(!freshParticipant){status('Peserta tidak ditemukan pada ruang ini. Masuk kembali dengan kode ruang.');return;}
+   const ref=onlineDb.ref(base+'/live/progress/'+onlineUid);
+   await ref.transaction(p=>p||{name:freshParticipant.name||'Siswa',team:freshParticipant.team||null,qIndex:0,score:0,correct:0,wrong:0,completed:false,startedAt:Date.now(),finishedAt:null,answers:{}});
+   const result=await ref.transaction(p=>{
+    if(!p||p.completed||Number(p.qIndex)>=live.questions.length)return;
+    const index=Number(p.qIndex)||0,q=live.questions[index];
     if(!q||p.answers&&p.answers[index])return;
     const correct=Number(choice)===Number(q.c);
+    p.name=p.name||freshParticipant.name||'Siswa';
+    p.team=p.team||freshParticipant.team||null;
     p.answers=p.answers||{};p.answers[index]={choice:Number(choice),correct,answeredAt:Date.now()};
     if(correct){p.score=(Number(p.score)||0)+100;p.correct=(Number(p.correct)||0)+1;}else{p.score=(Number(p.score)||0)-25;p.wrong=(Number(p.wrong)||0)+1;}
     p.qIndex=index+1;
     if(p.qIndex>=live.questions.length){p.completed=true;p.finishedAt=Date.now();}
     return p;
    });
+   if(!result.committed){status('Jawaban belum tersimpan. Periksa apakah soal sudah dijawab atau waktu pertandingan berakhir.');return;}
+   const saved=result.snapshot&&result.snapshot.val();
+   if(saved){status('Jawaban tersimpan untuk '+saved.name+'. Skor saat ini: '+Number(saved.score||0));}
   }catch(e){status('Jawaban gagal disimpan: '+(e.message||e));}
  };
  function startTicker(){
