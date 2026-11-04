@@ -131,17 +131,36 @@
   return '<h3>🏆 Papan Peringkat Individu</h3><table style="width:100%"><tr><th>Rank</th><th>Nama</th><th>Skor</th><th>Waktu</th><th>Status</th></tr>'+rows.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+escapeText(r.p.name||'Siswa')+'</td><td>'+Number(r.p.score||0)+'</td><td>'+r.elapsed+' dtk</td><td>'+(r.p.completed?'Selesai':'Mengerjakan')+'</td></tr>').join('')+'</table>';
  }
  async function maybeFinish(room,live){
-  if(!onlineUid||!live||live.status!=='playing')return;
-  const people=Object.keys(room.participants||{}),progress=live.progress||{};
-  const everyone=people.length>0&&people.every(uid=>progress[uid]&&progress[uid].completed);
-  const expired=!!live.deadlineAt&&Date.now()>=live.deadlineAt;
-  if(everyone||expired){
-   await onlineDb.ref('battleLobbyRooms/'+room.code+'/live').transaction(cur=>{
+  // Hanya pembuat ruang yang boleh memutuskan pertandingan selesai.
+  // Baca ulang daftar peserta dan progres terbaru agar data yang stale
+  // pada perangkat lain tidak mengakhiri pertandingan terlalu cepat.
+  if(!onlineUid||!room||onlineUid!==room.hostUid||!live||live.status!=='playing')return;
+  try{
+   const roomRef=onlineDb.ref('battleLobbyRooms/'+room.code);
+   const freshSnap=await roomRef.once('value');
+   if(!freshSnap.exists())return;
+   const freshRoom=freshSnap.val();
+   if(freshRoom.status!=='playing')return;
+   const liveRefFresh=roomRef.child('live');
+   const liveSnap=await liveRefFresh.once('value');
+   const freshLive=liveSnap.val();
+   if(!freshLive||freshLive.status!=='playing')return;
+   const people=Object.keys(freshRoom.participants||{}),progress=freshLive.progress||{};
+   const everyone=people.length>0&&people.every(uid=>progress[uid]&&progress[uid].completed);
+   const expired=!!freshLive.deadlineAt&&Date.now()>=freshLive.deadlineAt;
+   if(!everyone&&!expired)return;
+   await liveRefFresh.transaction(cur=>{
     if(!cur||cur.status!=='playing')return;
-    cur.status='completed';cur.finishedAt=Date.now();cur.finishReason=expired?'time_limit':'all_completed';return cur;
+    const currentProgress=cur.progress||{};
+    const allDone=people.length>0&&people.every(uid=>currentProgress[uid]&&currentProgress[uid].completed);
+    const timeUp=!!cur.deadlineAt&&Date.now()>=cur.deadlineAt;
+    if(!allDone&&!timeUp)return;
+    cur.status='completed';cur.finishedAt=Date.now();cur.finishReason=timeUp?'time_limit':'all_completed';return cur;
    });
-   await onlineDb.ref('battleLobbyRooms/'+room.code).update({status:'completed',completedAt:Date.now()});
-  }
+   const finalSnap=await liveRefFresh.once('value');
+   if(finalSnap.val()&&finalSnap.val().status==='completed')
+    await roomRef.update({status:'completed',completedAt:Date.now()});
+  }catch(e){status('Gagal memeriksa akhir pertandingan: '+(e.message||e));}
  }
  window.battleLiveAnswer=async function(choice){
   const room=lastRoom,live=lastLive;if(!room||!live||live.status!=='playing'||!onlineUid)return;
