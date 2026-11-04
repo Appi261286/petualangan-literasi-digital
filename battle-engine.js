@@ -2,7 +2,7 @@
    The host publishes one shared question set; every participant advances independently. */
 (function(){
  'use strict';
- let activeCode=null,liveRef=null,lastRoom=null,lastLive=null,renderTimer=null;
+ let activeCode=null,liveRef=null,lastRoom=null,lastLive=null,renderTimer=null,lastDrawKey=null;
  const $=id=>document.getElementById(id);
  const escapeText=v=>String(v==null?'':v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
  const shuffle=a=>{const x=a.slice();for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
@@ -63,7 +63,7 @@
  function listenRoom(room){
   if(activeCode===room.code&&liveRef)return;
   if(liveRef)liveRef.off();
-  activeCode=room.code;lastRoom=room;lastLive=null;
+  activeCode=room.code;lastRoom=room;lastLive=null;lastDrawKey=null;
   liveRef=onlineDb.ref('battleLobbyRooms/'+room.code+'/live');
   liveRef.on('value',async snap=>{
    lastLive=snap.val();
@@ -88,8 +88,15 @@
   const participants=room.participants||{},progress=live.progress||{},mine=progress[onlineUid];
   const total=live.questions.length,now=Date.now(),remaining=live.deadlineAt?Math.max(0,Math.ceil((live.deadlineAt-now)/1000)):null;
   const timer=remaining===null?'Tanpa batas waktu':Math.floor(remaining/60)+' menit '+String(remaining%60).padStart(2,'0')+' detik';
-  if(live.status==='completed'||(mine&&mine.completed)){
-   panel.innerHTML='<h3>🏁 '+(live.status==='completed'?'Pertandingan selesai':'Kamu sudah menyelesaikan soal')+'</h3><p>'+escapeText(mine?('Skor kamu: '+mine.score+' · Benar: '+mine.correct+'/'+total):'Hasil pertandingan tersedia di bawah.')+'</p>'+scoreboard(room,live);
+  const drawKey=JSON.stringify({status:live.status,mine:mine||null,total,game:room.game,mode:room.mode,level:room.level,deadlineAt:live.deadlineAt});
+  if(drawKey===lastDrawKey)return;
+  lastDrawKey=drawKey;
+  if(live.status==='completed'){
+   panel.innerHTML='<h3>🏁 Pertandingan selesai!</h3><p>'+escapeText(mine?('Skor kamu: '+mine.score+' · Benar: '+mine.correct+'/'+total):'Hasil pertandingan tersedia di bawah.')+'</p>'+scoreboard(room,live);
+   return;
+  }
+  if(mine&&mine.completed){
+   panel.innerHTML='<h3>✅ Kamu sudah menyelesaikan semua soal!</h3><p>Skor kamu: <b>'+Number(mine.score||0)+'</b> · Jawaban benar: <b>'+Number(mine.correct||0)+'/'+total+'</b>.</p><div class="notice">⏳ Jawabanmu sudah tersimpan. Menunggu peserta lain menyelesaikan soal atau waktu pertandingan habis. Kamu tidak perlu menjawab ulang.</div><h3>📊 Progres peserta</h3>'+scoreboard(room,live);
    return;
   }
   if(!mine){panel.innerHTML='<h3>Menyiapkan peserta…</h3>';return;}
@@ -144,7 +151,11 @@
   if(renderTimer)clearInterval(renderTimer);
   renderTimer=setInterval(()=>{
    if(!lastRoom||!lastLive)return;
-   draw(lastRoom,lastLive);
+   const timerEl=$('battle-live-timer');
+   if(timerEl&&lastLive.deadlineAt){
+    const seconds=Math.max(0,Math.ceil((lastLive.deadlineAt-Date.now())/1000));
+    timerEl.textContent=seconds<=0?'Waktu habis':Math.floor(seconds/60)+' menit '+String(seconds%60).padStart(2,'0')+' detik';
+   }
    if(lastLive.deadlineAt&&Date.now()>=lastLive.deadlineAt)maybeFinish(lastRoom,lastLive);
   },1000);
  }
