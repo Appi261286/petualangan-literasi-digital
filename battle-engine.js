@@ -111,7 +111,9 @@
    return;
   }
   if(mine&&mine.completed){
-   panel.innerHTML='<h3>✅ Kamu sudah menyelesaikan semua soal!</h3><p>Skor kamu: <b>'+Number(mine.score||0)+'</b> · Jawaban benar: <b>'+Number(mine.correct||0)+'/'+total+'</b>.</p><div class="notice">⏳ Jawabanmu sudah tersimpan. Menunggu peserta lain menyelesaikan soal atau waktu pertandingan habis. Kamu tidak perlu menjawab ulang.</div><h3>📊 Progres peserta</h3>'+scoreboard(room,live);
+   const finished=Object.values(progress).filter(p=>p&&p.completed).length;
+   const totalPlayers=Object.keys(participants).length;
+   panel.innerHTML='<h3>✅ Kamu sudah menyelesaikan semua soal!</h3><div class="notice">⏳ Jawabanmu sudah tersimpan. Hasil dan skor akan dibuka setelah semua peserta selesai atau waktu pertandingan habis. Kamu tidak perlu menjawab ulang.</div><p class="muted">Progres penyelesaian: '+finished+' dari '+totalPlayers+' peserta. Tetap tunggu di ruang Battle.</p>';
    return;
   }
   if(!mine){panel.innerHTML='<h3>Menyiapkan peserta…</h3>';return;}
