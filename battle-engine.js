@@ -5,7 +5,7 @@
  let activeCode=null,liveRef=null,lastRoom=null,lastLive=null,renderTimer=null;
  const $=id=>document.getElementById(id);
  const escapeText=v=>String(v==null?'':v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
- const shuffle=a=>{const x=a.slice();for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
+ const shuffle=a=>{const x=a.slice();let seed=2166136261;for(const ch of 'petualangan-literasi-battle-v1')seed=Math.imul(seed^ch.charCodeAt(0),16777619);const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};for(let i=x.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
  const levelRank=v=>({'Mudah':1,'Sedang':2,'Menantang':3,'Sulit':3,'Sangat Sulit':4}[v]||1);
  function questionPool(room){
   let source=(typeof gameQuestionBanks!=='undefined'&&gameQuestionBanks[room.game])||[];
@@ -46,7 +46,7 @@
  }
  function status(message){const el=$('lobby-status');if(el)el.textContent=message;}
  async function publishMatch(room){
-  if(!onlineDb||!onlineUid||onlineUid!==room.hostUid)return;
+  if(!onlineDb||!onlineUid)return;
   const ref=onlineDb.ref('battleLobbyRooms/'+room.code+'/live');
   const questions=questionPool(room);
   if(!questions.length){status('Bank soal untuk permainan ini belum memiliki soal pilihan ganda yang dapat dipakai dalam Battle.');return;}
