@@ -58,7 +58,7 @@
   if(!onlineUid||!live||!Array.isArray(live.questions))return;
   const participant=(room.participants||{})[onlineUid];if(!participant)return;
   const ref=onlineDb.ref('battleLobbyRooms/'+room.code+'/live/progress/'+onlineUid);
-  await ref.transaction(current=>current||{name:participant.name||'Siswa',team:participant.team||null,qIndex:0,score:0,correct:0,completed:false,startedAt:Date.now(),finishedAt:null,answers:{}});
+  await ref.transaction(current=>current||{name:participant.name||'Siswa',team:participant.team||null,qIndex:0,score:0,correct:0,wrong:0,completed:false,startedAt:Date.now(),finishedAt:null,answers:{}});
  }
  function listenRoom(room){
   if(activeCode===room.code&&liveRef)return;
@@ -103,9 +103,9 @@
   const all=live.progress||{},rows=Object.entries(all).map(([uid,p])=>({uid,p,elapsed:elapsed(p,live,Date.now())}));
   if(room.mode==='team'){
    const groups={};
-   rows.forEach(r=>{const key=r.p.team||'Tim belum ditentukan';groups[key]=groups[key]||{name:key,score:0,finished:0,time:0,members:[]};groups[key].score+=Number(r.p.score)||0;if(r.p.completed)groups[key].finished++;groups[key].time+=r.elapsed;groups[key].members.push((r.p.name||'Siswa')+(r.p.completed?' ✓':' (belum selesai)'));});
-   const ranked=Object.values(groups).sort((a,b)=>b.score-a.score||b.finished-a.finished||a.time-b.time);
-   return '<h3>🏆 Rekap Battle Tim</h3><table style="width:100%"><tr><th>Tim</th><th>Skor total</th><th>Selesai</th><th>Waktu</th></tr>'+ranked.map(t=>'<tr><td><b>'+escapeText(t.name)+'</b><br><small>'+escapeText(t.members.join(', '))+'</small></td><td>'+t.score+'</td><td>'+t.finished+'/'+t.members.length+'</td><td>'+t.time+' dtk</td></tr>').join('')+'</table><p class="muted">Urutan: skor total, jumlah anggota selesai, lalu total waktu anggota yang tercatat.</p>';
+   rows.forEach(r=>{const key=r.p.team||'Tim belum ditentukan';groups[key]=groups[key]||{name:key,score:1000,finished:0,time:0,finishTimeTotal:0,members:[]};groups[key].score+=Number(r.p.score)||0;if(r.p.completed){groups[key].finished++;groups[key].finishTimeTotal+=r.elapsed;}groups[key].time+=r.elapsed;groups[key].members.push((r.p.name||'Siswa')+(r.p.completed?' ✓':' (belum selesai)'));});
+   const ranked=Object.values(groups).sort((a,b)=>b.score-a.score||b.finished-a.finished||(a.finished?a.finishTimeTotal/a.finished:Infinity)-(b.finished?b.finishTimeTotal/b.finished:Infinity));
+   return '<h3>🏆 Rekap Battle Tim</h3><table style="width:100%"><tr><th>Tim</th><th>Skor total</th><th>Selesai</th><th>Waktu</th></tr>'+ranked.map(t=>'<tr><td><b>'+escapeText(t.name)+'</b><br><small>'+escapeText(t.members.join(', '))+'</small></td><td>'+t.score+'</td><td>'+t.finished+'/'+t.members.length+'</td><td>'+(t.finished?Math.round(t.finishTimeTotal/t.finished)+' dtk rata-rata':'-')+'</td></tr>').join('')+'</table><p class="muted">Setiap tim mendapat skor awal 1.000. Jawaban benar +100 poin dan jawaban salah -25 poin. Urutan: skor total, jumlah anggota selesai, lalu rata-rata waktu anggota yang menyelesaikan permainan.</p>';
   }
   rows.sort((a,b)=>(Number(b.p.score)||0)-(Number(a.p.score)||0)||a.elapsed-b.elapsed);
   return '<h3>🏆 Papan Peringkat Individu</h3><table style="width:100%"><tr><th>Rank</th><th>Nama</th><th>Skor</th><th>Waktu</th><th>Status</th></tr>'+rows.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+escapeText(r.p.name||'Siswa')+'</td><td>'+Number(r.p.score||0)+'</td><td>'+r.elapsed+' dtk</td><td>'+(r.p.completed?'Selesai':'Mengerjakan')+'</td></tr>').join('')+'</table>';
@@ -133,7 +133,7 @@
     if(!q||p.answers&&p.answers[index])return;
     const correct=Number(choice)===Number(q.c);
     p.answers=p.answers||{};p.answers[index]={choice:Number(choice),correct,answeredAt:Date.now()};
-    if(correct){p.score=(Number(p.score)||0)+100;p.correct=(Number(p.correct)||0)+1;}
+    if(correct){p.score=(Number(p.score)||0)+100;p.correct=(Number(p.correct)||0)+1;}else{p.score=(Number(p.score)||0)-25;p.wrong=(Number(p.wrong)||0)+1;}
     p.qIndex=index+1;
     if(p.qIndex>=live.questions.length){p.completed=true;p.finishedAt=Date.now();}
     return p;
