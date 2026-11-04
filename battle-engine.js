@@ -103,7 +103,7 @@
   }
   const total=live.questions.length,now=Date.now(),remaining=live.deadlineAt?Math.max(0,Math.ceil((live.deadlineAt-now)/1000)):null;
   const timer=remaining===null?'Tanpa batas waktu':Math.floor(remaining/60)+' menit '+String(remaining%60).padStart(2,'0')+' detik';
-  const drawKey=JSON.stringify({status:live.status,mine:mine||null,total,game:room.game,mode:room.mode,level:room.level,deadlineAt:live.deadlineAt});
+  const drawKey=JSON.stringify({status:live.status,mine:mine||null,progress,total,game:room.game,mode:room.mode,level:room.level,deadlineAt:live.deadlineAt});
   if(drawKey===lastDrawKey)return;
   lastDrawKey=drawKey;
   if(live.status==='completed'){
