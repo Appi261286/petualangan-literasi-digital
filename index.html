@@ -551,7 +551,13 @@ function startSelectedSingleGame(){if(selectedGameName)launchGamePage(selectedGa
 function startSelectedBattle(){
  if(!selectedGameName)return;
  const gameSelect=document.getElementById('lobby-game');
- if(gameSelect){const option=[...gameSelect.options].find(o=>o.value===selectedGameName||o.textContent===selectedGameName);if(option)gameSelect.value=option.value;}
+ if(gameSelect){
+  const option=[...gameSelect.options].find(o=>o.value===selectedGameName||o.textContent===selectedGameName);
+  if(option)gameSelect.value=option.value;
+  gameSelect.disabled=true;
+  gameSelect.style.display='none';
+  if(gameSelect.previousElementSibling)gameSelect.previousElementSibling.style.display='none';
+ }
  goScreen('screen-battle');
 }
 function joinSelectedBattleRoom(){
