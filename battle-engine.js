@@ -52,7 +52,10 @@
   if(!questions.length){status('Bank soal untuk permainan ini belum memiliki soal pilihan ganda yang dapat dipakai dalam Battle.');return;}
   const now=Date.now(),durationMs=(Number(room.durationMinutes)||15)*60000;
   const payload={version:1,status:'playing',game:room.game,mode:room.mode,level:room.level,questions,startedAt:Number(room.startedAt)||now,durationMs,deadlineAt:durationMs?(Number(room.startedAt)||now)+durationMs:null,progress:{}};
-  await ref.transaction(current=>current||payload);
+  await ref.transaction(current=>{
+   if(current&&Array.isArray(current.questions)&&current.questions.length>0)return current;
+   return payload;
+  });
  }
  async function ensureProgress(room,live){
   if(!onlineUid||!live||!Array.isArray(live.questions))return;
@@ -67,13 +70,18 @@
   liveRef=onlineDb.ref('battleLobbyRooms/'+room.code+'/live');
   liveRef.on('value',async snap=>{
    lastLive=snap.val();
-   if(!lastLive&&onlineUid===room.hostUid){
+   const hasQuestions=!!(lastLive&&Array.isArray(lastLive.questions)&&lastLive.questions.length>0);
+   if(!hasQuestions&&onlineUid===room.hostUid){
+    drawWaiting(room);
     try{await publishMatch(room);}catch(e){status('Gagal menyiapkan soal: '+(e.message||e));}
-   }else if(lastLive){
+   }else if(hasQuestions){
     try{await ensureProgress(room,lastLive);}catch(e){status('Gagal menyiapkan peserta: '+(e.message||e));}
     draw(room,lastLive);
     maybeFinish(room,lastLive);
-   }else drawWaiting(room);
+   }else{
+    drawWaiting(room);
+    status('Menunggu pembuat ruang menyiapkan daftar soal…');
+   }
   });
  }
  function drawWaiting(room){
@@ -86,6 +94,10 @@
  function draw(room,live){
   const panel=ensurePanel();if(!panel||!live)return;
   const participants=room.participants||{},progress=live.progress||{},mine=progress[onlineUid];
+  if(!Array.isArray(live.questions)||live.questions.length===0){
+   panel.innerHTML='<h3>⏳ Menyiapkan soal…</h3><p>Daftar soal belum diterima dari pembuat ruang. Tunggu sebentar atau minta pembuat ruang memuat ulang pertandingan.</p>';
+   return;
+  }
   const total=live.questions.length,now=Date.now(),remaining=live.deadlineAt?Math.max(0,Math.ceil((live.deadlineAt-now)/1000)):null;
   const timer=remaining===null?'Tanpa batas waktu':Math.floor(remaining/60)+' menit '+String(remaining%60).padStart(2,'0')+' detik';
   const drawKey=JSON.stringify({status:live.status,mine:mine||null,total,game:room.game,mode:room.mode,level:room.level,deadlineAt:live.deadlineAt});
