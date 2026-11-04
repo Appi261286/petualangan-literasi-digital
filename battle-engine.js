@@ -70,16 +70,17 @@
   liveRef=onlineDb.ref('battleLobbyRooms/'+room.code+'/live');
   liveRef.on('value',async snap=>{
    lastLive=snap.val();
+   const currentRoom=lastRoom||room;
    const hasQuestions=!!(lastLive&&Array.isArray(lastLive.questions)&&lastLive.questions.length>0);
-   if(!hasQuestions&&onlineUid===room.hostUid){
-    drawWaiting(room);
-    try{await publishMatch(room);}catch(e){status('Gagal menyiapkan soal: '+(e.message||e));}
+   if(!hasQuestions&&onlineUid===currentRoom.hostUid){
+    drawWaiting(currentRoom);
+    try{await publishMatch(currentRoom);}catch(e){status('Gagal menyiapkan soal: '+(e.message||e));}
    }else if(hasQuestions){
-    try{await ensureProgress(room,lastLive);}catch(e){status('Gagal menyiapkan peserta: '+(e.message||e));}
-    draw(room,lastLive);
-    maybeFinish(room,lastLive);
+    try{await ensureProgress(currentRoom,lastLive);}catch(e){status('Gagal menyiapkan peserta: '+(e.message||e));}
+    draw(currentRoom,lastLive);
+    maybeFinish(currentRoom,lastLive);
    }else{
-    drawWaiting(room);
+    drawWaiting(currentRoom);
     status('Menunggu pembuat ruang menyiapkan daftar soal…');
    }
   });
@@ -189,7 +190,8 @@
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&lastRoom&&lastLive)draw(lastRoom,lastLive);});
  window.battleLiveRoomChanged=function(room){
   if(!room)return;
+  if(activeCode===room.code)lastRoom=room;
   if(room.status==='playing'){listenRoom(room);startTicker();}
-  else if(room.status==='completed'&&lastLive){draw(room,lastLive);}
+  else if(room.status==='completed'&&lastLive){lastRoom=room;draw(room,lastLive);}
  };
  })();
