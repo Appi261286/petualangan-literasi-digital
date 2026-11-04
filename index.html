@@ -534,7 +534,7 @@ function joinTeacherRoom(){
 let studentGameMode='single';
 function goScreen(id){
  const play=document.getElementById('play');
- if(play&&!play.classList.contains('hidden')&&!confirmGameProgressExit('berpindah halaman'))return;
+ if(play&&play.style.display!=='none'&&!play.classList.contains('hidden')&&!confirmGameProgressExit('berpindah halaman'))return;
  document.querySelectorAll('#app-pages .app-screen').forEach(s=>s.classList.add('hidden'));
  const target=document.getElementById(id);if(target)target.classList.remove('hidden');
  window.scrollTo({top:0,behavior:'smooth'});
@@ -627,7 +627,7 @@ function launchGamePage(game){
  if(!startGame(game))return;
  document.querySelectorAll('#app-pages .app-screen').forEach(s=>s.classList.add('hidden'));
  document.getElementById('play').style.display='block';document.getElementById('play').classList.remove('hidden');
- const back=document.createElement('button');back.className='back-link';back.textContent='← Kembali ke pilihan permainan';back.onclick=()=>{if(!confirmGameProgressExit('kembali ke pilihan permainan'))return;document.getElementById('play').style.display='none';goScreen('screen-games')};
+ const back=document.createElement('button');back.className='back-link';back.textContent='← Kembali ke pilihan permainan';back.onclick=()=>{if(!confirmGameProgressExit('kembali ke pilihan permainan'))return;document.getElementById('play').style.display='none';document.getElementById('play').classList.add('hidden');goScreen('screen-games')};
  document.getElementById('play').prepend(back);window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1773,7 +1773,7 @@ function checkStoryOrder(){
  else feedback.innerHTML='<div class="notice">Belum tepat. Baca kembali sumber, perhatikan hubungan waktu dan sebab-akibat, lalu coba susun lagi.</div><button class="btn" onclick="renderStoryOrder()">Coba lagi</button>';
 }
 function nextStoryChallenge(){if(!gameSession)return;gameSession.index++;gameSession.order=[];renderQuestion();}
-function resetQuiz(){if(gameSession)startGame(gameSession.name);}
+function resetQuiz(){if(!gameSession)return;if(!confirmGameProgressExit('mengulang permainan'))return;startGameAtLevel(gameSession.name,gameSession.level);}
 function closeGame(){if(!confirmGameProgressExit('menutup permainan'))return;stopGameClock();document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';}
 
 </script>
