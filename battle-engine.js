@@ -104,7 +104,7 @@
   const q=live.questions[Math.min(mine.qIndex,total-1)];
   if(!q){panel.innerHTML='<h3>Semua soal selesai</h3>'+scoreboard(room,live);return;}
   const options=q.a.map((a,i)=>'<button class="btn '+(i===0?'':'secondary')+'" style="display:block;width:100%;text-align:left;margin:8px 0" onclick="battleLiveAnswer('+i+')">'+String.fromCharCode(65+i)+'. '+escapeText(a)+'</button>').join('');
-  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b>🎮 '+escapeText(room.game)+' · '+escapeText(room.mode==='team'?'Battle Tim':'Battle Individu')+'</b><b>'+escapeText(timer)+'</b></div><p>Kesulitan: '+escapeText(room.level)+(room.mode==='team'?' · Batas '+(Number(room.durationMinutes)||15)+' menit':'')+'</p><p><b>Soal '+(mine.qIndex+1)+' dari '+total+'</b> · Skor '+Number(mine.score||0)+'</p><h3>'+escapeText(q.q)+'</h3>'+options+'<p class="muted">Kamu menjawab secara mandiri. Tidak perlu menunggu peserta lain.</p>';
+  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b>🎮 '+escapeText(room.game)+' · '+escapeText(room.mode==='team'?'Battle Tim':'Battle Individu')+'</b><b id="battle-live-timer">'+escapeText(timer)+'</b></div><p>Kesulitan: '+escapeText(room.level)+(room.mode==='team'?' · Batas '+(Number(room.durationMinutes)||15)+' menit':'')+'</p><p><b>Soal '+(mine.qIndex+1)+' dari '+total+'</b> · Skor '+Number(mine.score||0)+'</p><h3>'+escapeText(q.q)+'</h3>'+options+'<p class="muted">Kamu menjawab secara mandiri. Tidak perlu menunggu peserta lain.</p>';
  }
  function scoreboard(room,live){
   const all=live.progress||{},rows=Object.entries(all).map(([uid,p])=>({uid,p,elapsed:elapsed(p,live,Date.now())}));
