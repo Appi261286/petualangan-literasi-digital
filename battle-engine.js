@@ -175,4 +175,9 @@
   };
  }
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&lastRoom&&lastLive)draw(lastRoom,lastLive);});
-})();
+ window.battleLiveRoomChanged=function(room){
+  if(!room)return;
+  if(room.status==='playing'){listenRoom(room);startTicker();}
+  else if(room.status==='completed'&&lastLive){draw(room,lastLive);}
+ };
+ })();
