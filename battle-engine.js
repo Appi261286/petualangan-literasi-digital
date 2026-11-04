@@ -69,7 +69,7 @@
   liveRef=onlineDb.ref('battleLobbyRooms/'+room.code+'/live');
   liveRef.on('value',async snap=>{
    lastLive=snap.val();
-   if(!lastLive&&onlineUid===room.hostUid){
+   if(!lastLive){
     try{await publishMatch(room);}catch(e){status('Gagal menyiapkan soal: '+(e.message||e));}
    }else if(lastLive){
     try{await ensureProgress(room,lastLive);}catch(e){status('Gagal menyiapkan peserta: '+(e.message||e));}
