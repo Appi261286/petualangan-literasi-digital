@@ -773,7 +773,7 @@ function watchBattleLobbyRoom(code,isHost){
  battleLobbyCurrentRef=onlineDb.ref('battleLobbyRooms/'+code);
  battleLobbyCurrentRef.on('value',snap=>{
   if(!snap.exists()){const el=document.getElementById('lobby-current-room');if(el)el.innerHTML='<div class="notice">Ruang '+escapeHtml(code)+' sudah ditutup atau kedaluwarsa.</div>';return;}
-  const room=snap.val();window.renderBattleLobbyRoom(room);
+  const room=snap.val();renderBattleLobbyRoom(room);if(window.battleLiveRoomChanged)window.battleLiveRoomChanged(room);
   if(room.status==='waiting'){
    if(battleLobbyTimer)clearInterval(battleLobbyTimer);
    battleLobbyTimer=setInterval(()=>resolveBattleLobbyExpiry(code),1000);
