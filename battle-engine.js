@@ -34,7 +34,7 @@
    const exact=valid.filter(q=>levelRank(q.level)===requested);
    if(exact.length>=3)valid=exact;
   }
-  return shuffle(valid).slice(0,Math.min(room.mode==='team'?12:10,valid.length)).map((q,i)=>({
+  return shuffle(valid).slice(0,Math.min(Number(room.questionCount)||5,valid.length)).map((q,i)=>({
    id:'q'+i,q:q.q,a:q.a.slice(),c:Number(q.c),why:q.why||'',level:q.level||room.level
   }));
  }
