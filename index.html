@@ -87,10 +87,17 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 
 <section id="app-pages">
  <section class="app-screen" id="screen-home">
-  <div class="welcome-card"><div class="welcome-icon">📚</div><div><h1>Selamat datang di Petualangan Literasi!</h1><p>Belajar membaca jadi petualangan seru. Pilih cara bermain dan mulai tantanganmu!</p></div></div>
-  <div class="home-play-area">
-   <div class="home-play-copy"><span class="eyebrow">SIAP BERPETUALANG?</span><h2>Pilih cara bermainmu!</h2><p>Main sendiri atau ajak teman-temanmu. Kamu yang menentukan.</p></div>
-   <button class="home-play-button" onclick="goScreen('screen-student')"><span>🚀</span><b>Mulai Bermain</b><small>Pilih Single Player atau Multiplayer</small><strong>Ayo mulai →</strong></button>
+  <div class="welcome-card" style="justify-content:center;text-align:center;min-height:58vh;flex-direction:column">
+   <div class="welcome-icon">📚</div><div><h1>Petualangan Literasi Digital</h1><p>Belajar membaca, memahami cerita, dan bermain bersama!</p></div>
+   <button class="home-play-button" style="width:min(100%,420px);min-height:100px;text-align:center;align-items:center" onclick="goScreen('screen-games')"><b>🚀 Mulai Permainan</b><small>Tekan untuk memulai petualangan</small></button>
+  </div>
+ </section>
+ <section class="app-screen hidden" id="screen-game-mode">
+  <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
+  <div class="screen-heading"><span>🎮 PILIH MODE</span><h1 id="selected-game-title">Pilih cara bermain</h1><p>Tentukan apakah ingin bermain sendiri atau bertanding dengan teman.</p></div>
+  <div class="mode-choice-grid">
+   <button class="mode-choice single-mode" onclick="startSelectedSingleGame()"><span class="mode-art">🧒📖</span><span class="mode-tag">SANTAI DAN MANDIRI</span><h2>Main Sendiri</h2><p>Langsung bermain tanpa pengaturan tambahan.</p><strong>Mulai permainan <span>→</span></strong></button>
+   <button class="mode-choice multi-mode" onclick="startSelectedBattle()"><span class="mode-art">🏆⚡</span><span class="mode-tag">TANTANGAN BERSAMA</span><h2>Battle</h2><p>Buat ruang atau bergabung dengan teman-teman.</p><strong>Pilih Battle <span>→</span></strong></button>
   </div>
  </section>
  <section class="app-screen hidden" id="screen-student">
@@ -122,8 +129,8 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
   <div class="form-card narrow"><label>Nama siswa</label><input id="class-student-name" class="field" placeholder="Nama lengkap"><label>Kode ruang dari guru</label><input id="class-room-code" class="field" placeholder="Contoh: BACA182" maxlength="10"><button class="btn" onclick="joinTeacherRoomPage()">Masuk ruang kelas</button><p id="class-join-message" class="muted small-note"></p></div>
  </section>
  <section class="app-screen hidden" id="screen-games">
-  <button class="back-link" onclick="goScreen('screen-student')">← Kembali ke area siswa</button>
-  <div class="screen-heading"><span>🎮 PILIH PERMAINAN</span><h1>Ayo mulai petualangan!</h1><p>Pilih permainan literasi yang ingin kamu mainkan.</p></div>
+  <button class="back-link" onclick="goScreen('screen-home')">← Halaman utama</button>
+  <div class="screen-heading"><span>🎮 PILIH PERMAINAN</span><h1>Ayo mulai petualangan!</h1><p>Pilih cerita rakyat atau salah satu dari delapan permainan. Setelah itu, tentukan mode bermain.</p></div>
   <div class="form-card" style="max-width:none;background:#eff8f7">
    <h2>🏆 Ruang Battle</h2><p class="muted">Ikuti pertandingan individu atau antartim dengan timer dan papan peringkat.</p>
    <button class="btn gold" onclick="goScreen('screen-battle')">Atur Battle Individu / Antartim →</button>
@@ -133,14 +140,14 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
    <button class="btn gold" onclick="goScreen('screen-cloze')">Buka Cerita & Kuis →</button>
   </div>
   <div class="games">
-   <button class="game" onclick="launchGamePage('Petualangan Literasi')"><span class="emoji">🗺️</span><strong>Petualangan Literasi</strong><small>Jelajahi cerita dan selesaikan misi.</small></button>
-   <button class="game" onclick="launchGamePage('Duel Kuis Literasi')"><span class="emoji">⚔️</span><strong>Duel Kuis Literasi</strong><small>Uji pengetahuan melalui kuis.</small></button>
-   <button class="game" onclick="launchGamePage('Tebak Kata')"><span class="emoji">🔤</span><strong>Tebak Kata</strong><small>Temukan kata dari petunjuk.</small></button>
-   <button class="game" onclick="launchGamePage('Susun Cerita')"><span class="emoji">🧩</span><strong>Susun Cerita</strong><small>Urutkan kejadian dalam cerita.</small></button>
-   <button class="game" onclick="launchGamePage('Detektif Bacaan')"><span class="emoji">🔎</span><strong>Detektif Bacaan</strong><small>Cari informasi penting dalam bacaan.</small></button>
-   <button class="game" onclick="launchGamePage('Puzzle Literasi')"><span class="emoji">🧠</span><strong>Puzzle Literasi</strong><small>Asah logika dan pemahaman.</small></button>
-   <button class="game" onclick="launchGamePage('Battle Literasi')"><span class="emoji">🏆</span><strong>Battle Literasi</strong><small>Kumpulkan poin dari tantangan.</small></button>
-   <button class="game" onclick="launchGamePage('Misi Penyelamatan Buku')"><span class="emoji">📖</span><strong>Misi Penyelamatan Buku</strong><small>Selesaikan misi penyelamatan buku.</small></button>
+   <button class="game" onclick="selectGameForMode('Petualangan Literasi')"><span class="emoji">🗺️</span><strong>Petualangan Literasi</strong><small>Jelajahi cerita dan selesaikan misi.</small></button>
+   <button class="game" onclick="selectGameForMode('Duel Kuis Literasi')"><span class="emoji">⚔️</span><strong>Duel Kuis Literasi</strong><small>Uji pengetahuan melalui kuis.</small></button>
+   <button class="game" onclick="selectGameForMode('Tebak Kata')"><span class="emoji">🔤</span><strong>Tebak Kata</strong><small>Temukan kata dari petunjuk.</small></button>
+   <button class="game" onclick="selectGameForMode('Susun Cerita')"><span class="emoji">🧩</span><strong>Susun Cerita</strong><small>Urutkan kejadian dalam cerita.</small></button>
+   <button class="game" onclick="selectGameForMode('Detektif Bacaan')"><span class="emoji">🔎</span><strong>Detektif Bacaan</strong><small>Cari informasi penting dalam bacaan.</small></button>
+   <button class="game" onclick="selectGameForMode('Puzzle Literasi')"><span class="emoji">🧠</span><strong>Puzzle Literasi</strong><small>Asah logika dan pemahaman.</small></button>
+   <button class="game" onclick="selectGameForMode('Battle Literasi')"><span class="emoji">🏆</span><strong>Battle Literasi</strong><small>Kumpulkan poin dari tantangan.</small></button>
+   <button class="game" onclick="selectGameForMode('Misi Penyelamatan Buku')"><span class="emoji">📖</span><strong>Misi Penyelamatan Buku</strong><small>Selesaikan misi penyelamatan buku.</small></button>
   </div>
 
  </section>
@@ -156,24 +163,24 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
   <p class="muted small-note">Kuis contoh ini tersimpan di dalam halaman website dan dapat dimainkan tanpa koneksi internet setelah halaman berhasil dimuat.</p>
  </section>
  <section class="app-screen hidden" id="screen-battle">
-  <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
+  <button class="back-link" onclick="goScreen('screen-game-mode')">← Kembali ke pilihan mode</button>
   <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Buat ruang Battle multiplayer</h1><p>Pilih permainan dan tingkat kesulitan, bagikan kode ruang, lalu tunggu teman bergabung. Ruang dikelola melalui Firebase.</p></div>
   <div id="battle-lobby" class="form-card" style="max-width:none;margin-bottom:20px">
-   <div class="online-intro"><span class="online-kicker">🌐 MULTIPLAYER · LOBI BERSAMA</span><h2>Ruang Battle Multiplayer</h2><p>Pilih mode dan permainan, buat ruang, lalu ajak teman bergabung dengan kode. Semua ruang menunggu maksimal 2 menit.</p></div>
+   <div class="online-intro"><span class="online-kicker">🏆 BATTLE</span><h2>Atur dan gabung Battle</h2><p>Pilih Battle Individu atau Battle Tim, atur pertandingan, lalu tunggu peserta bergabung. Permainan dimulai otomatis setelah hitung mundur 2 menit.</p></div>
    <div class="online-columns">
     <div class="online-card teacher-card"><h3>🎯 Buat ruang baru</h3>
      <label for="lobby-host-name">Nama / nama panggilan</label><input id="lobby-host-name" class="field" maxlength="24" placeholder="Contoh: Alya">
      <label for="lobby-mode">Mode pertandingan</label><select id="lobby-mode" class="field"><option value="individual">Battle Individu · maksimal 5 pemain</option><option value="team">Battle Tim · maksimal 4 tim × 3 pemain</option></select>
      <label for="lobby-game">Jenis permainan</label><select id="lobby-game" class="field"><option>Petualangan Literasi</option><option>Duel Kuis Literasi</option><option>Tebak Kata</option><option>Susun Cerita</option><option>Detektif Bacaan</option><option>Puzzle Literasi</option><option>Battle Literasi</option><option>Misi Penyelamatan Buku</option></select>
+     <label for="lobby-count">Jumlah soal</label><select id="lobby-count" class="field"><option value="3">3 soal</option><option value="5" selected>5 soal</option><option value="10">10 soal</option></select>
      <label for="lobby-level">Tingkat kesulitan</label><select id="lobby-level" class="field"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Menantang">Menantang</option></select>
      <label for="lobby-duration">Durasi pertandingan</label><select id="lobby-duration" class="field"><option value="5">5 menit</option><option value="10">10 menit</option><option value="15" selected>15 menit</option></select><p class="online-footnote">Durasi berlaku untuk Battle Individu maupun Battle Tim. Jawaban yang sudah masuk tetap dihitung saat waktu habis.</p>
      <button class="btn online-action" onclick="createBattleLobby()">Buat kode ruang</button>
     </div>
     <div class="online-card student-card"><h3>📱 Gabung ruang</h3>
      <label for="lobby-player-name">Nama / nama panggilan</label><input id="lobby-player-name" class="field" maxlength="24" placeholder="Contoh: Bima">
-     <label for="lobby-join-code">Kode ruang</label><input id="lobby-join-code" class="field" maxlength="8" placeholder="Contoh: BTL12345" style="text-transform:uppercase">
-     <button class="btn gold online-action" onclick="joinBattleLobby()">Gabung dengan kode</button>
-     <p class="online-footnote">Atau pilih salah satu ruang yang tersedia di daftar bawah.</p>
+     <button class="btn gold online-action" onclick="joinSelectedBattleRoom()">Pilih ruang aktif di daftar bawah</button>
+     <p class="online-footnote">Cukup isi nama, lalu tekan Gabung pada ruang yang ingin diikuti.</p>
     </div>
    </div>
    <p id="lobby-status" class="notice online-status" aria-live="polite">Menghubungkan ke Firebase…</p>
@@ -533,6 +540,26 @@ function joinTeacherRoom(){
 
 
 let studentGameMode='single';
+let selectedGameName='';
+function selectGameForMode(game){
+ selectedGameName=game;
+ const title=document.getElementById('selected-game-title');
+ if(title)title.textContent=game;
+ goScreen('screen-game-mode');
+}
+function startSelectedSingleGame(){if(selectedGameName)launchGamePage(selectedGameName);}
+function startSelectedBattle(){
+ if(!selectedGameName)return;
+ const gameSelect=document.getElementById('lobby-game');
+ if(gameSelect){const option=[...gameSelect.options].find(o=>o.value===selectedGameName||o.textContent===selectedGameName);if(option)gameSelect.value=option.value;}
+ goScreen('screen-battle');
+}
+function joinSelectedBattleRoom(){
+ const name=battleLobbyName('lobby-player-name');
+ if(!name){lobbyMessage('Isi nama terlebih dahulu, lalu pilih ruang aktif.');return;}
+ lobbyMessage('Silakan pilih tombol Gabung pada salah satu ruang aktif di bawah.');
+ document.getElementById('lobby-active-list')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
 function goScreen(id){
  const play=document.getElementById('play');
  if(play&&play.style.display!=='none'&&!play.classList.contains('hidden')&&!confirmGameProgressExit('berpindah halaman'))return;
@@ -659,7 +686,8 @@ async function createBattleLobby(){
  const mode=document.getElementById('lobby-mode').value,game=document.getElementById('lobby-game').value,level=document.getElementById('lobby-level').value;
  const durationMinutes=Number(document.getElementById('lobby-duration').value||15);
  const code=battleLobbyCode(),now=Date.now(),maxPlayers=mode==='individual'?5:12;
- const room={code,mode,game,level,durationMinutes,maxPlayers,status:'waiting',hostUid:onlineUid,createdAt:now,expiresAt:now+BATTLE_LOBBY_WAIT_MS,participants:{}};
+ const questionCount=Number(document.getElementById('lobby-count')?.value||5);
+  const room={code,mode,game,level,durationMinutes,questionCount,maxPlayers,status:'waiting',hostUid:onlineUid,createdAt:now,expiresAt:now+BATTLE_LOBBY_WAIT_MS,participants:{}};
  room.participants[onlineUid]={name,seat:0,team:mode==='team'?battleLobbyTeamForSeat(0):null,joinedAt:now,isHost:true};
  try{
   const ref=onlineDb.ref('battleLobbyRooms/'+code),result=await ref.transaction(existing=>existing||room);
