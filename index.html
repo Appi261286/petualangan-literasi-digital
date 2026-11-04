@@ -157,7 +157,7 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
  </section>
  <section class="app-screen hidden" id="screen-battle">
   <button class="back-link" onclick="goScreen('screen-games')">← Kembali ke pilihan permainan</button>
-  <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Atur pertandingan literasi</h1><p>Buat pertandingan di satu perangkat untuk uji coba. IFD, HP, dan laptop akan dapat tersinkron setelah Firebase dipasang.</p></div>
+  <div class="screen-heading"><span>🏆 ARENA BATTLE</span><h1>Buat ruang Battle multiplayer</h1><p>Pilih permainan dan tingkat kesulitan, bagikan kode ruang, lalu tunggu teman bergabung. Ruang dikelola melalui Firebase.</p></div>
   <div id="battle-lobby" class="form-card" style="max-width:none;margin-bottom:20px">
    <div class="online-intro"><span class="online-kicker">🌐 MULTIPLAYER · LOBI BERSAMA</span><h2>Ruang Battle Multiplayer</h2><p>Pilih mode dan permainan, buat ruang, lalu ajak teman bergabung dengan kode. Semua ruang menunggu maksimal 2 menit.</p></div>
    <div class="online-columns">
@@ -864,10 +864,11 @@ const onlineReady=(async()=>{
   const credential=await onlineAuth.signInAnonymously();
   onlineUid=credential.user.uid;
   document.getElementById('online-status').textContent='Terhubung ke Firebase. Guru dapat membuat ruang atau siswa dapat bergabung.';
-  watchBattleLobbyList();
+  watchBattleLobbyList();lobbyMessage('Terhubung ke Firebase. Buat ruang baru atau gabung melalui daftar ruang aktif.');
   return true;
  }catch(error){
   document.getElementById('online-status').textContent='Belum dapat terhubung: '+(error.message||error);
+  lobbyMessage('Firebase belum terhubung: '+(error.message||error));
   return false;
  }
 })();
