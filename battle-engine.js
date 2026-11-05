@@ -26,16 +26,16 @@
    valid=fallback;
   }
   const requested=levelRank(room.level);
-  if(room.mode==='team'){
-   let harder=valid.filter(q=>levelRank(q.level)>=Math.max(2,requested));
-   if(harder.length<6)harder=harder.concat(valid.filter(q=>levelRank(q.level)<Math.max(2,requested)));
-   valid=harder;
-  }else{
-   const exact=valid.filter(q=>levelRank(q.level)===requested);
-   if(exact.length>=3)valid=exact;
+  const requestedCount=Math.max(1,Number(room.questionCount)||5);
+  const exact=valid.filter(q=>levelRank(q.level)===requested);
+  if(exact.length>=Math.min(requestedCount,valid.length))valid=exact;
+  else if(exact.length){
+   const supplemental=valid.filter(q=>levelRank(q.level)!==requested)
+    .sort((a,b)=>Math.abs(levelRank(a.level)-requested)-Math.abs(levelRank(b.level)-requested));
+   valid=exact.concat(supplemental);
   }
-  return shuffle(valid).slice(0,Math.min(Number(room.questionCount)||5,valid.length)).map((q,i)=>({
-   id:'q'+i,q:q.q,a:q.a.slice(),c:Number(q.c),why:q.why||'',level:q.level||room.level
+  return shuffle(valid).slice(0,Math.min(requestedCount,valid.length)).map((q,i)=>({
+   id:'q'+i,q:q.q,a:q.a.slice(),c:Number(q.c),why:q.why||'',level:q.level||room.level,sourceId:q.sourceId||null
   }));
  }
  function ensurePanel(){
@@ -121,8 +121,10 @@
   if(remaining!==null&&remaining<=0){panel.innerHTML='<h3>⏰ Waktu Battle Tim habis</h3><p>Jawaban yang sudah tersimpan tetap dihitung.</p>';return;}
   const q=live.questions[Math.min(mine.qIndex,total-1)];
   if(!q){panel.innerHTML='<h3>Semua soal selesai</h3>'+scoreboard(room,live);return;}
+  const readingSource=q.sourceId&&typeof gameReadingSources!=='undefined'?(gameReadingSources[room.game]||{})[q.sourceId]:null;
+  const readingPanel=readingSource?'<details class="notice" open><summary><b>📖 Bacaan sumber: '+escapeText(readingSource.title)+'</b></summary><p style="white-space:pre-line">'+escapeText(readingSource.text)+'</p></details>':'';
   const options=q.a.map((a,i)=>'<button class="btn '+(i===0?'':'secondary')+'" style="display:block;width:100%;text-align:left;margin:8px 0" onclick="battleLiveAnswer('+i+')">'+String.fromCharCode(65+i)+'. '+escapeText(a)+'</button>').join('');
-  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b>🎮 '+escapeText(room.game)+' · '+escapeText(room.mode==='team'?'Battle Tim':'Battle Individu')+'</b><b id="battle-live-timer">'+escapeText(timer)+'</b></div><p>Kesulitan: '+escapeText(room.level)+(room.mode==='team'?' · Batas '+(Number(room.durationMinutes)||15)+' menit':'')+'</p><p><b>Soal '+(mine.qIndex+1)+' dari '+total+'</b> · Skor '+Number(mine.score||0)+'</p><h3>'+escapeText(q.q)+'</h3>'+options+'<p class="muted">Kamu menjawab secara mandiri. Tidak perlu menunggu peserta lain.</p>'+(anyCompleted?'<div class="notice">🏆 Papan skor sementara telah dibuka dan diperbarui saat peserta menyelesaikan soal.</div>'+scoreboard(room,live):'');
+  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b>🎮 '+escapeText(room.game)+' · '+escapeText(room.mode==='team'?'Battle Tim':'Battle Individu')+'</b><b id="battle-live-timer">'+escapeText(timer)+'</b></div><p>Kesulitan: '+escapeText(room.level)+(room.mode==='team'?' · Batas '+(Number(room.durationMinutes)||15)+' menit':'')+'</p><p><b>Soal '+(mine.qIndex+1)+' dari '+total+'</b> · Skor '+Number(mine.score||0)+'</p>'+readingPanel+'<h3>'+escapeText(q.q)+'</h3>'+options+'<p class="muted">Kamu menjawab secara mandiri. Tidak perlu menunggu peserta lain.</p>'+(anyCompleted?'<div class="notice">🏆 Papan skor sementara telah dibuka dan diperbarui saat peserta menyelesaikan soal.</div>'+scoreboard(room,live):'');
  }
  function scoreboard(room,live){
   const all=live.progress||{},rows=Object.entries(all).map(([uid,p])=>({uid,p,elapsed:elapsed(p,live,Date.now())}));
