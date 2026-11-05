@@ -810,11 +810,11 @@ function watchBattleLobbyRoom(code,isHost){
  battleLobbyCurrentCode=code;battleLobbyIsHost=isHost;battleLobbyCurrentUid=onlineUid;
  battleLobbyCurrentRef=onlineDb.ref('battleLobbyRooms/'+code);
  battleLobbyCurrentRef.on('value',snap=>{
-  if(!snap.exists()){const el=document.getElementById('lobby-current-room');if(el)el.innerHTML='<div class="notice">Ruang '+escapeHtml(code)+' sudah ditutup atau kedaluwarsa.</div>';return;}
-  const room=snap.val();renderBattleLobbyRoom(room);if(window.battleLiveRoomChanged)window.battleLiveRoomChanged(room);
+  if(!snap.exists()){if(battleLobbyTimer){clearInterval(battleLobbyTimer);battleLobbyTimer=null;}battleLobbyDisplayRoom=null;const el=document.getElementById('lobby-current-room');if(el)el.innerHTML='<div class="notice">Ruang '+escapeHtml(code)+' sudah ditutup atau kedaluwarsa.</div>';return;}
+  const room=snap.val();battleLobbyDisplayRoom=room;renderBattleLobbyRoom(room);if(window.battleLiveRoomChanged)window.battleLiveRoomChanged(room);
   if(room.status==='waiting'){
    if(battleLobbyTimer)clearInterval(battleLobbyTimer);
-   battleLobbyTimer=setInterval(()=>resolveBattleLobbyExpiry(code),1000);
+   battleLobbyTimer=setInterval(()=>{if(battleLobbyCurrentCode===code&&battleLobbyDisplayRoom&&battleLobbyDisplayRoom.status==='waiting')renderBattleLobbyRoom(battleLobbyDisplayRoom);resolveBattleLobbyExpiry(code);},1000);
    resolveBattleLobbyExpiry(code);
   }else if(battleLobbyTimer){clearInterval(battleLobbyTimer);battleLobbyTimer=null;}
  });
@@ -1029,11 +1029,15 @@ async function onlineJoinRoom(){
 function onlineWatchRoom(code,isHost){
  if(onlineRoomRef)onlineRoomRef.off();
  if(onlineTick){clearInterval(onlineTick);onlineTick=null}
- onlineRoomCode=code;onlineRoomRef=onlineDb.ref('battleRooms/'+code);
+ if(onlineUiTick){clearInterval(onlineUiTick);onlineUiTick=null}
+ onlineWatchingIsHost=isHost;onlineRoomCode=code;onlineRoomRef=onlineDb.ref('battleRooms/'+code);
  onlineSetStatus((isHost?'Ruang pertandingan berhasil dibuat.':'Berhasil bergabung ke pertandingan.')+' Kode: '+code);
  onlineRoomRef.on('value',snap=>{
   if(!snap.exists()){onlineSetStatus('Ruang tidak ditemukan.');return}
   onlineRoomData=snap.val();onlineRenderRoom(isHost);
+  if(onlineRoomData.status==='playing'){
+   if(!onlineUiTick)onlineUiTick=setInterval(()=>{if(onlineRoomData&&onlineRoomData.status==='playing')onlineRenderRoom(onlineWatchingIsHost);},1000);
+  }else if(onlineUiTick){clearInterval(onlineUiTick);onlineUiTick=null;}
   if(isHost&&onlineRoomData.status==='playing'){
    const key=String(onlineRoomData.qIndex)+'_'+String(onlineRoomData.startedAt);
    if(key!==onlineTickKey){
