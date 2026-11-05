@@ -747,6 +747,20 @@ async function createBattleLobby(){
   if(button){button.disabled=true;button.dataset.originalText=button.textContent;button.textContent='Sedang membuat ruang…';}
   try{
    const ok=await onlineReady;if(!ok){lobbyMessage('Firebase belum terhubung. Muat ulang halaman dan coba lagi.');return;}
+   if(battleLobbyCurrentCode&&battleLobbyCurrentUid===onlineUid&&battleLobbyIsHost){
+    try{
+     const currentRef=onlineDb.ref('battleLobbyRooms/'+battleLobbyCurrentCode),currentSnap=await currentRef.once('value');
+     if(currentSnap.exists()){
+      const currentRoom=currentSnap.val();
+      if(currentRoom.hostUid===onlineUid&&['waiting','playing'].includes(currentRoom.status)){
+       watchBattleLobbyRoom(battleLobbyCurrentCode,true);
+       lobbyMessage('Ruang Anda sudah dibuat dengan kode '+battleLobbyCurrentCode+'. Klik berikutnya tidak membuat ruang baru.');
+       document.getElementById('lobby-current-room')?.scrollIntoView({behavior:'smooth',block:'center'});
+       return;
+      }
+     }else{battleLobbyCurrentCode=null;battleLobbyCurrentUid=null;battleLobbyIsHost=false;}
+    }catch(e){lobbyMessage('Belum dapat memeriksa ruang sebelumnya. Tidak membuat ruang baru agar tidak terjadi duplikasi.');return;}
+   }
    const name=battleLobbyName('lobby-host-name');if(!name){lobbyMessage('Isi nama panggilan terlebih dahulu.');return;}
    const mode=document.getElementById('lobby-mode').value,game=document.getElementById('lobby-game').value,level=document.getElementById('lobby-level').value;
    const durationMinutes=Number(document.getElementById('lobby-duration').value||15);
