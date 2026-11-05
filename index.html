@@ -704,7 +704,7 @@ function launchGamePage(game){
  document.getElementById('play').prepend(back);window.scrollTo({top:0,behavior:'smooth'});
 }
 
-let battleLobbyRef=null,battleLobbyCurrentRef=null,battleLobbyCurrentCode=null,battleLobbyCurrentUid=null,battleLobbyTimer=null,battleLobbyIsHost=false;
+let battleLobbyRef=null,battleLobbyCurrentRef=null,battleLobbyCurrentCode=null,battleLobbyCurrentUid=null,battleLobbyTimer=null,battleLobbyIsHost=false,battleLobbyDisplayRoom=null;
  let battleLobbyCreating=false;
 const BATTLE_LOBBY_WAIT_MS=120000;
 function lobbyMessage(message){const el=document.getElementById('lobby-status');if(el)el.textContent=message;}
@@ -977,7 +977,7 @@ function openTeacherPage(){
 
 
 const firebaseConfig={apiKey:"AIzaSyDzEFqW3HylbvAstQBC6hnJIRxnc_0bl6U",authDomain:"petualangan-literasi-digital.firebaseapp.com",databaseURL:"https://petualangan-literasi-digital-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"petualangan-literasi-digital",storageBucket:"petualangan-literasi-digital.firebasestorage.app",messagingSenderId:"259136282493",appId:"1:259136282493:web:b9eae92234f744a9747614"};
-let onlineDb=null,onlineAuth=null,onlineUid=null,onlineRoomCode=null,onlineRoomData=null,onlineRoomRef=null,onlineTick=null,onlineTickKey='';
+let onlineDb=null,onlineAuth=null,onlineUid=null,onlineRoomCode=null,onlineRoomData=null,onlineRoomRef=null,onlineTick=null,onlineTickKey='',onlineUiTick=null,onlineWatchingIsHost=false;
 const onlineReady=(async()=>{
  try{
   if(!window.firebase){throw new Error('Pustaka Firebase belum termuat. Periksa koneksi internet lalu muat ulang.')}
