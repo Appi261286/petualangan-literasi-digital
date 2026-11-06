@@ -1266,7 +1266,7 @@ function renderClozeStory(){
  document.getElementById('cloze-story-title').textContent=story.title;
  const picker=document.getElementById('cloze-story-select');if(picker)picker.value=String(activeClozeStory);
  const storyOptions=clozeStoryLibrary.map((item,i)=>'<option value="'+i+'">'+escapeHtml(item.title)+'</option>').join('');
- if(picker)picker.innerHTML=storyOptions;
+ if(picker){picker.innerHTML=storyOptions;picker.value=String(activeClozeStory);}
  const elements=clozeStoryElements[story.title]||{};
  const elementLabels=[['Tema','tema'],['Tokoh','tokoh'],['Watak tokoh','watak'],['Latar','latar'],['Alur','alur'],['Konflik','konflik'],['Amanat','amanat']];
  const elementHtml='<section class="cloze-elements"><h3>📖 Mengenal Unsur Cerita</h3><p>Perhatikan unsur-unsur yang membangun cerita <strong>'+escapeHtml(story.title)+'</strong>. Contohnya diambil dari bacaan di atas.</p>'+elementLabels.map(([label,key])=>elements[key]?'<div class="cloze-element"><strong>'+label+'</strong><p>'+escapeHtml(elements[key])+'</p></div>':'').join('')+'</section>';
