@@ -1788,18 +1788,16 @@ function startGame(name){
 function startGameAtLevel(name,level){
  stopGameClock();player=document.getElementById('nama').value.trim()||'Pemain';
  const gameBank=name==='Susun Cerita'?storyQuestionBank:(gameQuestionBanks[name]||contentBank.questions);
- const targetCount=5,levelKey=level==='Mudah'?'Mudah':level==='Sedang'?'Sedang':'Menantang';
- const levelBank=gameBank.filter(q=>q.level===levelKey);
+ const targetCount=5,levelKey=level==='Mudah'?'Mudah':level==='Sedang'?'Sedang':'Menantang',levelBank=gameBank.filter(q=>q.level===levelKey);
  if(!levelBank.length){document.getElementById('quiz-area').innerHTML='<div class="notice">Belum ada soal untuk tingkat kesulitan ini. Silakan pilih tingkat lain.</div>';return;}
  const historyKey='literasiSeen_'+name+'_'+levelKey;let seen=[];
  try{seen=JSON.parse(localStorage.getItem(historyKey)||'[]');if(!Array.isArray(seen))seen=[];}catch(e){seen=[];}
  let fresh=levelBank.filter(q=>!seen.includes(q.q));if(fresh.length<targetCount){seen=[];fresh=levelBank;}
  const selected=shuffleGameItems(fresh).slice(0,targetCount);
  try{localStorage.setItem(historyKey,JSON.stringify(seen.concat(selected.map(q=>q.q))));}catch(e){}
- gameSession={name,level:levelKey,items:selected,index:0,score:0,streak:0,lives:3,finished:false,started:false,answered:false,seconds:45,order:[],orderChecked:false};
+ gameSession={name,level:levelKey,items:selected.slice(0,targetCount),questionLimit:Math.min(targetCount,selected.length),index:0,score:0,streak:0,lives:3,finished:false,started:false,answered:false,seconds:45,order:[],orderChecked:false};
  current=0;score=0;document.getElementById('game-title').textContent=name;renderQuestion();
-}
-function changeGameLevel(level){
+}function changeGameLevel(level){
  const select=document.getElementById('level');if(!pendingGameName)return;
  if(!level){if(gameSession&&hasGameProgress()){select.value=gameSession.level;return;}gameSession=null;document.getElementById('quiz-area').innerHTML='<div class="notice">Pilih tingkat kesulitan untuk menampilkan soal.</div>';return;}
  if(gameSession&&!gameSession.finished&&gameSession.level!==level&&!confirmGameProgressExit('mengganti tingkat kesulitan')){select.value=gameSession.level;return;}
@@ -1822,6 +1820,8 @@ function finishGame(reason){
 }
 function renderQuestion(){
  if(!gameSession||gameSession.finished)return;
+ if(gameSession.index>=gameSession.items.length){finishGame();return;}
+ gameSession.answered=false;
  const g=gameSession.name,area=document.getElementById('quiz-area');
  if(g==='Susun Cerita'){renderStoryOrder();return;}
  const q=gameSession.items[gameSession.index];
@@ -1852,12 +1852,13 @@ function renderQuestion(){
  }
 }
 function showGameFeedback(ok,message){
- if(gameSession)gameSession.answered=true;
+ if(!gameSession||gameSession.finished||gameSession.answered)return;
+ gameSession.answered=true;
  const el=document.getElementById('feedback');if(!el)return;
  el.innerHTML='<div class="notice">'+(ok?'✅ Tepat! ':'💡 Belum tepat. ')+escapeHtml(message)+'</div><button class="btn" onclick="nextGameQuestion()">Lanjutkan →</button>';
 }
 function answer(i){
- if(!gameSession||gameSession.finished)return;
+ if(!gameSession||gameSession.finished||gameSession.answered)return;
  const q=gameSession.items[gameSession.index];if(!q)return;
  document.querySelectorAll('#quiz-area .answer').forEach(b=>b.disabled=true);
  const ok=i===q.c;
@@ -1867,6 +1868,7 @@ function answer(i){
  showGameFeedback(ok,q.why+(gameSession.name==='Battle Literasi'&&ok&&gameSession.streak>1?' Kombo '+gameSession.streak+'!':''));
 }
 function submitWordAnswer(){
+ if(!gameSession||gameSession.finished||gameSession.answered)return;
  const q=gameSession.items[gameSession.index],v=(document.getElementById('word-answer').value||'').trim().toLowerCase();
  if(!v){document.getElementById('feedback').textContent='Masukkan jawaban terlebih dahulu.';return;}
  const target=q.a[q.c].toLowerCase();
@@ -1875,6 +1877,7 @@ function submitWordAnswer(){
  showGameFeedback(ok,ok?'Kata yang kamu pilih sesuai dengan petunjuk.':'Jawaban yang diharapkan: '+q.a[q.c]+'. '+q.why);
 }
 function submitPuzzleAnswer(){
+ if(!gameSession||gameSession.finished||gameSession.answered)return;
  const v=(document.getElementById('puzzle-answer').value||'').trim().toLowerCase().replace(/\s+/g,'');
  const target=gameSession.puzzleAnswer.toLowerCase().replace(/\s+/g,'');
  const ok=v===target;
@@ -1882,11 +1885,10 @@ function submitPuzzleAnswer(){
  showGameFeedback(ok,ok?'Kamu berhasil menyusun huruf!':'Jawaban yang benar: '+gameSession.puzzleAnswer);
 }
 function nextGameQuestion(){
- if(!gameSession||gameSession.finished)return;
+ if(!gameSession||gameSession.finished||!gameSession.answered)return;
  if(gameSession.name==='Misi Penyelamatan Buku'&&gameSession.lives<=0){finishGame('Misi selesai');return;}
- gameSession.index++;current=gameSession.index;
- if(gameSession.index>=gameSession.items.length){finishGame(gameSession.name==='Misi Penyelamatan Buku'?'Buku berhasil diselamatkan!':'Semua tantangan selesai!');return;}
- renderQuestion();
+ if(gameSession.index+1>=gameSession.items.length){finishGame(gameSession.name==='Misi Penyelamatan Buku'?'Buku berhasil diselamatkan!':'Semua tantangan selesai!');return;}
+ gameSession.index++;current=gameSession.index;gameSession.order=[];gameSession.answered=false;renderQuestion();
 }
 function renderStoryOrder(){
  const q=gameSession.items[gameSession.index],area=document.getElementById('quiz-area');
@@ -1896,14 +1898,19 @@ function renderStoryOrder(){
  if(!gameSession.order||!gameSession.order.length)gameSession.order=shuffleGameItems(q.events);
  area.innerHTML='<div class="muted">🧩 Susun Cerita • Tantangan '+(gameSession.index+1)+' dari '+gameSession.items.length+' • Skor '+gameSession.score+'</div>'+reading+'<div class="question">'+escapeHtml(q.q)+'</div><p class="muted">Gunakan tombol panah untuk memindahkan peristiwa hingga urutannya benar.</p>'+gameSession.order.map((item,i)=>'<div class="notice" style="display:flex;align-items:center;gap:8px"><b>'+(i+1)+'.</b><span style="flex:1">'+escapeHtml(item[0])+'</span><button class="btn secondary" style="padding:6px 10px" onclick="moveStoryItem('+i+',-1)" '+(i===0?'disabled':'')+'>↑</button><button class="btn secondary" style="padding:6px 10px" onclick="moveStoryItem('+i+',1)" '+(i===gameSession.order.length-1?'disabled':'')+'>↓</button></div>').join('')+'<button class="btn" onclick="checkStoryOrder()">Periksa urutan</button><div id="feedback"></div>';
 }
-function moveStoryItem(i,d){const j=i+d;if(j<0||j>=gameSession.order.length)return;[gameSession.order[i],gameSession.order[j]]=[gameSession.order[j],gameSession.order[i]];renderStoryOrder();}
+function moveStoryItem(i,d){if(!gameSession||gameSession.finished||gameSession.answered)return;const j=i+d;if(j<0||j>=gameSession.order.length)return;[gameSession.order[i],gameSession.order[j]]=[gameSession.order[j],gameSession.order[i]];renderStoryOrder();}
 function checkStoryOrder(){
- gameSession.answered=true;
- const q=gameSession.items[gameSession.index],ok=gameSession.order.every((item,i)=>item[1]===i+1),feedback=document.getElementById('feedback');
+ if(!gameSession||gameSession.finished||gameSession.answered)return;
+ const ok=gameSession.order.every((item,i)=>item[1]===i+1),feedback=document.getElementById('feedback');gameSession.answered=true;
  if(ok){gameSession.score+=20;score=gameSession.score;feedback.innerHTML='<div class="notice">🌟 Tepat! Urutan peristiwa sudah benar.</div><button class="btn" onclick="nextStoryChallenge()">Lanjut ke tantangan berikutnya</button>';}
- else feedback.innerHTML='<div class="notice">Belum tepat. Baca kembali sumber, perhatikan hubungan waktu dan sebab-akibat, lalu coba susun lagi.</div><button class="btn" onclick="renderStoryOrder()">Coba lagi</button>';
+ else feedback.innerHTML='<div class="notice">Belum tepat. Baca kembali sumber, perhatikan hubungan waktu dan sebab-akibat, lalu coba susun lagi.</div><button class="btn" onclick="retryStoryOrder()">Coba lagi</button>';
 }
-function nextStoryChallenge(){if(!gameSession)return;gameSession.index++;gameSession.order=[];renderQuestion();}
+function retryStoryOrder(){if(!gameSession||gameSession.finished)return;gameSession.answered=false;renderStoryOrder();}
+function nextStoryChallenge(){
+ if(!gameSession||gameSession.finished||!gameSession.answered)return;
+ if(gameSession.index+1>=gameSession.items.length){finishGame('Semua tantangan selesai!');return;}
+ gameSession.index++;gameSession.order=[];gameSession.answered=false;renderQuestion();
+}
 function resetQuiz(){if(!gameSession)return;if(!confirmGameProgressExit('mengulang permainan'))return;startGameAtLevel(gameSession.name,gameSession.level);}
 function closeGame(){if(!confirmGameProgressExit('menutup permainan'))return;stopGameClock();document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';}
 
