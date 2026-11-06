@@ -126,6 +126,9 @@ main{margin:7px auto;padding:0 12px 24px}
 #game-music-toggle:focus-visible{outline:3px solid #f4b942;outline-offset:3px}
 @media(max-width:480px){#game-music-toggle{right:10px;bottom:10px;padding:10px 13px;font-size:13px}}
 
+
+/* Ruang Guru khusus layar IFP */
+.ifp-screen{max-width:1180px;margin:0 auto}.ifp-screen .ifp-title{font-size:clamp(30px,4vw,48px)}.ifp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.ifp-card{background:#fff;border:2px solid #dce7ee;border-radius:22px;padding:clamp(18px,3vw,30px);box-shadow:0 8px 24px #17324d0c}.ifp-card label{display:block;font-weight:750;margin-top:14px}.ifp-card .field{font-size:18px;min-height:54px}.ifp-action{min-height:64px;font-size:19px;padding:16px 24px}.ifp-stat{display:flex;gap:12px;flex-wrap:wrap}.ifp-stat span{background:#eaf4f6;border-radius:14px;padding:12px 16px;font-weight:750}.ifp-results{overflow:auto}.ifp-results table{width:100%;border-collapse:collapse;min-width:650px}.ifp-results th,.ifp-results td{padding:12px;border-bottom:1px solid #dce7ee;text-align:left}.ifp-results th{background:#edf6f7}@media(max-width:760px){.ifp-grid{grid-template-columns:1fr}.ifp-action{width:100%}}
 </style>
 </head>
 <body>
@@ -138,6 +141,35 @@ main{margin:7px auto;padding:0 12px 24px}
   <div class="welcome-card" style="justify-content:center;text-align:center;min-height:58vh;flex-direction:column">
    <div class="welcome-icon">📚</div><div><h1>Petualangan Literasi Digital</h1><p>Belajar membaca, memahami cerita, dan bermain bersama!</p></div>
    <button class="home-play-button" style="width:min(100%,420px);min-height:100px;text-align:center;align-items:center" onclick="goScreen('screen-games')"><b>🚀 Mulai Permainan</b><small>Tekan untuk memulai petualangan</small></button>
+   <button class="btn ifp-action" style="width:min(100%,420px);background:#155e75" onclick="openIFPRoom()">🖥️ Ruang Guru / Uji Siswa (IFP)</button>
+   <button class="btn secondary" style="width:min(100%,420px);min-height:54px" onclick="openGameResults()">🏆 Pusat Hasil Permainan</button>
+  </div>
+ </section>
+
+ <section class="app-screen hidden ifp-screen" id="screen-teacher-ifp">
+  <button class="back-link" onclick="goScreen('screen-home')">← Halaman utama</button>
+  <div class="screen-heading"><span>🖥️ RUANG KHUSUS IFP</span><h1 class="ifp-title">Ruang Guru / Uji Siswa</h1><p>Atur kegiatan pengujian langsung dari layar sentuh IFP. Tidak memerlukan akun atau HP guru.</p></div>
+  <div class="ifp-grid">
+   <div class="ifp-card"><h2>🎯 Atur permainan</h2>
+    <label for="ifp-game">Jenis permainan</label><select id="ifp-game" class="field"><option>Petualangan Literasi</option><option>Duel Kuis Literasi</option><option>Tebak Kata</option><option>Susun Cerita</option><option>Detektif Bacaan</option><option>Puzzle Literasi</option><option>Battle Literasi</option><option>Misi Penyelamatan Buku</option></select>
+    <label for="ifp-level">Tingkat kesulitan</label><select id="ifp-level" class="field"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Menantang">Menantang</option></select>
+    <label for="ifp-player">Nama siswa / kelompok</label><input id="ifp-player" class="field" maxlength="40" placeholder="Contoh: Kelompok 1 atau Siswa 1">
+    <p class="muted">Tahap awal menggunakan lima soal sesuai pengaturan mesin game yang sudah ada. Pengaturan jumlah soal lanjutan akan diselaraskan setelah seluruh mode terintegrasi.</p>
+    <button class="btn ifp-action" style="width:100%" onclick="startTeacherIFPGame()">▶ Mulai Uji Siswa</button>
+   </div>
+   <div class="ifp-card"><h2>🧑‍🏫 Kendali kegiatan</h2><div class="notice">Gunakan layar IFP sebagai pusat tampilan dan kendali. Siswa maju bergantian untuk menjawab melalui layar sentuh.</div>
+    <div class="ifp-stat"><span>Mode: Individu / bergiliran</span><span>Perangkat: IFP</span><span>Login: Tidak diperlukan</span></div>
+    <h3 style="margin-top:20px">Alur penggunaan</h3><ol><li>Pilih game dan tingkat kesulitan.</li><li>Masukkan nama siswa atau kelompok.</li><li>Tekan Mulai Uji Siswa.</li><li>Siswa menjawab di layar IFP.</li><li>Hasil dicatat pada Pusat Hasil Permainan.</li></ol>
+    <button class="btn secondary ifp-action" style="width:100%" onclick="openGameResults()">📊 Lihat Hasil Permainan</button>
+   </div>
+  </div>
+ </section>
+ <section class="app-screen hidden ifp-screen" id="screen-game-results">
+  <button class="back-link" onclick="goScreen('screen-home')">← Halaman utama</button>
+  <div class="screen-heading"><span>🏆 REKAP HASIL</span><h1 class="ifp-title">Pusat Hasil Permainan</h1><p>Rekap hasil yang tersimpan pada perangkat ini dan hasil daring yang berhasil disinkronkan.</p></div>
+  <div class="ifp-card"><div class="ifp-stat"><span>Jumlah hasil: <b id="ifp-result-count">0</b></span><span>Total poin: <b id="ifp-result-points">0</b></span></div>
+   <label for="ifp-result-filter">Filter jenis permainan</label><select id="ifp-result-filter" class="field" onchange="renderGameResults()"><option value="">Semua permainan</option><option value="Mandiri">Main Sendiri</option><option value="IFP">Uji Siswa IFP</option><option value="Battle">Battle</option></select>
+   <div id="ifp-result-status" class="notice">Memuat hasil permainan...</div><div id="ifp-result-table" class="ifp-results"></div>
   </div>
  </section>
  <section class="app-screen hidden" id="screen-game-mode">
@@ -581,7 +613,13 @@ gameQuestionBanks["Misi Penyelamatan Buku"].push(
 
 let current=0,score=0,player='';
 function getScores(){try{return JSON.parse(localStorage.getItem('literasiScores')||'[]')}catch(e){return[]}}
-function saveScore(name,points,game){const s=getScores();s.unshift({name,points,game,date:new Date().toLocaleDateString('id-ID')});localStorage.setItem('literasiScores',JSON.stringify(s.slice(0,50)));updateTeacher()}
+let teacherIFPContext=null,cloudGameResults=[];
+function saveScore(name,points,game,extra){
+ const record={name,points,game,date:new Date().toLocaleDateString('id-ID'),timestamp:Date.now(),mode:extra&&extra.mode||'Mandiri',sessionCode:extra&&extra.sessionCode||''};
+ const s=getScores();s.unshift(record);try{localStorage.setItem('literasiScores',JSON.stringify(s.slice(0,100)));}catch(e){}
+ if(onlineDb){onlineDb.ref('gameResults').push(record).catch(err=>{console.warn('Hasil belum tersinkron ke Firebase:',err.message);});}
+ updateTeacher();if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();
+}
 function joinRoom(){
  const n=document.getElementById('nama').value.trim(),k=document.getElementById('kode').value.trim().toUpperCase(),el=document.getElementById('join-msg');
  if(!n||!k){el.textContent='Isi nama pemain dan kode ruang terlebih dahulu.';return}
@@ -601,7 +639,26 @@ function joinRoom(){
  }
  el.textContent='Kode tidak dikenali. Gunakan kode TIM untuk Main Tim atau kode LIT untuk Battle Kelas.';
 }
-function showTeacher(){document.getElementById('teacher').classList.remove('hidden');updateTeacher()}
+
+function openIFPRoom(){goScreen('screen-teacher-ifp');const input=document.getElementById('ifp-player');if(input)input.focus();}
+function startTeacherIFPGame(){
+ const game=document.getElementById('ifp-game').value,level=document.getElementById('ifp-level').value,name=document.getElementById('ifp-player').value.trim();
+ if(!name){alert('Isi nama siswa atau kelompok terlebih dahulu.');document.getElementById('ifp-player').focus();return;}
+ if(gameSession&&!gameSession.finished&&!confirmGameProgressExit('memulai uji siswa baru'))return;
+ document.getElementById('nama').value=name;pendingGameName=game;teacherIFPContext={mode:'IFP',game,level,startedAt:Date.now(),code:'IFP-'+Date.now().toString(36).toUpperCase()};
+ goScreen('screen-games');const play=document.getElementById('play');play.classList.remove('hidden');play.style.display='block';document.getElementById('level').value=level;startGameAtLevel(game,level);play.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function getAllGameResults(){const local=getScores();const byId=new Map();[...local,...cloudGameResults].forEach((r,i)=>{const key=(r.timestamp||r.date||'')+'|'+(r.name||'')+'|'+(r.game||'')+'|'+(r.points||0);if(!byId.has(key))byId.set(key,r);});return [...byId.values()].sort((a,b)=>(Number(b.timestamp)||0)-(Number(a.timestamp)||0));}
+function openGameResults(){goScreen('screen-game-results');renderGameResults();}
+function renderGameResults(){
+ const all=getAllGameResults(),filter=document.getElementById('ifp-result-filter')?.value||'',rows=filter?all.filter(r=>(r.mode||'Mandiri')===filter):all;
+ document.getElementById('ifp-result-count').textContent=rows.length;document.getElementById('ifp-result-points').textContent=rows.reduce((n,r)=>n+(Number(r.points)||0),0);
+ const status=document.getElementById('ifp-result-status');if(status)status.textContent=onlineDb?'Menampilkan hasil lokal dan data Firebase yang berhasil disinkronkan.':'Belum terhubung ke Firebase; hasil yang tampil berasal dari perangkat ini.';
+ const target=document.getElementById('ifp-result-table');if(!target)return;
+ target.innerHTML=rows.length?'<table><thead><tr><th>Nama</th><th>Game</th><th>Mode</th><th>Skor</th><th>Tanggal</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+escapeHtml(r.name||'Pemain')+'</td><td>'+escapeHtml(r.game||'-')+'</td><td>'+escapeHtml(r.mode||'Mandiri')+'</td><td><b>'+Number(r.points||0)+'</b></td><td>'+escapeHtml(r.date||'-')+'</td></tr>').join('')+'</tbody></table>':'<p class="muted">Belum ada hasil permainan.</p>';
+}
+function watchGameResults(){if(!onlineDb)return;onlineDb.ref('gameResults').limitToLast(300).on('value',snap=>{const data=snap.val()||{};cloudGameResults=Object.values(data).filter(Boolean);updateTeacher();if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();},err=>{console.warn('Tidak dapat membaca rekap Firebase:',err.message);});}
+\nfunction showTeacher(){document.getElementById('teacher').classList.remove('hidden');updateTeacher()}
 function makeRoom(){const c='BACA'+Math.floor(100+Math.random()*900);document.getElementById('room-code').textContent=c+' (kode contoh)'}
 function startGame(name){player=document.getElementById('nama').value.trim()||'Pemain';current=0;score=0;document.getElementById('game-title').textContent=name;document.getElementById('play').classList.remove('hidden');document.getElementById('play').scrollIntoView({behavior:'smooth'});renderQuestion()}
 function closeGame(){document.getElementById('play').classList.add('hidden')}
@@ -609,7 +666,7 @@ function resetQuiz(){current=0;score=0;renderQuestion()}
 function renderQuestion(){const area=document.getElementById('quiz-area');if(current>=questions.length){area.innerHTML='<h3>🎉 Permainan selesai!</h3><p>Skor kamu: <b>'+score+' / '+questions.length*20+'</b></p><p>Terus berlatih membaca dan memahami cerita.</p><button class="btn" onclick="startGame(document.getElementById(\'game-title\').textContent)">Main lagi</button>';saveScore(player,score,document.getElementById('game-title').textContent);return}
 const q=questions[current];area.innerHTML='<p class="muted">Pertanyaan '+(current+1)+' dari '+questions.length+' • Skor '+score+'</p><div class="question">'+q.q+'</div><div class="answers">'+q.a.map((a,i)=>'<button class="answer" onclick="answer('+i+')">'+a+'</button>').join('')+'</div><div id="feedback"></div>'}
 function answer(i){const q=questions[current],buttons=document.querySelectorAll('.answer');buttons.forEach(b=>b.disabled=true);const ok=i===q.c;if(ok)score+=20;document.getElementById('feedback').innerHTML='<div class="notice">'+(ok?'✅ Benar!':'💡 Belum tepat.')+' '+q.why+'</div><button class="btn" onclick="current++;renderQuestion()">'+(current===questions.length-1?'Lihat hasil':'Pertanyaan berikutnya')+'</button>'}
-function updateTeacher(){const s=getScores();document.getElementById('player-count').textContent=new Set(s.map(x=>x.name)).size;document.getElementById('point-count').textContent=s.reduce((a,x)=>a+x.points,0);document.getElementById('score-list').innerHTML=s.length?s.map(x=>'<p><b>'+escapeHtml(x.name)+'</b> — '+escapeHtml(x.game)+': '+x.points+' poin <small>('+x.date+')</small></p>').join(''):'Belum ada skor.'}
+function updateTeacher(){const s=getAllGameResults();document.getElementById('player-count').textContent=new Set(s.map(x=>x.name)).size;document.getElementById('point-count').textContent=s.reduce((a,x)=>a+(Number(x.points)||0),0);document.getElementById('score-list').innerHTML=s.length?s.slice(0,100).map(x=>'<p><b>'+escapeHtml(x.name)+'</b> — '+escapeHtml(x.game)+': '+Number(x.points||0)+' poin <small>('+escapeHtml(x.date||'-')+' · '+escapeHtml(x.mode||'Mandiri')+')</small></p>').join(''):'Belum ada skor.'}
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function clearScores(){if(confirm('Hapus semua skor yang tersimpan di browser ini?')){localStorage.removeItem('literasiScores');updateTeacher()}}
 
@@ -1058,7 +1115,7 @@ const onlineReady=(async()=>{
   const credential=await onlineAuth.signInAnonymously();
   onlineUid=credential.user.uid;
   document.getElementById('online-status').textContent='Terhubung ke Firebase. Guru dapat membuat ruang atau siswa dapat bergabung.';
-  watchBattleLobbyList();lobbyMessage('Terhubung ke Firebase. Buat ruang baru atau gabung melalui daftar ruang aktif.');
+  watchBattleLobbyList();watchGameResults();lobbyMessage('Terhubung ke Firebase. Buat ruang baru atau gabung melalui daftar ruang aktif.');
   return true;
  }catch(error){
   document.getElementById('online-status').textContent='Belum dapat terhubung: '+(error.message||error);
@@ -1989,7 +2046,7 @@ function finishGame(reason){
  const max=gameSession.items.length*20;
  const area=document.getElementById('quiz-area');
  area.innerHTML='<div class="notice"><h3>🎉 '+(reason||'Permainan selesai!')+'</h3><p>Nama pemain: <b>'+escapeHtml(player)+'</b></p><p>Skor akhir: <b>'+gameSession.score+' / '+max+'</b></p><p>Jawaban benar: '+Math.round(gameSession.score/20)+' dari '+gameSession.items.length+' tantangan.</p></div><button class="btn" onclick="startGame(\''+escapeHtml(gameSession.name).replace(/'/g,"\\'")+'\')">Main lagi</button> <button class="btn secondary" onclick="closeGame()">Kembali</button>';
- score=gameSession.score;saveScore(player,score,gameSession.name);
+ score=gameSession.score;saveScore(player,score,gameSession.name,{mode:teacherIFPContext?'IFP':'Mandiri',sessionCode:teacherIFPContext&&teacherIFPContext.code||''});teacherIFPContext=null;
 }
 function renderQuestion(){
  if(!gameSession||gameSession.finished)return;
