@@ -1104,6 +1104,7 @@ function nextBattleTurn(){
  renderBattleTurn();
 }
 function finishBattle(){
+ const wasIFP=!!teacherIFPContext;
  clearInterval(battleTimer);setGameMusicActive(false);
  if(battleState.mode==='team'&&battleState.answerMode==='individual'){
   battleState.entities.forEach((team,teamIndex)=>{
@@ -1122,7 +1123,7 @@ function finishBattle(){
  }).join('');
  document.getElementById('battle-play-area').classList.add('hidden');
  const board=document.getElementById('battle-scoreboard');board.classList.remove('hidden');
- board.innerHTML='<h2>🏆 Papan Peringkat</h2><p class="muted">Ruang '+document.getElementById('battle-room').value+' • '+(battleState.mode==='team'?'Battle Antartim — '+(battleState.answerMode==='individual'?'anggota menjawab sendiri':'diskusi tim'):'Battle Individu')+'</p><table class="battle-score-table"><thead><tr><th>Rank</th><th>Peserta / Tim</th><th>Skor</th><th>Waktu</th><th>Bintang</th></tr></thead><tbody>'+rows+'</tbody></table><p class="muted small-note">Peringkat ditentukan dari skor tertinggi. Jika skor sama, waktu total tercepat menang.</p><button class="btn" onclick="goScreen(&quot;screen-battle&quot;);document.getElementById(&quot;battle-scoreboard&quot;).classList.add(&quot;hidden&quot;)">Atur pertandingan baru</button>';
+ board.innerHTML='<h2>🏆 Papan Peringkat</h2><p class="muted">Ruang '+document.getElementById('battle-room').value+' • '+(battleState.mode==='team'?'Battle Antartim — '+(battleState.answerMode==='individual'?'anggota menjawab sendiri':'diskusi tim'):'Battle Individu')+'</p><table class="battle-score-table"><thead><tr><th>Rank</th><th>Peserta / Tim</th><th>Skor</th><th>Waktu</th><th>Bintang</th></tr></thead><tbody>'+rows+'</tbody></table><p class="muted small-note">Peringkat ditentukan dari skor tertinggi. Jika skor sama, waktu total tercepat menang.</p>'+(wasIFP?'<button class="btn" onclick="goScreen(&quot;screen-teacher-ifp&quot;)">Kembali ke Ruang Guru IFP</button>':'<button class="btn" onclick="goScreen(&quot;screen-battle&quot;);document.getElementById(&quot;battle-scoreboard&quot;).classList.add(&quot;hidden&quot;)">Atur pertandingan baru</button>');
  ranked.forEach(p=>saveScore(p.name,p.score,'Battle Literasi',{mode:teacherIFPContext?'IFP-Battle':'Battle'}));if(teacherIFPContext)teacherIFPContext=null;
  board.scrollIntoView({behavior:'smooth',block:'start'});
 }
