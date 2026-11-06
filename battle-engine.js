@@ -26,8 +26,8 @@
    if(!Array.isArray(q.a)||q.a.length<2||!Number.isInteger(Number(q.c))||Number(q.c)<0||Number(q.c)>=q.a.length)return null;
    return {id:'q'+i,type:'choice',q:q.q,a:q.a.map(String),c:Number(q.c),why:q.why||'',level:q.level||room.level,sourceId:q.sourceId||null};
   }).filter(Boolean);
-  const exact=typed.filter(q=>levelRank(q.level)===requested);let valid=exact.length>=Math.min(count,typed.length)?exact.slice():typed.slice();
-  if(exact.length&&exact.length<Math.min(count,typed.length)){const extra=typed.filter(q=>levelRank(q.level)!==requested).sort((a,b)=>Math.abs(levelRank(a.level)-requested)-Math.abs(levelRank(b.level)-requested));valid=exact.concat(extra);}
+  const exact=typed.filter(q=>levelRank(q.level)===requested);let valid=exact.slice();
+  if(exact.length&&exact.length<count){const extra=typed.filter(q=>levelRank(q.level)!==requested).sort((a,b)=>Math.abs(levelRank(a.level)-requested)-Math.abs(levelRank(b.level)-requested));valid=valid.concat(extra);}
   return shuffle(valid).slice(0,count);
  }
  function ensurePanel(){
