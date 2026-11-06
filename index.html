@@ -350,8 +350,8 @@ function playGameMusicTone(freq,when,duration,volume,type){
 function playGameMusicBeat(){
  if(!gameMusicContext||gameMusicContext.state!=='running')return;
  const now=gameMusicContext.currentTime,step=gameMusicStep%gameMusicNotes.length;
- playGameMusicTone(gameMusicNotes[step],now,0.50,0.35,'triangle');
- if(step%4===0)playGameMusicTone([130.81,146.83,164.81,146.83][Math.floor(step/4)],now,1.05,0.18,'sine');
+ playGameMusicTone(gameMusicNotes[step],now,0.50,0.65,'triangle');
+ if(step%4===0)playGameMusicTone([130.81,146.83,164.81,146.83][Math.floor(step/4)],now,1.05,0.30,'sine');
  gameMusicStep++;
 }
 async function startGameMusic(){
