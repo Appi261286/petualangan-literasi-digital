@@ -658,7 +658,8 @@ function renderGameResults(){
  target.innerHTML=rows.length?'<table><thead><tr><th>Nama</th><th>Game</th><th>Mode</th><th>Skor</th><th>Tanggal</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+escapeHtml(r.name||'Pemain')+'</td><td>'+escapeHtml(r.game||'-')+'</td><td>'+escapeHtml(r.mode||'Mandiri')+'</td><td><b>'+Number(r.points||0)+'</b></td><td>'+escapeHtml(r.date||'-')+'</td></tr>').join('')+'</tbody></table>':'<p class="muted">Belum ada hasil permainan.</p>';
 }
 function watchGameResults(){if(!onlineDb)return;onlineDb.ref('gameResults').limitToLast(300).on('value',snap=>{const data=snap.val()||{};cloudGameResults=Object.values(data).filter(Boolean);updateTeacher();if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();},err=>{console.warn('Tidak dapat membaca rekap Firebase:',err.message);});}
-\nfunction showTeacher(){document.getElementById('teacher').classList.remove('hidden');updateTeacher()}
+
+function showTeacher(){document.getElementById('teacher').classList.remove('hidden');updateTeacher()}
 function makeRoom(){const c='BACA'+Math.floor(100+Math.random()*900);document.getElementById('room-code').textContent=c+' (kode contoh)'}
 function startGame(name){player=document.getElementById('nama').value.trim()||'Pemain';current=0;score=0;document.getElementById('game-title').textContent=name;document.getElementById('play').classList.remove('hidden');document.getElementById('play').scrollIntoView({behavior:'smooth'});renderQuestion()}
 function closeGame(){document.getElementById('play').classList.add('hidden')}
@@ -1095,7 +1096,7 @@ function finishBattle(){
  document.getElementById('battle-play-area').classList.add('hidden');
  const board=document.getElementById('battle-scoreboard');board.classList.remove('hidden');
  board.innerHTML='<h2>🏆 Papan Peringkat</h2><p class="muted">Ruang '+document.getElementById('battle-room').value+' • '+(battleState.mode==='team'?'Battle Antartim — '+(battleState.answerMode==='individual'?'anggota menjawab sendiri':'diskusi tim'):'Battle Individu')+'</p><table class="battle-score-table"><thead><tr><th>Rank</th><th>Peserta / Tim</th><th>Skor</th><th>Waktu</th><th>Bintang</th></tr></thead><tbody>'+rows+'</tbody></table><p class="muted small-note">Peringkat ditentukan dari skor tertinggi. Jika skor sama, waktu total tercepat menang.</p><button class="btn" onclick="goScreen(&quot;screen-battle&quot;);document.getElementById(&quot;battle-scoreboard&quot;).classList.add(&quot;hidden&quot;)">Atur pertandingan baru</button>';
- ranked.forEach(p=>saveScore(p.name,p.score,'Battle Literasi'));
+ ranked.forEach(p=>saveScore(p.name,p.score,'Battle Literasi',{mode:'Battle'}));
  board.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
