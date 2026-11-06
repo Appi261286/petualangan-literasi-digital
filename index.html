@@ -661,12 +661,13 @@ function startTeacherIFPBattle(){
  if(!m1.length||!m2.length){alert('Masukkan minimal satu anggota untuk setiap tim.');return;}
  if(gameSession&&!gameSession.finished&&!confirmGameProgressExit('memulai Battle IFP'))return;
  teacherIFPContext={mode:'IFP-Battle',startedAt:Date.now(),code:'IFP-BTL-'+Date.now().toString(36).toUpperCase()};
- document.getElementById('battle-mode').value='team';document.getElementById('battle-players').value=t1+' | '+m1.join(', ')+'\\n'+t2+' | '+m2.join(', ');
+ document.getElementById('battle-mode').value='team';document.getElementById('battle-players').value=t1+' | '+m1.join(', ')+'\n'+t2+' | '+m2.join(', ');
  document.getElementById('team-answer-mode').value=document.getElementById('ifp-team-answer').value;
  document.getElementById('battle-count').value='5';document.getElementById('battle-seconds').value='30';document.getElementById('battle-level').value=document.getElementById('ifp-level')?.value||'Mudah';
  goScreen('screen-battle');startBattle();
 }
-\nfunction startTeacherIFPGame(){
+
+function startTeacherIFPGame(){
  const game=document.getElementById('ifp-game').value,level=document.getElementById('ifp-level').value,name=document.getElementById('ifp-player').value.trim();
  if(!name){alert('Isi nama siswa atau kelompok terlebih dahulu.');document.getElementById('ifp-player').focus();return;}
  if(gameSession&&!gameSession.finished&&!confirmGameProgressExit('memulai uji siswa baru'))return;
