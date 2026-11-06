@@ -122,10 +122,15 @@ main{margin:7px auto;padding:0 12px 24px}
  #battle-lobby .online-columns{grid-template-columns:1fr}
 }
 
+#game-music-toggle{position:fixed;right:16px;bottom:16px;z-index:9999;border:0;border-radius:999px;padding:11px 16px;background:#155e75;color:#fff;font:700 14px system-ui;box-shadow:0 5px 18px #17324d30;cursor:pointer}
+#game-music-toggle:focus-visible{outline:3px solid #f4b942;outline-offset:3px}
+@media(max-width:480px){#game-music-toggle{right:10px;bottom:10px;padding:10px 13px;font-size:13px}}
+
 </style>
 </head>
 <body>
 <header><div class="top"><div><div class="brand">📚 Petualangan Literasi Digital</div><div class="sub">Belajar membaca, memahami cerita, dan bermain bersama!</div></div></div></header>
+<button id="game-music-toggle" type="button" class="hidden" onclick="toggleGameMusic()" aria-pressed="false">🔊 Musik: ON</button>
 <main>
 
 <section id="app-pages">
@@ -326,6 +331,67 @@ main{margin:7px auto;padding:0 12px 24px}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
+
+/* Musik latar orisinal berbasis Web Audio; hanya aktif selama permainan. */
+let gameMusicContext=null,gameMusicTimer=null,gameMusicActive=false,gameMusicStep=0;
+let gameMusicWanted=true;
+try{gameMusicWanted=localStorage.getItem('literasiGameMusic')!=='off';}catch(e){}
+const gameMusicNotes=[523.25,659.25,783.99,659.25,587.33,698.46,783.99,698.46,523.25,659.25,880,783.99,698.46,659.25,587.33,523.25];
+function playGameMusicTone(freq,when,duration,volume,type){
+ if(!gameMusicContext)return;
+ const osc=gameMusicContext.createOscillator(),gain=gameMusicContext.createGain();
+ osc.type=type||'sine';osc.frequency.setValueAtTime(freq,when);
+ gain.gain.setValueAtTime(0.0001,when);
+ gain.gain.exponentialRampToValueAtTime(volume,when+0.035);
+ gain.gain.exponentialRampToValueAtTime(0.0001,when+duration);
+ osc.connect(gain);gain.connect(gameMusicContext.destination);
+ osc.start(when);osc.stop(when+duration+0.03);
+}
+function playGameMusicBeat(){
+ if(!gameMusicContext||gameMusicContext.state!=='running')return;
+ const now=gameMusicContext.currentTime,step=gameMusicStep%gameMusicNotes.length;
+ playGameMusicTone(gameMusicNotes[step],now,0.42,0.035,'triangle');
+ if(step%4===0)playGameMusicTone([130.81,146.83,164.81,146.83][Math.floor(step/4)],now,1.05,0.025,'sine');
+ gameMusicStep++;
+}
+async function startGameMusic(){
+ if(!gameMusicActive||!gameMusicWanted)return;
+ try{
+  const AudioCtx=window.AudioContext||window.webkitAudioContext;
+  if(!AudioCtx)return;
+  if(!gameMusicContext)gameMusicContext=new AudioCtx();
+  if(gameMusicContext.state!=='running')await gameMusicContext.resume();
+  if(!gameMusicActive||!gameMusicWanted)return;
+  if(gameMusicTimer===null){gameMusicStep=0;playGameMusicBeat();gameMusicTimer=setInterval(playGameMusicBeat,560);}
+ }catch(e){}
+}
+function updateGameMusicButton(){
+ const button=document.getElementById('game-music-toggle');if(!button)return;
+ button.classList.toggle('hidden',!gameMusicActive);
+ button.textContent=gameMusicWanted?'🔊 Musik: ON':'🔇 Musik: OFF';
+ button.setAttribute('aria-pressed',String(gameMusicWanted));
+}
+function setGameMusicActive(active){
+ const next=!!active;
+ if(gameMusicActive===next){updateGameMusicButton();if(next&&gameMusicWanted&&gameMusicTimer===null)startGameMusic();return;}
+ gameMusicActive=next;
+ if(!next){
+  if(gameMusicTimer!==null){clearInterval(gameMusicTimer);gameMusicTimer=null;}
+  if(gameMusicContext&&gameMusicContext.state==='running')gameMusicContext.suspend().catch(()=>{});
+ }else if(gameMusicWanted){startGameMusic();}
+ updateGameMusicButton();
+}
+function toggleGameMusic(){
+ gameMusicWanted=!gameMusicWanted;
+ try{localStorage.setItem('literasiGameMusic',gameMusicWanted?'on':'off');}catch(e){}
+ if(gameMusicWanted)startGameMusic();
+ else{
+  if(gameMusicTimer!==null){clearInterval(gameMusicTimer);gameMusicTimer=null;}
+  if(gameMusicContext&&gameMusicContext.state==='running')gameMusicContext.suspend().catch(()=>{});
+ }
+ updateGameMusicButton();
+}
+
 const contentBank = {
  id:'misteri-buku-perpustakaan-01',
  title:'Misteri Hilangnya Buku Perpustakaan',
@@ -905,6 +971,7 @@ function startBattle(){
   entities.forEach((team,teamIndex)=>team.members.forEach((member,memberIndex)=>turnOrder.push({teamIndex,memberIndex,name:member,score:0,time:0})));
  }else entities.forEach((entity,entityIndex)=>turnOrder.push({teamIndex:entityIndex,memberIndex:-1,name:entity.name,score:0,time:0}));
  battleState={mode,answerMode,entities,turnOrder,questions:shuffled,qIndex:0,entityIndex:0,seconds:Number(document.getElementById('battle-seconds').value),penalty:Number(document.getElementById('battle-penalty').value),started:false};
+ setGameMusicActive(true);
  document.getElementById('battle-play-area').classList.remove('hidden');
  document.getElementById('battle-scoreboard').classList.add('hidden');
  if(count>questions.length)document.getElementById('battle-play-area').innerHTML='<div class="notice">Bank contoh saat ini berisi '+questions.length+' soal. Pertandingan uji coba menggunakan '+questions.length+' soal dulu; jumlah 10–20 akan aktif setelah bank soal ditambah.</div>';
@@ -948,7 +1015,7 @@ function nextBattleTurn(){
  renderBattleTurn();
 }
 function finishBattle(){
- clearInterval(battleTimer);
+ clearInterval(battleTimer);setGameMusicActive(false);
  if(battleState.mode==='team'&&battleState.answerMode==='individual'){
   battleState.entities.forEach((team,teamIndex)=>{
    const members=battleState.turnOrder.filter(t=>t.teamIndex===teamIndex);
@@ -1898,7 +1965,7 @@ function startGameAtLevel(name,level){
  const selected=shuffleGameItems(fresh).slice(0,targetCount);
  try{localStorage.setItem(historyKey,JSON.stringify(seen.concat(selected.map(q=>q.q))));}catch(e){}
  gameSession={name,level:levelKey,items:selected.slice(0,targetCount),questionLimit:Math.min(targetCount,selected.length),index:0,score:0,streak:0,lives:3,finished:false,started:false,answered:false,seconds:45,order:[],orderChecked:false};
- current=0;score=0;document.getElementById('game-title').textContent=name;renderQuestion();
+ setGameMusicActive(true);current=0;score=0;document.getElementById('game-title').textContent=name;renderQuestion();
 }function changeGameLevel(level){
  const select=document.getElementById('level');if(!pendingGameName)return;
  if(!level){if(gameSession&&hasGameProgress()){select.value=gameSession.level;return;}gameSession=null;document.getElementById('quiz-area').innerHTML='<div class="notice">Pilih tingkat kesulitan untuk menampilkan soal.</div>';return;}
@@ -1914,7 +1981,7 @@ function resetQuiz(){
 }
 function finishGame(reason){
  if(!gameSession||gameSession.finished)return;
- stopGameClock();gameSession.finished=true;
+ stopGameClock();setGameMusicActive(false);gameSession.finished=true;
  const max=gameSession.items.length*20;
  const area=document.getElementById('quiz-area');
  area.innerHTML='<div class="notice"><h3>🎉 '+(reason||'Permainan selesai!')+'</h3><p>Nama pemain: <b>'+escapeHtml(player)+'</b></p><p>Skor akhir: <b>'+gameSession.score+' / '+max+'</b></p><p>Jawaban benar: '+Math.round(gameSession.score/20)+' dari '+gameSession.items.length+' tantangan.</p></div><button class="btn" onclick="startGame(\''+escapeHtml(gameSession.name).replace(/'/g,"\\'")+'\')">Main lagi</button> <button class="btn secondary" onclick="closeGame()">Kembali</button>';
@@ -2014,7 +2081,7 @@ function nextStoryChallenge(){
  gameSession.index++;gameSession.order=[];gameSession.answered=false;renderQuestion();
 }
 function resetQuiz(){if(!gameSession)return;if(!confirmGameProgressExit('mengulang permainan'))return;startGameAtLevel(gameSession.name,gameSession.level);}
-function closeGame(){if(!confirmGameProgressExit('menutup permainan'))return;stopGameClock();document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';}
+function closeGame(){if(!confirmGameProgressExit('menutup permainan'))return;stopGameClock();setGameMusicActive(false);document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';}
 
 </script>
 <script src="battle-engine.js"></script>
