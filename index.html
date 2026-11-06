@@ -197,8 +197,9 @@ main{margin:7px auto;padding:0 12px 24px}
    <div class="cloze-story-heading"><span>📚 KOLEKSI CERITA RAKYAT NUSANTARA</span><h2 id="cloze-story-title">Timun Mas</h2><label for="cloze-story-select">Pilih cerita</label><select id="cloze-story-select" class="field" onchange="changeClozeStory(this.value)"><option value="0">Timun Mas</option><option value="1">Malin Kundang</option><option value="2">Bawang Merah dan Bawang Putih</option><option value="3">Sangkuriang</option><option value="4">Keong Mas</option><option value="5">Asal Mula Danau Toba</option></select><p class="muted">Bacalah cerita, pelajari unsur-unsurnya, lalu lengkapi kata yang hilang.</p></div>
    <div id="cloze-story-text" class="cloze-story-text"></div>
    <div class="cloze-actions"><button class="btn" onclick="checkClozeAnswers()">Periksa Jawaban</button><button class="btn secondary" onclick="resetClozeQuiz()">Ulangi</button></div>
-   <div id="cloze-feedback" class="cloze-feedback" aria-live="polite"></div>
-  </div>
+    <div style="margin-top:10px"><button id="cloze-elements-button" class="btn secondary" type="button" onclick="toggleClozeElements()" aria-expanded="false">📖 Tampilkan Unsur Cerita</button></div>
+    <div id="cloze-feedback" class="cloze-feedback" aria-live="polite"></div>
+    <div id="cloze-elements-panel" class="hidden"></div>  </div>
   <p class="muted small-note">Kuis contoh ini tersimpan di dalam halaman website dan dapat dimainkan tanpa koneksi internet setelah halaman berhasil dimuat.</p>
  </section>
  <section class="app-screen hidden" id="screen-battle">
@@ -1270,8 +1271,21 @@ function renderClozeStory(){
  const elements=clozeStoryElements[story.title]||{};
  const elementLabels=[['Tema','tema'],['Tokoh','tokoh'],['Watak tokoh','watak'],['Latar','latar'],['Alur','alur'],['Konflik','konflik'],['Amanat','amanat']];
  const elementHtml='<section class="cloze-elements"><h3>📖 Mengenal Unsur Cerita</h3><p>Perhatikan unsur-unsur yang membangun cerita <strong>'+escapeHtml(story.title)+'</strong>. Contohnya diambil dari bacaan di atas.</p>'+elementLabels.map(([label,key])=>elements[key]?'<div class="cloze-element"><strong>'+label+'</strong><p>'+escapeHtml(elements[key])+'</p></div>':'').join('')+'</section>';
- el.innerHTML='<p class="cloze-story-intro">'+escapeHtml(story.intro)+'</p>'+items.map((item,i)=>'<p class="cloze-story-paragraph">'+escapeHtml(item.before)+'<input class="cloze-blank" type="text" data-cloze-index="'+i+'" aria-label="Kata yang hilang nomor '+(i+1)+'" autocomplete="off" placeholder="Kata '+(i+1)+'"><span class="cloze-hint">Petunjuk: '+escapeHtml(item.hint)+'</span>'+escapeHtml(item.after)+'</p>').join('')+elementHtml;
+ el.innerHTML='<p class="cloze-story-intro">'+escapeHtml(story.intro)+'</p>'+items.map((item,i)=>'<p class="cloze-story-paragraph">'+escapeHtml(item.before)+'<input class="cloze-blank" type="text" data-cloze-index="'+i+'" aria-label="Kata yang hilang nomor '+(i+1)+'" autocomplete="off" placeholder="Kata '+(i+1)+'"><span class="cloze-hint">Petunjuk: '+escapeHtml(item.hint)+'</span>'+escapeHtml(item.after)+'</p>').join('');
+ const elementsPanel=document.getElementById('cloze-elements-panel');
+ const elementsButton=document.getElementById('cloze-elements-button');
+ if(elementsPanel){elementsPanel.innerHTML=elementHtml;elementsPanel.classList.add('hidden');}
+ if(elementsButton){elementsButton.textContent='📖 Tampilkan Unsur Cerita';elementsButton.setAttribute('aria-expanded','false');}
  document.getElementById('cloze-feedback').textContent='';
+}
+function toggleClozeElements(){
+ const panel=document.getElementById('cloze-elements-panel');
+ const button=document.getElementById('cloze-elements-button');
+ if(!panel||!button)return;
+ const show=panel.classList.contains('hidden');
+ panel.classList.toggle('hidden',!show);
+ button.textContent=show?'🙈 Sembunyikan Unsur Cerita':'📖 Tampilkan Unsur Cerita';
+ button.setAttribute('aria-expanded',String(show));
 }
 function checkClozeAnswers(){
  const items=getActiveClozeItems(),inputs=[...document.querySelectorAll('[data-cloze-index]')];let score=0;
