@@ -80,6 +80,7 @@
   });
  }
  function drawWaiting(room){
+  if(typeof setGameMusicActive==='function')setGameMusicActive(false);
   const panel=ensurePanel();if(panel)panel.innerHTML='<h3>Menyiapkan pertandingan…</h3><p>Guru sedang menyiapkan soal bersama. Sebentar lagi permainan dimulai.</p>';
  }
  function elapsed(progress,live,now){
@@ -94,6 +95,7 @@
   const timer=remaining===null?'Tanpa batas waktu':Math.floor(remaining/60)+' menit '+String(remaining%60).padStart(2,'0')+' detik';
   const drawKey=JSON.stringify({status:live.status,mine:mine||null,progress,total,game:room.game,mode:room.mode,level:room.level,deadlineAt:live.deadlineAt});
   if(drawKey===lastDrawKey)return;lastDrawKey=drawKey;
+  if(typeof setGameMusicActive==='function')setGameMusicActive(false);
   if(live.status==='completed'){panel.innerHTML='<h3>🏁 Pertandingan selesai!</h3><p>'+escapeText(mine?('Skor kamu: '+mine.score+' · Benar: '+mine.correct+'/'+total):'Hasil pertandingan tersedia di bawah.')+'</p>'+scoreboard(room,live);return;}
   const anyCompleted=Object.values(progress).some(p=>p&&p.completed);
   if(mine&&mine.completed){const finished=Object.values(progress).filter(p=>p&&p.completed).length,totalPlayers=Object.keys(participants).length;panel.innerHTML='<h3>✅ Kamu sudah menyelesaikan semua soal!</h3><div class="notice">⏳ Jawabanmu sudah tersimpan. Papan skor sementara akan diperbarui saat peserta lain selesai.</div><p class="muted">Progres: '+finished+' dari '+totalPlayers+' peserta.</p>'+scoreboard(room,live);return;}
@@ -118,6 +120,7 @@
    interaction='<div class="question">'+escapeText(q.q)+'</div>'+letters+'<label for="battle-text-answer">'+(q.type==='puzzle'?'Susun jawaban dari huruf di atas':'Ketik jawaban yang tepat')+'</label><input id="battle-text-answer" class="field" autocomplete="off" placeholder="Tulis jawabanmu..."><button class="btn" onclick="battleTextSubmit()">Kirim jawaban</button>';
   }else interaction='<div class="question">'+escapeText(q.q)+'</div>'+(q.a||[]).map((a,i)=>'<button class="btn '+(i===0?'':'secondary')+'" style="display:block;width:100%;text-align:left;margin:8px 0" onclick="battleLiveAnswer('+i+')">'+String.fromCharCode(65+i)+'. '+escapeText(a)+'</button>').join('');
   panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b>🎮 '+escapeText(room.game)+' · '+escapeText(room.mode==='team'?'Battle Tim':'Battle Individu')+'</b><b id="battle-live-timer">'+escapeText(timer)+'</b></div><p>Kesulitan: '+escapeText(room.level)+'</p><p><b>Soal '+(index+1)+' dari '+total+'</b> · Skor '+Number(mine.score||0)+'</p>'+readingPanel+intro+interaction+'<p class="muted">Jawabanmu tersimpan secara otomatis setelah dikirim.</p>'+(anyCompleted?'<div class="notice">🏆 Papan skor sementara telah dibuka.</div>'+scoreboard(room,live):'');
+  if(typeof setGameMusicActive==='function')setGameMusicActive(true);
  }
  function scoreboard(room,live){
   const all=live.progress||{},rows=Object.entries(all).map(([uid,p])=>({uid,p,elapsed:elapsed(p,live,Date.now())}));
