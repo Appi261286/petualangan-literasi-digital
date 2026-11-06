@@ -350,8 +350,8 @@ function playGameMusicTone(freq,when,duration,volume,type){
 function playGameMusicBeat(){
  if(!gameMusicContext||gameMusicContext.state!=='running')return;
  const now=gameMusicContext.currentTime,step=gameMusicStep%gameMusicNotes.length;
- playGameMusicTone(gameMusicNotes[step],now,0.42,0.035,'triangle');
- if(step%4===0)playGameMusicTone([130.81,146.83,164.81,146.83][Math.floor(step/4)],now,1.05,0.025,'sine');
+ playGameMusicTone(gameMusicNotes[step],now,0.50,0.14,'triangle');
+ if(step%4===0)playGameMusicTone([130.81,146.83,164.81,146.83][Math.floor(step/4)],now,1.05,0.075,'sine');
  gameMusicStep++;
 }
 async function startGameMusic(){
@@ -363,7 +363,11 @@ async function startGameMusic(){
   if(gameMusicContext.state!=='running')await gameMusicContext.resume();
   if(!gameMusicActive||!gameMusicWanted)return;
   if(gameMusicTimer===null){gameMusicStep=0;playGameMusicBeat();gameMusicTimer=setInterval(playGameMusicBeat,560);}
- }catch(e){}
+ }catch(e){
+  gameMusicWanted=false;
+  try{localStorage.setItem('literasiGameMusic','off');}catch(ignore){}
+  updateGameMusicButton();
+ }
 }
 function updateGameMusicButton(){
  const button=document.getElementById('game-music-toggle');if(!button)return;
