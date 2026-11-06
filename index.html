@@ -624,11 +624,11 @@ gameQuestionBanks["Misi Penyelamatan Buku"].push(
 
 let current=0,score=0,player='';
 function getScores(){try{return JSON.parse(localStorage.getItem('literasiScores')||'[]')}catch(e){return[]}}
-let teacherIFPContext=null,cloudGameResults=[],returnToIFPRoom=false;
+let teacherIFPContext=null,cloudGameResults=[],returnToIFPRoom=false,gameResultsSyncStatus='Menunggu koneksi Firebase.';
 function saveScore(name,points,game,extra){
  const record={name,points,game,date:new Date().toLocaleDateString('id-ID'),timestamp:Date.now(),mode:extra&&extra.mode||'Mandiri',sessionCode:extra&&extra.sessionCode||''};
  const s=getScores();s.unshift(record);try{localStorage.setItem('literasiScores',JSON.stringify(s.slice(0,100)));}catch(e){}
- if(onlineDb){onlineDb.ref('gameResults').push(record).catch(err=>{console.warn('Hasil belum tersinkron ke Firebase:',err.message);});}
+ if(onlineDb){onlineDb.ref('gameResults').push(record).then(()=>{gameResultsSyncStatus='Hasil terbaru berhasil dikirim ke Firebase.';if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();}).catch(err=>{gameResultsSyncStatus='Firebase menolak penyimpanan hasil: '+err.message;console.warn(gameResultsSyncStatus);if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();});}else{gameResultsSyncStatus='Firebase belum terhubung; hasil hanya tersimpan di perangkat ini.';}
  updateTeacher();if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();
 }
 function joinRoom(){
@@ -679,11 +679,11 @@ function openGameResults(){goScreen('screen-game-results');renderGameResults();}
 function renderGameResults(){
  const all=getAllGameResults(),filter=document.getElementById('ifp-result-filter')?.value||'',rows=filter?all.filter(r=>(r.mode||'Mandiri')===filter):all;
  document.getElementById('ifp-result-count').textContent=rows.length;document.getElementById('ifp-result-points').textContent=rows.reduce((n,r)=>n+(Number(r.points)||0),0);
- const status=document.getElementById('ifp-result-status');if(status)status.textContent=onlineDb?'Menampilkan hasil lokal dan data Firebase yang berhasil disinkronkan.':'Belum terhubung ke Firebase; hasil yang tampil berasal dari perangkat ini.';
+ const status=document.getElementById('ifp-result-status');if(status)status.textContent=gameResultsSyncStatus;
  const target=document.getElementById('ifp-result-table');if(!target)return;
  target.innerHTML=rows.length?'<table><thead><tr><th>Nama</th><th>Game</th><th>Mode</th><th>Skor</th><th>Tanggal</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+escapeHtml(r.name||'Pemain')+'</td><td>'+escapeHtml(r.game||'-')+'</td><td>'+escapeHtml(r.mode||'Mandiri')+'</td><td><b>'+Number(r.points||0)+'</b></td><td>'+escapeHtml(r.date||'-')+'</td></tr>').join('')+'</tbody></table>':'<p class="muted">Belum ada hasil permainan.</p>';
 }
-function watchGameResults(){if(!onlineDb)return;onlineDb.ref('gameResults').limitToLast(300).on('value',snap=>{const data=snap.val()||{};cloudGameResults=Object.values(data).filter(Boolean);updateTeacher();if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();},err=>{console.warn('Tidak dapat membaca rekap Firebase:',err.message);});}
+function watchGameResults(){if(!onlineDb){gameResultsSyncStatus='Firebase belum terhubung; hasil hanya tersimpan di perangkat ini.';return;}onlineDb.ref('gameResults').limitToLast(300).on('value',snap=>{const data=snap.val()||{};cloudGameResults=Object.values(data).filter(Boolean);gameResultsSyncStatus='Rekap Firebase tersambung.';updateTeacher();if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();},err=>{gameResultsSyncStatus='Tidak dapat membaca rekap Firebase: '+err.message;console.warn(gameResultsSyncStatus);if(document.getElementById('screen-game-results')&&!document.getElementById('screen-game-results').classList.contains('hidden'))renderGameResults();});}
 
 function showTeacher(){document.getElementById('teacher').classList.remove('hidden');updateTeacher()}
 function makeRoom(){const c='BACA'+Math.floor(100+Math.random()*900);document.getElementById('room-code').textContent=c+' (kode contoh)'}
