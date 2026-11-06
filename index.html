@@ -624,7 +624,7 @@ gameQuestionBanks["Misi Penyelamatan Buku"].push(
 
 let current=0,score=0,player='';
 function getScores(){try{return JSON.parse(localStorage.getItem('literasiScores')||'[]')}catch(e){return[]}}
-let teacherIFPContext=null,cloudGameResults=[];
+let teacherIFPContext=null,cloudGameResults=[],returnToIFPRoom=false;
 function saveScore(name,points,game,extra){
  const record={name,points,game,date:new Date().toLocaleDateString('id-ID'),timestamp:Date.now(),mode:extra&&extra.mode||'Mandiri',sessionCode:extra&&extra.sessionCode||''};
  const s=getScores();s.unshift(record);try{localStorage.setItem('literasiScores',JSON.stringify(s.slice(0,100)));}catch(e){}
@@ -2074,7 +2074,7 @@ function finishGame(reason){
  const max=gameSession.items.length*20;
  const area=document.getElementById('quiz-area');
  area.innerHTML='<div class="notice"><h3>🎉 '+(reason||'Permainan selesai!')+'</h3><p>Nama pemain: <b>'+escapeHtml(player)+'</b></p><p>Skor akhir: <b>'+gameSession.score+' / '+max+'</b></p><p>Jawaban benar: '+Math.round(gameSession.score/20)+' dari '+gameSession.items.length+' tantangan.</p></div><button class="btn" onclick="startGame(\''+escapeHtml(gameSession.name).replace(/'/g,"\\'")+'\')">Main lagi</button> <button class="btn secondary" onclick="closeGame()">Kembali</button>';
- score=gameSession.score;saveScore(player,score,gameSession.name,{mode:teacherIFPContext?'IFP':'Mandiri',sessionCode:teacherIFPContext&&teacherIFPContext.code||''});teacherIFPContext=null;
+ score=gameSession.score;returnToIFPRoom=!!teacherIFPContext;saveScore(player,score,gameSession.name,{mode:teacherIFPContext?'IFP':'Mandiri',sessionCode:teacherIFPContext&&teacherIFPContext.code||''});teacherIFPContext=null;
 }
 function renderQuestion(){
  if(!gameSession||gameSession.finished)return;
@@ -2170,7 +2170,7 @@ function nextStoryChallenge(){
  gameSession.index++;gameSession.order=[];gameSession.answered=false;renderQuestion();
 }
 function resetQuiz(){if(!gameSession)return;if(!confirmGameProgressExit('mengulang permainan'))return;startGameAtLevel(gameSession.name,gameSession.level);}
-function closeGame(){if(!confirmGameProgressExit('menutup permainan'))return;stopGameClock();setGameMusicActive(false);document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';}
+function closeGame(){if(!confirmGameProgressExit('menutup permainan'))return;const backToIFP=!!teacherIFPContext||returnToIFPRoom;teacherIFPContext=null;returnToIFPRoom=false;stopGameClock();setGameMusicActive(false);document.getElementById('play').classList.add('hidden');document.getElementById('play').style.display='none';if(backToIFP)goScreen('screen-teacher-ifp');}
 
 </script>
 <script src="battle-engine.js"></script>
