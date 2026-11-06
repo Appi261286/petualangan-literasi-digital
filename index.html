@@ -151,11 +151,22 @@ main{margin:7px auto;padding:0 12px 24px}
   <div class="screen-heading"><span>🖥️ RUANG KHUSUS IFP</span><h1 class="ifp-title">Ruang Guru / Uji Siswa</h1><p>Atur kegiatan pengujian langsung dari layar sentuh IFP. Tidak memerlukan akun atau HP guru.</p></div>
   <div class="ifp-grid">
    <div class="ifp-card"><h2>🎯 Atur permainan</h2>
-    <label for="ifp-game">Jenis permainan</label><select id="ifp-game" class="field"><option>Petualangan Literasi</option><option>Duel Kuis Literasi</option><option>Tebak Kata</option><option>Susun Cerita</option><option>Detektif Bacaan</option><option>Puzzle Literasi</option><option>Battle Literasi</option><option>Misi Penyelamatan Buku</option></select>
-    <label for="ifp-level">Tingkat kesulitan</label><select id="ifp-level" class="field"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Menantang">Menantang</option></select>
-    <label for="ifp-player">Nama siswa / kelompok</label><input id="ifp-player" class="field" maxlength="40" placeholder="Contoh: Kelompok 1 atau Siswa 1">
-    <p class="muted">Tahap awal menggunakan lima soal sesuai pengaturan mesin game yang sudah ada. Pengaturan jumlah soal lanjutan akan diselaraskan setelah seluruh mode terintegrasi.</p>
-    <button class="btn ifp-action" style="width:100%" onclick="startTeacherIFPGame()">▶ Mulai Uji Siswa</button>
+    <label for="ifp-mode">Mode uji</label><select id="ifp-mode" class="field" onchange="toggleIFPModeFields()"><option value="individual">Uji individu / bergiliran</option><option value="team">Battle dua tim</option></select>
+    <div id="ifp-individual-fields">
+     <label for="ifp-game">Jenis permainan</label><select id="ifp-game" class="field"><option>Petualangan Literasi</option><option>Duel Kuis Literasi</option><option>Tebak Kata</option><option>Susun Cerita</option><option>Detektif Bacaan</option><option>Puzzle Literasi</option><option>Battle Literasi</option><option>Misi Penyelamatan Buku</option></select>
+     <label for="ifp-level">Tingkat kesulitan</label><select id="ifp-level" class="field"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Menantang">Menantang</option></select>
+     <label for="ifp-player">Nama siswa / kelompok</label><input id="ifp-player" class="field" maxlength="40" placeholder="Contoh: Kelompok 1 atau Siswa 1">
+    </div>
+    <div id="ifp-team-fields" class="hidden">
+     <div class="notice">Battle IFP saat ini menggunakan dua tim saja. Kedua tim bermain bergantian pada satu layar IFP.</div>
+     <label for="ifp-team-one">Nama Tim 1</label><input id="ifp-team-one" class="field" maxlength="30" value="Tim Merah">
+     <label for="ifp-team-one-members">Anggota Tim 1 (pisahkan dengan koma)</label><textarea id="ifp-team-one-members" class="field" rows="2" placeholder="Alya, Bima, Citra"></textarea>
+     <label for="ifp-team-two">Nama Tim 2</label><input id="ifp-team-two" class="field" maxlength="30" value="Tim Biru">
+     <label for="ifp-team-two-members">Anggota Tim 2 (pisahkan dengan koma)</label><textarea id="ifp-team-two-members" class="field" rows="2" placeholder="Dodi, Eka, Fani"></textarea>
+     <label for="ifp-team-answer">Cara menjawab</label><select id="ifp-team-answer" class="field"><option value="individual">Anggota bergiliran menjawab</option><option value="team">Tim berdiskusi, satu jawaban</option></select>
+    </div>
+    <p class="muted">Uji individu menggunakan lima soal dari bank game yang dipilih. Battle dua tim menggunakan mesin Battle Literasi yang sudah tersedia.</p>
+    <button class="btn ifp-action" style="width:100%" onclick="startTeacherIFPActivity()">▶ Mulai Uji di IFP</button>
    </div>
    <div class="ifp-card"><h2>🧑‍🏫 Kendali kegiatan</h2><div class="notice">Gunakan layar IFP sebagai pusat tampilan dan kendali. Siswa maju bergantian untuk menjawab melalui layar sentuh.</div>
     <div class="ifp-stat"><span>Mode: Individu / bergiliran</span><span>Perangkat: IFP</span><span>Login: Tidak diperlukan</span></div>
@@ -168,7 +179,7 @@ main{margin:7px auto;padding:0 12px 24px}
   <button class="back-link" onclick="goScreen('screen-home')">← Halaman utama</button>
   <div class="screen-heading"><span>🏆 REKAP HASIL</span><h1 class="ifp-title">Pusat Hasil Permainan</h1><p>Rekap hasil yang tersimpan pada perangkat ini dan hasil daring yang berhasil disinkronkan.</p></div>
   <div class="ifp-card"><div class="ifp-stat"><span>Jumlah hasil: <b id="ifp-result-count">0</b></span><span>Total poin: <b id="ifp-result-points">0</b></span></div>
-   <label for="ifp-result-filter">Filter jenis permainan</label><select id="ifp-result-filter" class="field" onchange="renderGameResults()"><option value="">Semua permainan</option><option value="Mandiri">Main Sendiri</option><option value="IFP">Uji Siswa IFP</option><option value="Battle">Battle</option></select>
+   <label for="ifp-result-filter">Filter jenis permainan</label><select id="ifp-result-filter" class="field" onchange="renderGameResults()"><option value="">Semua permainan</option><option value="Mandiri">Main Sendiri</option><option value="IFP">Uji Siswa IFP</option><option value="Battle">Battle</option><option value="IFP-Battle">Battle IFP</option></select>
    <div id="ifp-result-status" class="notice">Memuat hasil permainan...</div><div id="ifp-result-table" class="ifp-results"></div>
   </div>
  </section>
@@ -641,7 +652,21 @@ function joinRoom(){
 }
 
 function openIFPRoom(){goScreen('screen-teacher-ifp');const input=document.getElementById('ifp-player');if(input)input.focus();}
-function startTeacherIFPGame(){
+
+function toggleIFPModeFields(){const team=document.getElementById('ifp-mode').value==='team';document.getElementById('ifp-individual-fields').classList.toggle('hidden',team);document.getElementById('ifp-team-fields').classList.toggle('hidden',!team);}
+function startTeacherIFPActivity(){if(document.getElementById('ifp-mode').value==='team'){startTeacherIFPBattle();return;}startTeacherIFPGame();}
+function startTeacherIFPBattle(){
+ const t1=document.getElementById('ifp-team-one').value.trim()||'Tim Merah',t2=document.getElementById('ifp-team-two').value.trim()||'Tim Biru';
+ const m1=document.getElementById('ifp-team-one-members').value.split(',').map(x=>x.trim()).filter(Boolean),m2=document.getElementById('ifp-team-two-members').value.split(',').map(x=>x.trim()).filter(Boolean);
+ if(!m1.length||!m2.length){alert('Masukkan minimal satu anggota untuk setiap tim.');return;}
+ if(gameSession&&!gameSession.finished&&!confirmGameProgressExit('memulai Battle IFP'))return;
+ teacherIFPContext={mode:'IFP-Battle',startedAt:Date.now(),code:'IFP-BTL-'+Date.now().toString(36).toUpperCase()};
+ document.getElementById('battle-mode').value='team';document.getElementById('battle-players').value=t1+' | '+m1.join(', ')+'\\n'+t2+' | '+m2.join(', ');
+ document.getElementById('team-answer-mode').value=document.getElementById('ifp-team-answer').value;
+ document.getElementById('battle-count').value='5';document.getElementById('battle-seconds').value='30';document.getElementById('battle-level').value=document.getElementById('ifp-level')?.value||'Mudah';
+ goScreen('screen-battle');startBattle();
+}
+\nfunction startTeacherIFPGame(){
  const game=document.getElementById('ifp-game').value,level=document.getElementById('ifp-level').value,name=document.getElementById('ifp-player').value.trim();
  if(!name){alert('Isi nama siswa atau kelompok terlebih dahulu.');document.getElementById('ifp-player').focus();return;}
  if(gameSession&&!gameSession.finished&&!confirmGameProgressExit('memulai uji siswa baru'))return;
@@ -1020,7 +1045,8 @@ function startBattle(){
   lines.forEach(name=>entities.push({name, members:[],score:0,time:0}));
  }
  if(entities.length<2){alert('Masukkan minimal dua peserta atau dua tim untuk memulai battle.');return}
- if(mode==='team'&&entities.length>8){alert('Untuk uji coba, maksimal 8 tim.');return}
+ if(mode==='team'&&teacherIFPContext&&entities.length!==2){alert('Battle IFP harus tepat dua tim.');return}
+ if(mode==='team'&&!teacherIFPContext&&entities.length>8){alert('Untuk uji coba, maksimal 8 tim.');return}
  if(mode==='individual'&&entities.length>30){alert('Untuk uji coba, maksimal 30 peserta.');return}
  const count=Number(document.getElementById('battle-count').value);
  const available=Math.min(count,questions.length);
@@ -1096,7 +1122,7 @@ function finishBattle(){
  document.getElementById('battle-play-area').classList.add('hidden');
  const board=document.getElementById('battle-scoreboard');board.classList.remove('hidden');
  board.innerHTML='<h2>🏆 Papan Peringkat</h2><p class="muted">Ruang '+document.getElementById('battle-room').value+' • '+(battleState.mode==='team'?'Battle Antartim — '+(battleState.answerMode==='individual'?'anggota menjawab sendiri':'diskusi tim'):'Battle Individu')+'</p><table class="battle-score-table"><thead><tr><th>Rank</th><th>Peserta / Tim</th><th>Skor</th><th>Waktu</th><th>Bintang</th></tr></thead><tbody>'+rows+'</tbody></table><p class="muted small-note">Peringkat ditentukan dari skor tertinggi. Jika skor sama, waktu total tercepat menang.</p><button class="btn" onclick="goScreen(&quot;screen-battle&quot;);document.getElementById(&quot;battle-scoreboard&quot;).classList.add(&quot;hidden&quot;)">Atur pertandingan baru</button>';
- ranked.forEach(p=>saveScore(p.name,p.score,'Battle Literasi',{mode:'Battle'}));
+ ranked.forEach(p=>saveScore(p.name,p.score,'Battle Literasi',{mode:teacherIFPContext?'IFP-Battle':'Battle'}));if(teacherIFPContext)teacherIFPContext=null;
  board.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
