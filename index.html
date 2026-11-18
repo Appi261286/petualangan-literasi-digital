@@ -67,7 +67,22 @@ body>main>.hero,body>main>#mode-bermain,body>main>#daftar-game,body>main>section
 .cloze-promo{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:22px;padding:22px;background:linear-gradient(120deg,#fff5dc,#f1eafe);border:1px solid #f0dfb5;border-radius:20px}.cloze-promo h2{margin:7px 0;font-size:21px}.cloze-promo p{margin:0;color:var(--muted);line-height:1.5}
 .cloze-card{max-width:850px;margin:18px auto;background:white;border:1px solid var(--line);border-radius:22px;padding:clamp(17px,4vw,30px);box-shadow:0 8px 25px #17324d0d}.cloze-story-heading{padding:18px;background:#f1f8f6;border-radius:16px;margin-bottom:20px}.cloze-story-heading span{font-size:12px;letter-spacing:1px;font-weight:800;color:var(--teal)}.cloze-story-heading h2{margin:8px 0}.cloze-story-heading p{margin:0}
 .cloze-story-text{font-size:18px;line-height:2.2}.cloze-blank{display:inline-block;width:min(155px,30vw);padding:5px 8px;border:2px dashed #91b9b4;border-radius:9px;font:inherit;font-size:16px;background:#fbfefd;color:var(--ink);vertical-align:middle}.cloze-blank:focus{outline:3px solid #bde4dc;border-color:var(--teal)}.cloze-blank.correct{border:2px solid #16845b;background:#e9f8ef}.cloze-blank.wrong{border:2px solid #c65b50;background:#fff0ed}.cloze-hint{display:block;font-size:12px;color:var(--muted);line-height:1.3;margin:1px 0 8px}
-.cloze-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.cloze-feedback{margin-top:15px;font-weight:650;line-height:1.6}.cloze-elements{margin:24px 0 8px;padding:18px;border:1px solid #b9d9d4;border-radius:16px;background:linear-gradient(135deg,#f0faf7,#fffdf4)}.cloze-elements h3{margin:0 0 8px;color:var(--teal)}.cloze-elements>p{margin:0 0 12px;font-size:14px}.cloze-element{padding:10px 12px;margin:9px 0;background:#fff;border-left:4px solid #62aaa0;border-radius:9px}.cloze-element strong{display:block;margin-bottom:3px;color:#236b65}.cloze-element p{margin:0;font-size:14px;line-height:1.6}..cloze-feedback:empty{display:none}@media(max-width:600px){.cloze-promo{align-items:flex-start;flex-direction:column}.cloze-story-text{font-size:16px;line-height:2.3}.cloze-blank{width:min(125px,34vw);font-size:15px}}
+.cloze-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.cloze-feedback{margin-top:15px;font-weight:650;line-height:1.6}.cloze-elements{margin:24px 0 8px;padding:18px;border:1px solid #b9d9d4;border-radius:16px;background:linear-gradient(135deg,#f0faf7,#fffdf4)}.cloze-elements h3{margin:0 0 8px;color:var(--teal)}.cloze-elements>p{margin:0 0 12px;font-size:14px}.cloze-element{padding:10px 12px;margin:9px 0;background:#fff;border-left:4px solid #62aaa0;border-radius:9px}.cloze-element strong{display:block;margin-bottom:3px;color:#236b65}.cloze-element p{margin:0;font-size:14px;line-height:1.6}..cloze-feedback:empty{display:none}
+/* Form refleksi unsur cerita rakyat */
+.cloze-elements-form{display:grid;grid-template-columns:1fr;gap:12px;margin:16px 0}
+.cloze-element-field{display:block;padding:12px;background:#fff;border:1px solid #d7e6e2;border-radius:10px}
+.cloze-element-field strong{display:block;margin-bottom:7px;color:#236b65}
+.cloze-element-field textarea{display:block;width:100%;min-height:64px;resize:vertical;box-sizing:border-box;padding:10px;border:1px solid #cbd8d5;border-radius:8px;font:inherit;line-height:1.5}
+.cloze-elements-results{margin-top:18px;padding-top:14px;border-top:1px solid #c9ddd8}
+.cloze-elements-results h4{margin:0 0 7px;color:var(--teal)}
+.cloze-element-compare{margin:12px 0;padding:12px;background:#fff;border:1px solid #d7e6e2;border-radius:10px}
+.cloze-element-compare h5{margin:0 0 9px;color:#236b65;font-size:15px}
+.cloze-compare-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cloze-compare-answer,.cloze-compare-reference{min-width:0;padding:10px;border-radius:8px;background:#f7faf9}
+.cloze-compare-answer strong,.cloze-compare-reference strong{display:block;margin-bottom:5px;font-size:13px}
+.cloze-compare-answer p,.cloze-compare-reference p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6}
+@media(max-width:600px){.cloze-compare-columns{grid-template-columns:1fr}}
+@media(max-width:600px){.cloze-promo{align-items:flex-start;flex-direction:column}.cloze-story-text{font-size:16px;line-height:2.3}.cloze-blank{width:min(125px,34vw);font-size:15px}}
 
 
 .battle-team-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}
@@ -1425,14 +1440,10 @@ function renderClozeStory(){
  const picker=document.getElementById('cloze-story-select');if(picker)picker.value=String(activeClozeStory);
  const storyOptions=clozeStoryLibrary.map((item,i)=>'<option value="'+i+'">'+escapeHtml(item.title)+'</option>').join('');
  if(picker){picker.innerHTML=storyOptions;picker.value=String(activeClozeStory);}
- const elements=clozeStoryElements[story.title]||{};
- const elementLabels=[['Tema','tema'],['Tokoh','tokoh'],['Watak tokoh','watak'],['Latar','latar'],['Alur','alur'],['Konflik','konflik'],['Amanat','amanat']];
- const elementHtml='<section class="cloze-elements"><h3>📖 Mengenal Unsur Cerita</h3><p>Perhatikan unsur-unsur yang membangun cerita <strong>'+escapeHtml(story.title)+'</strong>. Contohnya diambil dari bacaan di atas.</p>'+elementLabels.map(([label,key])=>elements[key]?'<div class="cloze-element"><strong>'+label+'</strong><p>'+escapeHtml(elements[key])+'</p></div>':'').join('')+'</section>';
- el.innerHTML='<p class="cloze-story-intro">'+escapeHtml(story.intro)+'</p>'+items.map((item,i)=>'<p class="cloze-story-paragraph">'+escapeHtml(item.before)+'<input class="cloze-blank" type="text" data-cloze-index="'+i+'" aria-label="Kata yang hilang nomor '+(i+1)+'" autocomplete="off" placeholder="Kata '+(i+1)+'"><span class="cloze-hint">Petunjuk: '+escapeHtml(item.hint)+'</span>'+escapeHtml(item.after)+'</p>').join('');
  const elementsPanel=document.getElementById('cloze-elements-panel');
  const elementsButton=document.getElementById('cloze-elements-button');
- if(elementsPanel){elementsPanel.innerHTML=elementHtml;elementsPanel.classList.add('hidden');}
- if(elementsButton){elementsButton.textContent='📖 Tampilkan Unsur Cerita';elementsButton.setAttribute('aria-expanded','false');}
+ if(elementsPanel){elementsPanel.innerHTML='';elementsPanel.classList.add('hidden');}
+ if(elementsButton){elementsButton.textContent='✍️ Isi Unsur Cerita';elementsButton.setAttribute('aria-expanded','false');}
  document.getElementById('cloze-feedback').textContent='';
 }
 function toggleClozeElements(){
@@ -1440,9 +1451,27 @@ function toggleClozeElements(){
  const button=document.getElementById('cloze-elements-button');
  if(!panel||!button)return;
  const show=panel.classList.contains('hidden');
- panel.classList.toggle('hidden',!show);
- button.textContent=show?'🙈 Sembunyikan Unsur Cerita':'📖 Tampilkan Unsur Cerita';
- button.setAttribute('aria-expanded',String(show));
+ if(show){
+  const story=clozeStoryLibrary[activeClozeStory];
+  const labels=[['Tema','tema'],['Tokoh','tokoh'],['Watak tokoh','watak'],['Latar','latar'],['Alur','alur'],['Konflik','konflik'],['Amanat','amanat']];
+  panel.innerHTML='<section class="cloze-elements"><h3>✍️ Tulis Unsur Cerita</h3><p>Bacalah kembali cerita <strong>'+escapeHtml(story.title)+'</strong>. Tuliskan pendapatmu pada setiap kotak. Jawaban acuan baru akan terlihat setelah kamu menekan tombol Bandingkan Jawaban.</p><div class="cloze-elements-form">'+labels.map(([label,key])=>'<label class="cloze-element-field"><strong>'+label+'</strong><textarea data-element-answer="'+key+'" rows="2" placeholder="Tuliskan jawabanmu tentang '+label.toLocaleLowerCase('id-ID')+'..."></textarea></label>').join('')+'</div><button class="btn" type="button" onclick="compareClozeElements()">Bandingkan Jawaban</button><div id="cloze-elements-comparison" aria-live="polite"></div></section>';
+  panel.classList.remove('hidden');
+  button.textContent='🙈 Sembunyikan Unsur Cerita';
+  button.setAttribute('aria-expanded','true');
+ }else{
+  panel.classList.add('hidden');
+  button.textContent='✍️ Isi Unsur Cerita';
+  button.setAttribute('aria-expanded','false');
+ }
+}
+function compareClozeElements(){
+ const panel=document.getElementById('cloze-elements-panel');
+ const result=document.getElementById('cloze-elements-comparison');
+ if(!panel||!result)return;
+ const story=clozeStoryLibrary[activeClozeStory];
+ const elements=clozeStoryElements[story.title]||{};
+ const labels=[['Tema','tema'],['Tokoh','tokoh'],['Watak tokoh','watak'],['Latar','latar'],['Alur','alur'],['Konflik','konflik'],['Amanat','amanat']];
+ result.innerHTML='<div class="cloze-elements-results"><h4>🔎 Hasil Perbandingan</h4><p>Bandingkan jawabanmu dengan acuan. Jawabanmu tidak harus sama persis karena dapat ditulis dengan kalimat sendiri.</p>'+labels.map(([label,key])=>{const field=panel.querySelector('[data-element-answer="'+key+'"]');const answer=field?field.value.trim():'';const reference=elements[key]||'Acuan untuk unsur ini belum tersedia.';return '<div class="cloze-element-compare"><h5>'+label+'</h5><div class="cloze-compare-columns"><div class="cloze-compare-answer"><strong>Jawaban Saya</strong><p>'+(answer?escapeHtml(answer):'<em>Belum diisi.</em>')+'</p></div><div class="cloze-compare-reference"><strong>Jawaban Acuan</strong><p>'+escapeHtml(reference)+'</p></div></div></div>';}).join('')+'</div>';
 }
 function checkClozeAnswers(){
  const items=getActiveClozeItems(),inputs=[...document.querySelectorAll('[data-cloze-index]')];let score=0;
